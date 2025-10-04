@@ -1,0 +1,16 @@
+appId: com.example.audiopie
+productName: AudioPie
+files:
+  - dist/**/*
+  - package.json
+mac:
+  category: public.app-category.music
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+    - deb
+extraResources:
+  - assets/icon.png

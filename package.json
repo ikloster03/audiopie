@@ -1,0 +1,30 @@
+{
+  "name": "audio-pie",
+  "version": "0.1.0",
+  "description": "AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.",
+  "license": "MIT",
+  "main": "dist/main/main.js",
+  "author": "",
+  "scripts": {
+    "dev": "concurrently \"npm:watch-main\" \"npm:watch-renderer\" \"npm:copy-static:watch\" \"npm:start\"",
+    "watch-main": "tsc -p tsconfig.json -w --pretty",
+    "watch-renderer": "tsc -p tsconfig.json -w --pretty",
+    "copy-static": "node scripts/copy-static.js",
+    "copy-static:watch": "node scripts/copy-static.js --watch",
+    "start": "electron .",
+    "build": "npm run copy-static && tsc -p tsconfig.json && electron-builder"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/sortablejs": "^1.15.8",
+    "concurrently": "^9",
+    "electron": "^31",
+    "electron-builder": "^24",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "electron-store": "^9",
+    "execa": "^9",
+    "sortablejs": "^1"
+  }
+}
