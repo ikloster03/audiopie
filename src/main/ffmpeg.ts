@@ -1,12 +1,12 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { execa } from 'execa';
-import type { Subprocess } from 'execa';
+import execa from 'execa';
+import type { ExecaChildProcess } from 'execa';
 import { BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 import { resolveBinary, getDefaultTempDir } from './settings';
 
-let currentProcess: Subprocess | null = null;
+let currentProcess: ExecaChildProcess | null = null;
 let cancelRequested = false;
 let libfdkAvailable: boolean | null = null;
 
@@ -111,7 +111,7 @@ const parseFfmpegTime = (line: string): number | undefined => {
   return Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
 };
 
-const attachLogging = (child: Subprocess, logPath: string) => {
+const attachLogging = (child: ExecaChildProcess, logPath: string) => {
   const stream = fs.createWriteStream(logPath, { flags: 'a' });
   child.stdout?.on('data', (chunk: Buffer) => stream.write(chunk));
   child.stderr?.on('data', (chunk: Buffer) => stream.write(chunk));

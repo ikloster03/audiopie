@@ -12,5 +12,7 @@ linux:
   target:
     - AppImage
     - deb
+  executableArgs:
+    - --no-sandbox
 extraResources:
   - assets/icon.png
