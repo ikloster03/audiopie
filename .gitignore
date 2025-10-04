@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Electron-builder output
+*.app
+*.exe
+*.dmg
+*.AppImage
+*.deb
+release/
