@@ -1,0 +1,41 @@
+{
+  "appId": "com.example.audiopie",
+  "productName": "AudioPie",
+  "asar": true,
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": ["dist", "dist-electron"],
+  "mac": {
+    "artifactName": "${productName}_${version}.${ext}",
+    "target": ["dmg"],
+    "category": "public.app-category.music"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "artifactName": "${productName}_${version}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "artifactName": "${productName}_${version}.${ext}",
+    "category": "Audio"
+  },
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": ".",
+      "filter": ["**/*"]
+    }
+  ]
+}

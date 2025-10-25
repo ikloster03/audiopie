@@ -1,5 +1,5 @@
 import React from 'react';
-import type { BookMetadata } from '../../main/types';
+import type { BookMetadata } from '../types';
 import { useAppContext } from '../context/AppContext';
 
 interface MetadataField {

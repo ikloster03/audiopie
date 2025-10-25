@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Sortable from 'sortablejs';
-import type { TrackInfo } from '../../main/types';
+import type { TrackInfo } from '../types';
 import { useAppContext } from '../context/AppContext';
 
 interface TrackItemProps {

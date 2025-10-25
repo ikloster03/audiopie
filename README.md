@@ -1,42 +1,75 @@
 # AudioPie
 
-AudioPie is a cross-platform Electron application for crafting `.m4b` audiobooks from a list of `.mp3` tracks. The app lets you edit audiobook metadata, manage chapter timing, and run FFmpeg/FFprobe pipelines from a friendly desktop UI.
+AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.
+
+## Features
+
+- 🎵 Convert MP3 tracks to M4B audiobook format
+- 📖 Edit chapters with drag & drop
+- 🎨 Metadata editing support
+- 🔧 FFmpeg integration
+- 💾 Project save/load functionality
 
 ## Tech Stack
 
-- **Electron** - Desktop application framework
-- **React 18** - UI library with modern hooks
-- **TypeScript** - Type-safe development
-- **Vite** - Fast build tool and dev server
-- **electron-vite** - Electron-optimized Vite configuration
-- **Sortable.js** - Drag & drop functionality
+- ⚡️ **Vite** - Next generation frontend tooling
+- ⚛️ **React 18** - UI framework
+- 🖥 **Electron** - Cross-platform desktop apps
+- 📘 **TypeScript** - Type safety
+- 🎨 **CSS** - Styling
 
-## Requirements
+## Project Structure
 
-- Node.js 18+
-- FFmpeg and FFprobe available in `PATH` or configured inside the app settings
+```
+├── electron/          # Electron main & preload processes
+│   ├── main/         # Main process
+│   └── preload/      # Preload scripts
+├── src/              # React application (renderer)
+│   ├── components/   # React components
+│   ├── context/      # React context
+│   └── styles/       # CSS styles
+├── public/           # Static assets
+├── build/            # App icons
+└── assets/           # Additional resources (FFmpeg, etc.)
+```
 
-## Getting started
+## Development
+
+### Install dependencies
 
 ```bash
 npm install
+```
+
+### Start development server
+
+```bash
 npm run dev
 ```
 
-The `dev` script starts electron-vite dev server with hot module replacement (HMR) for the renderer process and hot reloading for the main process.
-
-## Building installers
+### Build for production
 
 ```bash
 npm run build
 ```
 
-Electron Builder generates distributable packages for Windows, macOS, and Linux inside the `dist/` directory.
+The built application will be in the `release/{version}` directory.
 
-## Project format
+## Scripts
 
-Projects can be saved to and restored from `.audiopie.json` files. They store track order, chapter definitions, and all metadata fields, allowing you to pause and resume work effortlessly.
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build application for production
+- `npm run preview` - Preview production build
+
+## Requirements
+
+- Node.js >= 18.0.0
+- npm or yarn
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details
+
+## Author
+
+Ivan Monastyrev (i@ikloster.ru)

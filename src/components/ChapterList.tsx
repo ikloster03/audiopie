@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Chapter } from '../../main/types';
+import type { Chapter } from '../types';
 import { useAppContext } from '../context/AppContext';
 
 interface ChapterRowProps {

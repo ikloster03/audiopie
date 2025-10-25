@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { AppSettings } from '../../main/types';
+import type { AppSettings } from '../types';
 import { useAppContext } from '../context/AppContext';
 
 interface SettingsDialogProps {

@@ -1,35 +1,38 @@
 {
-  "name": "audio-pie",
+  "name": "audiopie",
+  "private": true,
   "version": "0.1.0",
-  "description": "AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.",
+  "description": "AudioPie - build m4b audiobooks from mp3 tracks with chapter editing",
   "license": "MIT",
-  "main": "dist-electron/main/main.js",
   "author": {
     "name": "Ivan Monastyrev",
     "email": "i@ikloster.ru"
   },
+  "main": "dist-electron/main/main.js",
   "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build && electron-builder",
-    "preview": "electron-vite preview"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
-    "@types/sortablejs": "^1.15.8",
-    "@vitejs/plugin-react": "^4.2.1",
-    "electron": "^31",
-    "electron-builder": "^24",
-    "electron-vite": "^2.0.0",
-    "typescript": "^5",
-    "vite": "^5.2.8"
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "electron-store": "^8.2.0",
     "execa": "^5.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "sortablejs": "^1"
+    "sortablejs": "^1.15.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/sortablejs": "^1.15.8",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^31.2.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.3",
+    "vite-plugin-electron": "^0.28.7",
+    "vite-plugin-electron-renderer": "^0.14.5"
   }
 }

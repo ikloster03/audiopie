@@ -8,7 +8,7 @@ import { initializeBinaries } from './settings';
 const isDev = !app.isPackaged;
 
 const createWindow = async () => {
-  const preloadPath = path.join(__dirname, '..', 'preload', 'preload.js');
+  const preloadPath = path.join(__dirname, '../preload/preload.js');
   
   // Проверяем наличие иконки
   const iconPath = path.join(app.getAppPath(), 'assets', 'icon.png');
@@ -29,10 +29,11 @@ const createWindow = async () => {
   registerIpcHandlers(mainWindow);
 
   // In dev mode, load from Vite dev server
-  if (isDev && process.env.ELECTRON_RENDERER_URL) {
-    await mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
+  if (isDev) {
+    const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:3000';
+    await mainWindow.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    const htmlPath = path.join(__dirname, '..', 'renderer', 'index.html');
+    const htmlPath = path.join(__dirname, '../renderer/index.html');
     await mainWindow.loadFile(htmlPath);
   }
 

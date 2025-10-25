@@ -5,7 +5,7 @@ import { MetadataForm } from './components/MetadataForm';
 import { ProgressModal } from './components/ProgressModal';
 import { SettingsDialog } from './components/SettingsDialog';
 import { useAppContext } from './context/AppContext';
-import type { BuildOptions } from '../main/types';
+import type { BuildOptions } from './types';
 
 export const App: React.FC = () => {
   const { tracks, setTracks, setChapters, metadata, settings } = useAppContext();

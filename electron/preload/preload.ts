@@ -9,7 +9,7 @@ ipcRenderer.on('build/onProgress', (_event: IpcRendererEvent, progress: BuildPro
   progressListeners.forEach((listener) => listener(progress));
 });
 
-contextBridge.exposeInMainWorld('audioPie', {
+const audioPieAPI = {
   tracks: {
     selectFiles: (): Promise<string[]> => ipcRenderer.invoke('tracks/selectFiles'),
     addFromPaths: (paths: string[]): Promise<TrackInfo[]> => ipcRenderer.invoke('tracks/addFromPaths', paths),
@@ -33,7 +33,9 @@ contextBridge.exposeInMainWorld('audioPie', {
       ipcRenderer.invoke('build/selectOutput', { directory, fileName }),
     onProgress: (listener: ProgressListener) => {
       progressListeners.add(listener);
-      return () => progressListeners.delete(listener);
+      return () => {
+        progressListeners.delete(listener);
+      };
     },
   },
   project: {
@@ -44,41 +46,12 @@ contextBridge.exposeInMainWorld('audioPie', {
     get: (): Promise<AppSettings> => ipcRenderer.invoke('settings/get'),
     set: (partial: Partial<AppSettings>): Promise<AppSettings> => ipcRenderer.invoke('settings/set', partial),
   },
-});
+};
+
+contextBridge.exposeInMainWorld('audioPie', audioPieAPI);
 
 declare global {
   interface Window {
-    audioPie: {
-      tracks: {
-        selectFiles(): Promise<string[]>;
-        addFromPaths(paths: string[]): Promise<TrackInfo[]>;
-        reorder(newOrder: number[]): Promise<void>;
-        remove(indexes: number[]): Promise<void>;
-        updateTitle(index: number, title: string): Promise<TrackInfo | undefined>;
-      };
-      metadata: {
-        get(): Promise<BookMetadata>;
-        set(partial: Partial<BookMetadata>): Promise<void>;
-        selectCover(): Promise<string | undefined>;
-      };
-      chapters: {
-        autoFromTracks(): Promise<Chapter[]>;
-        update(chapters: Chapter[]): Promise<void>;
-      };
-      build: {
-        start(options: BuildOptions): Promise<void>;
-        cancel(): Promise<void>;
-        selectOutput(directory?: string, fileName?: string): Promise<string | undefined>;
-        onProgress(listener: ProgressListener): () => void;
-      };
-      project: {
-        save(path?: string): Promise<void>;
-        open(): Promise<{ tracks: TrackInfo[]; chapters: Chapter[]; metadata: BookMetadata }>;
-      };
-      settings: {
-        get(): Promise<AppSettings>;
-        set(partial: Partial<AppSettings>): Promise<AppSettings>;
-      };
-    };
+    audioPie: typeof audioPieAPI;
   }
 }
