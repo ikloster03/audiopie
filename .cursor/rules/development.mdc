@@ -1,0 +1,156 @@
+---
+alwaysApply: false
+---
+
+# Development & Build Configuration
+
+## Build System
+
+### Vite & electron-vite
+- Use electron-vite for optimized Electron builds
+- Keep renderer code separate from main process code
+- Use proper asset handling for production builds
+- Configure proper externals for Electron dependencies
+- HMR enabled for renderer process in development
+
+### Development Workflow
+```bash
+npm run dev      # Start with HMR (renderer) and hot reload (main)
+npm run build    # Build and package with electron-builder
+npm run preview  # Preview production build
+```
+
+### Debugging
+- **Renderer**: Use Chrome DevTools (auto-opens in dev mode)
+- **Main Process**: Use VS Code debugger or Chrome DevTools remote
+- Check console for errors in both processes
+- Use `console.error()` for error logging in development
+
+## Error Handling
+
+### Best Practices
+- Always handle errors in async operations with try-catch
+- Provide user-friendly error messages (never expose stack traces)
+- Log errors appropriately:
+  - Development: `console.error()` with full details
+  - Production: Implement proper logging (file/service)
+- Never expose internal errors or paths to users
+- Validate all inputs before processing
+
+**Example:**
+```typescript
+try {
+  const result = await riskyOperation();
+  return result;
+} catch (error) {
+  console.error('Operation failed:', error);
+  throw new Error('User-friendly message describing what went wrong');
+}
+```
+
+### IPC Error Handling
+- Catch errors in IPC handlers
+- Return meaningful error messages
+- Handle errors in renderer when calling IPC methods
+- Show user feedback (toast, modal, alert) on errors
+
+## Testing & Quality
+
+### Code Quality
+- Write type-safe code - let TypeScript catch errors at compile time
+- Test IPC handlers thoroughly with edge cases
+- Test file operations (invalid paths, permissions, missing files)
+- Validate user inputs before processing
+- Handle file system errors gracefully
+
+### Manual Testing Checklist
+- [ ] Test on Windows, macOS, and Linux
+- [ ] Test with invalid file paths
+- [ ] Test with very large files
+- [ ] Test with missing FFmpeg/FFprobe
+- [ ] Test error scenarios (disk full, no permissions)
+- [ ] Test drag & drop functionality
+- [ ] Test project save/restore
+
+## Documentation
+- Comment complex logic and algorithms
+- Document IPC API in `types.ts`
+- Keep README.md updated with setup instructions
+- Document FFmpeg command patterns used
+- Add JSDoc comments for public APIs
+# Development & Build Configuration
+
+## Build System
+
+### Vite & electron-vite
+- Use electron-vite for optimized Electron builds
+- Keep renderer code separate from main process code
+- Use proper asset handling for production builds
+- Configure proper externals for Electron dependencies
+- HMR enabled for renderer process in development
+
+### Development Workflow
+```bash
+npm run dev      # Start with HMR (renderer) and hot reload (main)
+npm run build    # Build and package with electron-builder
+npm run preview  # Preview production build
+```
+
+### Debugging
+- **Renderer**: Use Chrome DevTools (auto-opens in dev mode)
+- **Main Process**: Use VS Code debugger or Chrome DevTools remote
+- Check console for errors in both processes
+- Use `console.error()` for error logging in development
+
+## Error Handling
+
+### Best Practices
+- Always handle errors in async operations with try-catch
+- Provide user-friendly error messages (never expose stack traces)
+- Log errors appropriately:
+  - Development: `console.error()` with full details
+  - Production: Implement proper logging (file/service)
+- Never expose internal errors or paths to users
+- Validate all inputs before processing
+
+**Example:**
+```typescript
+try {
+  const result = await riskyOperation();
+  return result;
+} catch (error) {
+  console.error('Operation failed:', error);
+  throw new Error('User-friendly message describing what went wrong');
+}
+```
+
+### IPC Error Handling
+- Catch errors in IPC handlers
+- Return meaningful error messages
+- Handle errors in renderer when calling IPC methods
+- Show user feedback (toast, modal, alert) on errors
+
+## Testing & Quality
+
+### Code Quality
+- Write type-safe code - let TypeScript catch errors at compile time
+- Test IPC handlers thoroughly with edge cases
+- Test file operations (invalid paths, permissions, missing files)
+- Validate user inputs before processing
+- Handle file system errors gracefully
+
+### Manual Testing Checklist
+- [ ] Test on Windows, macOS, and Linux
+- [ ] Test with invalid file paths
+- [ ] Test with very large files
+- [ ] Test with missing FFmpeg/FFprobe
+- [ ] Test error scenarios (disk full, no permissions)
+- [ ] Test drag & drop functionality
+- [ ] Test project save/restore
+
+## Documentation
+- Comment complex logic and algorithms
+- Document IPC API in `types.ts`
+- Keep README.md updated with setup instructions
+- Document FFmpeg command patterns used
+- Add JSDoc comments for public APIs

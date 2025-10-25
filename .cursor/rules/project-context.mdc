@@ -1,0 +1,44 @@
+# AudioPie Project Context
+
+## Overview
+AudioPie is a cross-platform Electron desktop application for crafting `.m4b` audiobooks from MP3 tracks with metadata editing, chapter management, and FFmpeg integration.
+
+## Tech Stack
+- **Electron 31** - Desktop application framework
+- **React 18** - UI library with modern hooks and Context API
+- **TypeScript 5** - Type-safe development with strict mode
+- **Vite + electron-vite** - Fast build tooling optimized for Electron
+- **Sortable.js** - Drag & drop functionality
+- **FFmpeg/FFprobe** - Audio processing and metadata extraction
+- **electron-store** - Settings persistence
+
+## Project Structure
+```
+src/
+├── main/          # Electron main process
+│   ├── main.ts
+│   ├── ipc.ts
+│   ├── ffmpeg.ts
+│   ├── settings.ts
+│   ├── project.ts
+│   └── types.ts
+├── renderer/      # React UI
+│   ├── App.tsx
+│   ├── components/
+│   ├── context/
+│   └── styles/
+└── preload/       # IPC bridge
+    └── preload.ts
+```
+
+## Key Features
+- MP3 to M4B audiobook conversion
+- Metadata editing (title, author, narrator, genre, year, description)
+- Chapter management with timing
+- Drag & drop track reordering
+- Project save/restore (.audiopie.json)
+- Configurable FFmpeg/FFprobe paths
+
+## Requirements
+- Node.js 18+
+- FFmpeg and FFprobe in PATH or configured in settings

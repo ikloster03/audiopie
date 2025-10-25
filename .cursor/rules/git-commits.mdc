@@ -1,0 +1,178 @@
+---
+alwaysApply: false
+---
+
+# Git Commit Guidelines
+
+## Commit Message Format
+
+### Conventional Commits
+Use the conventional commits format for all commit messages:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- **feat**: New feature for the user
+- **fix**: Bug fix for the user
+- **refactor**: Code refactoring (no functional changes)
+- **docs**: Documentation changes
+- **style**: Code formatting (no code logic changes)
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks (deps, config, build)
+- **perf**: Performance improvements
+
+### Scope (optional)
+- `main`: Main process changes
+- `renderer`: Renderer process changes
+- `ipc`: IPC communication changes
+- `ui`: UI/component changes
+- `ffmpeg`: FFmpeg integration
+- `build`: Build configuration
+- `deps`: Dependencies
+
+### Examples
+
+**Good commits:**
+```
+feat(ffmpeg): add progress streaming for encoding
+fix(ipc): validate file paths to prevent directory traversal
+refactor(ui): extract track list logic into custom hook
+docs: update README with FFmpeg requirements
+style(renderer): format components with prettier
+chore(deps): update electron to v31
+```
+
+**Bad commits:**
+```
+fixed bug          # Not descriptive, no type
+WIP                # Not meaningful
+updated files      # Too vague
+asdfasdf          # Not a real message
+```
+
+## Commit Best Practices
+
+### Language
+- **Write ALL commit messages in English** (project requirement)
+- Use imperative mood ("add feature" not "added feature")
+- Be concise but descriptive
+- Explain WHY, not just WHAT
+
+### Atomic Commits
+- Keep commits focused on a single logical change
+- Don't mix refactoring with features
+- Don't mix formatting with logic changes
+- Each commit should be buildable and testable
+
+### Message Quality
+- First line (subject): max 50-72 characters
+- Body: wrap at 72 characters, explain context
+- Reference issues/PRs in footer if applicable
+- Use bullets for multiple changes (if unavoidable)
+
+### When to Commit
+- After completing a feature or fix
+- After refactoring a module
+- Before switching to another task
+- After each logical step in complex changes
+
+### What NOT to Commit
+- Work in progress (unless marked as WIP and on feature branch)
+- Broken code or failing tests
+- Debug console.log statements
+- Commented-out code blocks
+- Temporary files or experiments
+- Sensitive data (keys, tokens, passwords)
+# Git Commit Guidelines
+
+## Commit Message Format
+
+### Conventional Commits
+Use the conventional commits format for all commit messages:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- **feat**: New feature for the user
+- **fix**: Bug fix for the user
+- **refactor**: Code refactoring (no functional changes)
+- **docs**: Documentation changes
+- **style**: Code formatting (no code logic changes)
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks (deps, config, build)
+- **perf**: Performance improvements
+
+### Scope (optional)
+- `main`: Main process changes
+- `renderer`: Renderer process changes
+- `ipc`: IPC communication changes
+- `ui`: UI/component changes
+- `ffmpeg`: FFmpeg integration
+- `build`: Build configuration
+- `deps`: Dependencies
+
+### Examples
+
+**Good commits:**
+```
+feat(ffmpeg): add progress streaming for encoding
+fix(ipc): validate file paths to prevent directory traversal
+refactor(ui): extract track list logic into custom hook
+docs: update README with FFmpeg requirements
+style(renderer): format components with prettier
+chore(deps): update electron to v31
+```
+
+**Bad commits:**
+```
+fixed bug          # Not descriptive, no type
+WIP                # Not meaningful
+updated files      # Too vague
+asdfasdf          # Not a real message
+```
+
+## Commit Best Practices
+
+### Language
+- **Write ALL commit messages in English** (project requirement)
+- Use imperative mood ("add feature" not "added feature")
+- Be concise but descriptive
+- Explain WHY, not just WHAT
+
+### Atomic Commits
+- Keep commits focused on a single logical change
+- Don't mix refactoring with features
+- Don't mix formatting with logic changes
+- Each commit should be buildable and testable
+
+### Message Quality
+- First line (subject): max 50-72 characters
+- Body: wrap at 72 characters, explain context
+- Reference issues/PRs in footer if applicable
+- Use bullets for multiple changes (if unavoidable)
+
+### When to Commit
+- After completing a feature or fix
+- After refactoring a module
+- Before switching to another task
+- After each logical step in complex changes
+
+### What NOT to Commit
+- Work in progress (unless marked as WIP and on feature branch)
+- Broken code or failing tests
+- Debug console.log statements
+- Commented-out code blocks
+- Temporary files or experiments
+- Sensitive data (keys, tokens, passwords)

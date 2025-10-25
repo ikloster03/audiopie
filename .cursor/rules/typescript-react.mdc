@@ -1,0 +1,156 @@
+---
+alwaysApply: false
+---
+
+# TypeScript & React Best Practices
+
+## TypeScript Guidelines
+
+### Type Safety
+- Always use strict TypeScript with explicit types
+- Never use `any` - use `unknown` when type is truly unknown
+- Prefer interfaces over type aliases for object shapes
+- Use type imports: `import type { Type } from './module'`
+- Enable all strict compiler options (already configured in tsconfig.json)
+- Use const assertions where appropriate
+- Prefer readonly properties and arrays when data shouldn't mutate
+
+### Naming Conventions
+- **PascalCase**: React components, TypeScript interfaces/types
+- **camelCase**: variables, functions, methods
+- **SCREAMING_SNAKE_CASE**: constants
+- Prefix interfaces with `I` only if there's a naming conflict
+- Use descriptive names - avoid abbreviations unless widely understood
+
+### File Organization
+- One component per file
+- Co-locate types with their usage when they're not shared
+- Shared types go in `types.ts` files
+- Keep main process code in `src/main/`
+- Keep renderer process code in `src/renderer/`
+- Keep preload scripts in `src/preload/`
+
+## React Best Practices
+
+### Component Structure
+- Use functional components with hooks exclusively
+- Prefer named exports over default exports
+- Use `React.FC` type for component definitions
+- Keep components small and focused (single responsibility)
+- Extract complex logic into custom hooks
+- Use Context API for global state (already using AppContext)
+
+**Example:**
+```typescript
+import React from 'react';
+import type { ComponentProps } from './types';
+
+export const Component: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
+  const [state, setState] = React.useState<Type>(initialValue);
+  
+  const handleAction = React.useCallback(() => {
+    // Handler logic
+  }, [dependencies]);
+  
+  return (
+    <div>
+      {/* JSX */}
+    </div>
+  );
+};
+```
+
+### Hooks Usage
+- Follow React hooks rules (order, no conditionals)
+- Use `useCallback` for event handlers passed to children
+- Use `useMemo` for expensive computations
+- Custom hooks must start with `use` prefix
+- Keep effects focused and minimal
+
+### State Management
+- Use Context API with custom hooks (pattern in AppContext)
+- Keep state as close as possible to where it's used
+- Lift state only when necessary
+- Prefer composition over prop drilling
+
+### Performance
+- Memoize expensive calculations with `useMemo`
+- Memoize callbacks with `useCallback` when passing to children
+- Use React DevTools Profiler to identify bottlenecks
+- Lazy load components when appropriate
+# TypeScript & React Best Practices
+
+## TypeScript Guidelines
+
+### Type Safety
+- Always use strict TypeScript with explicit types
+- Never use `any` - use `unknown` when type is truly unknown
+- Prefer interfaces over type aliases for object shapes
+- Use type imports: `import type { Type } from './module'`
+- Enable all strict compiler options (already configured in tsconfig.json)
+- Use const assertions where appropriate
+- Prefer readonly properties and arrays when data shouldn't mutate
+
+### Naming Conventions
+- **PascalCase**: React components, TypeScript interfaces/types
+- **camelCase**: variables, functions, methods
+- **SCREAMING_SNAKE_CASE**: constants
+- Prefix interfaces with `I` only if there's a naming conflict
+- Use descriptive names - avoid abbreviations unless widely understood
+
+### File Organization
+- One component per file
+- Co-locate types with their usage when they're not shared
+- Shared types go in `types.ts` files
+- Keep main process code in `src/main/`
+- Keep renderer process code in `src/renderer/`
+- Keep preload scripts in `src/preload/`
+
+## React Best Practices
+
+### Component Structure
+- Use functional components with hooks exclusively
+- Prefer named exports over default exports
+- Use `React.FC` type for component definitions
+- Keep components small and focused (single responsibility)
+- Extract complex logic into custom hooks
+- Use Context API for global state (already using AppContext)
+
+**Example:**
+```typescript
+import React from 'react';
+import type { ComponentProps } from './types';
+
+export const Component: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
+  const [state, setState] = React.useState<Type>(initialValue);
+  
+  const handleAction = React.useCallback(() => {
+    // Handler logic
+  }, [dependencies]);
+  
+  return (
+    <div>
+      {/* JSX */}
+    </div>
+  );
+};
+```
+
+### Hooks Usage
+- Follow React hooks rules (order, no conditionals)
+- Use `useCallback` for event handlers passed to children
+- Use `useMemo` for expensive computations
+- Custom hooks must start with `use` prefix
+- Keep effects focused and minimal
+
+### State Management
+- Use Context API with custom hooks (pattern in AppContext)
+- Keep state as close as possible to where it's used
+- Lift state only when necessary
+- Prefer composition over prop drilling
+
+### Performance
+- Memoize expensive calculations with `useMemo`
+- Memoize callbacks with `useCallback` when passing to children
+- Use React DevTools Profiler to identify bottlenecks
+- Lazy load components when appropriate

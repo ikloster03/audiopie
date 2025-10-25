@@ -1,0 +1,66 @@
+# Electron Security & Architecture
+
+## Security Rules (CRITICAL)
+
+### Context Isolation
+- **ALWAYS** use `contextIsolation: true` in BrowserWindow (already configured)
+- **NEVER** enable `nodeIntegration` in BrowserWindow
+- Use preload script for IPC bridge (already implemented as `window.audioPie`)
+- Validate and sanitize ALL data from renderer process
+- Never pass unsanitized user input to `child_process` or `execa`
+
+### IPC Communication
+
+#### Main Process Handlers
+- Use typed IPC handlers (pattern established in `ipc.ts`)
+- Validate all IPC arguments before processing
+- Handle errors gracefully with try-catch
+- Use `ipcRenderer.invoke` for request/response pattern
+- Keep IPC messages focused and atomic
+
+**Example:**
+```typescript
+// In main process
+ipcMain.handle('channel:name', async (event, arg) => {
+  // Validate arg
+  if (!arg || typeof arg !== 'string') {
+    throw new Error('Invalid argument');
+  }
+  // Process request
+  const result = await doSomething(arg);
+  return result;
+});
+```
+
+#### Preload Bridge
+```typescript
+// In preload
+contextBridge.exposeInMainWorld('audioPie', {
+  feature: {
+    method: (arg) => ipcRenderer.invoke('channel:name', arg)
+  }
+});
+```
+
+## Process Separation
+
+### Main Process
+- Keep main process logic minimal
+- Offload heavy work to child processes or workers
+- Use electron-store for persistent settings
+- Handle ALL file system operations in main process
+- Validate file paths to prevent directory traversal attacks
+
+### Renderer Process
+- Access Electron APIs **ONLY** through preload bridge (`window.audioPie`)
+- **NEVER** import Electron or Node modules directly
+- Keep renderer code focused on UI
+- Use proper loading states for async operations
+- Handle errors from IPC calls gracefully
+
+## File System Security
+- Validate all file paths before operations
+- Use `path.normalize()` and check if path is within allowed directories
+- Sanitize user-provided filenames
+- Handle file system errors (permissions, disk space, missing files)
+- Never trust file paths from renderer without validation

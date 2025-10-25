@@ -1,0 +1,88 @@
+# FFmpeg Integration
+
+## FFmpeg/FFprobe Usage
+
+### Availability Checks
+- **Always** check if FFmpeg/FFprobe are available before using
+- Provide clear error messages if binaries are not found
+- Allow users to configure custom paths in settings
+- Validate binary paths before execution
+
+### Process Management
+- Use `execa` for subprocess management (already in dependencies)
+- Set appropriate timeouts for long-running operations
+- Handle process errors gracefully
+- Kill processes on app exit or user cancellation
+
+### Progress Updates
+- Stream progress updates to UI when possible
+- Parse FFmpeg output for progress percentage
+- Show progress modal during encoding
+- Allow users to cancel long operations
+
+### Audio Processing
+
+#### File Validation
+- Validate audio file formats before processing (check extensions, probe files)
+- Use FFprobe to extract metadata and duration
+- Handle corrupted or invalid files gracefully
+- Provide feedback for unsupported formats
+
+#### Encoding Parameters
+- Use proper encoding parameters for M4B output:
+  ```bash
+  -c:a aac              # AAC codec for M4B
+  -b:a {bitrate}k       # Configurable bitrate (default 128k)
+  -vn                   # No video
+  -f mp4                # MP4 container
+  ```
+- Support configurable bitrate (from settings)
+- Optionally re-encode or copy audio streams
+- Embed chapter markers in M4B file
+- Embed metadata (title, author, narrator, genre, year, description)
+
+#### Chapter Management
+- Generate chapters from track list
+- Support manual chapter editing
+- Validate chapter timing (no overlaps, within bounds)
+- Format chapters for FFmpeg metadata file
+
+**Example metadata file:**
+```
+;FFMETADATA1
+title=Audiobook Title
+artist=Author Name
+composer=Narrator Name
+genre=Audiobook
+date=2024
+
+[CHAPTER]
+TIMEBASE=1/1000
+START=0
+END=180000
+title=Chapter 1
+
+[CHAPTER]
+TIMEBASE=1/1000
+START=180000
+END=360000
+title=Chapter 2
+```
+
+## Error Handling
+- Catch FFmpeg/FFprobe errors with meaningful messages
+- Parse stderr for specific error types
+- Provide actionable feedback to users
+- Handle common errors:
+  - Binary not found
+  - Invalid input files
+  - Insufficient disk space
+  - Encoding errors
+  - Permission denied
+
+## Best Practices
+- Validate all paths before passing to FFmpeg
+- Escape special characters in file paths
+- Use temporary files for intermediate steps
+- Clean up temporary files after operations
+- Log FFmpeg commands in development for debugging

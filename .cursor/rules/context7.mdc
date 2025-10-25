@@ -1,0 +1,328 @@
+---
+alwaysApply: true
+---
+
+# Context7 Documentation Integration
+
+## When to Use Context7
+
+Use Context7 (via MCP tools) to fetch up-to-date documentation when working with:
+
+### Core Technologies
+
+#### Electron (@electron/electron)
+Request when dealing with:
+- IPC communication patterns
+- BrowserWindow configuration
+- Security best practices
+- App lifecycle management
+- Native modules integration
+- Auto-updates
+- Menu and tray APIs
+
+#### React (@facebook/react)
+Request when dealing with:
+- Advanced hooks patterns
+- Context API usage
+- Performance optimization
+- Concurrent features
+- Suspense and Error Boundaries
+- Component composition patterns
+
+#### TypeScript (@microsoft/TypeScript)
+Request when dealing with:
+- Advanced type system features
+- Generics and conditional types
+- Type guards and narrowing
+- Module resolution issues
+- Compiler configuration
+- Declaration files
+
+#### Vite (@vitejs/vite)
+Request when dealing with:
+- Build configuration
+- Plugin development
+- Asset handling
+- Environment variables
+- Optimization settings
+
+### Key Dependencies
+
+#### electron-vite
+- Electron-specific Vite configuration
+- Multi-process build setup
+- Hot reload configuration
+
+#### electron-store
+- Settings persistence patterns
+- Schema validation
+- Migration strategies
+
+#### execa
+- Subprocess management
+- Stream handling
+- Error handling patterns
+
+#### sortablejs
+- Drag & drop configuration
+- Event handling
+- Custom animations
+
+## Trigger Phrases
+
+Automatically request Context7 documentation when encountering:
+
+- "How do I implement [specific Electron feature]?"
+- "What's the best way to [React pattern]?"
+- "How to optimize [performance issue]?"
+- "How to configure [build/vite setting]?"
+- Complex TypeScript compilation errors
+- Build/bundling problems
+- IPC security questions
+- FFmpeg integration with Node.js
+
+## Context7 Request Workflow
+
+### Step 1: Resolve Library ID
+```typescript
+// First, resolve the library ID
+mcp_context7_resolve-library-id({
+  libraryName: "electron"  // or "react", "typescript", "vite"
+})
+```
+
+### Step 2: Fetch Documentation
+```typescript
+// Then fetch docs with specific topic
+mcp_context7_get-library-docs({
+  context7CompatibleLibraryID: "/electron/electron",  // from step 1
+  topic: "IPC security",  // focused topic
+  tokens: 5000  // optional, default 5000
+})
+```
+
+### Step 3: Apply Documentation
+- Read the fetched documentation
+- Apply best practices to the code
+- Reference documentation in code comments if complex
+- Update implementation based on latest patterns
+
+## Example Scenarios
+
+### Scenario 1: IPC Security
+```
+User asks: "How do I secure IPC communication?"
+
+Actions:
+1. Resolve library ID for Electron
+2. Fetch docs with topic: "IPC security contextBridge"
+3. Review security best practices
+4. Apply to ipc.ts implementation
+5. Validate all arguments in handlers
+```
+
+### Scenario 2: React Performance
+```
+User asks: "Why is my component re-rendering too much?"
+
+Actions:
+1. Resolve library ID for React
+2. Fetch docs with topic: "hooks useCallback useMemo performance"
+3. Identify unnecessary re-renders
+4. Apply memoization patterns
+5. Test with React DevTools Profiler
+```
+
+### Scenario 3: Build Configuration
+```
+Working on: Electron app not building correctly
+
+Actions:
+1. Resolve library IDs for electron-vite and vite
+2. Fetch docs with topic: "electron build configuration"
+3. Review build settings
+4. Update electron.vite.config.ts
+5. Test build process
+```
+
+### Scenario 4: TypeScript Errors
+```
+Error: Complex generic type not resolving correctly
+
+Actions:
+1. Resolve library ID for TypeScript
+2. Fetch docs with topic: "generics conditional types"
+3. Understand type inference rules
+4. Refactor type definitions
+5. Verify with strict type checking
+```
+
+## Best Practices
+
+- Request docs **before** implementing complex features
+- Focus on specific topics rather than broad requests
+- Cache frequently used patterns in code examples
+- Reference official docs in complex code sections
+- Update rules when new patterns are discovered
+# Context7 Documentation Integration
+
+## When to Use Context7
+
+Use Context7 (via MCP tools) to fetch up-to-date documentation when working with:
+
+### Core Technologies
+
+#### Electron (@electron/electron)
+Request when dealing with:
+- IPC communication patterns
+- BrowserWindow configuration
+- Security best practices
+- App lifecycle management
+- Native modules integration
+- Auto-updates
+- Menu and tray APIs
+
+#### React (@facebook/react)
+Request when dealing with:
+- Advanced hooks patterns
+- Context API usage
+- Performance optimization
+- Concurrent features
+- Suspense and Error Boundaries
+- Component composition patterns
+
+#### TypeScript (@microsoft/TypeScript)
+Request when dealing with:
+- Advanced type system features
+- Generics and conditional types
+- Type guards and narrowing
+- Module resolution issues
+- Compiler configuration
+- Declaration files
+
+#### Vite (@vitejs/vite)
+Request when dealing with:
+- Build configuration
+- Plugin development
+- Asset handling
+- Environment variables
+- Optimization settings
+
+### Key Dependencies
+
+#### electron-vite
+- Electron-specific Vite configuration
+- Multi-process build setup
+- Hot reload configuration
+
+#### electron-store
+- Settings persistence patterns
+- Schema validation
+- Migration strategies
+
+#### execa
+- Subprocess management
+- Stream handling
+- Error handling patterns
+
+#### sortablejs
+- Drag & drop configuration
+- Event handling
+- Custom animations
+
+## Trigger Phrases
+
+Automatically request Context7 documentation when encountering:
+
+- "How do I implement [specific Electron feature]?"
+- "What's the best way to [React pattern]?"
+- "How to optimize [performance issue]?"
+- "How to configure [build/vite setting]?"
+- Complex TypeScript compilation errors
+- Build/bundling problems
+- IPC security questions
+- FFmpeg integration with Node.js
+
+## Context7 Request Workflow
+
+### Step 1: Resolve Library ID
+```typescript
+// First, resolve the library ID
+mcp_context7_resolve-library-id({
+  libraryName: "electron"  // or "react", "typescript", "vite"
+})
+```
+
+### Step 2: Fetch Documentation
+```typescript
+// Then fetch docs with specific topic
+mcp_context7_get-library-docs({
+  context7CompatibleLibraryID: "/electron/electron",  // from step 1
+  topic: "IPC security",  // focused topic
+  tokens: 5000  // optional, default 5000
+})
+```
+
+### Step 3: Apply Documentation
+- Read the fetched documentation
+- Apply best practices to the code
+- Reference documentation in code comments if complex
+- Update implementation based on latest patterns
+
+## Example Scenarios
+
+### Scenario 1: IPC Security
+```
+User asks: "How do I secure IPC communication?"
+
+Actions:
+1. Resolve library ID for Electron
+2. Fetch docs with topic: "IPC security contextBridge"
+3. Review security best practices
+4. Apply to ipc.ts implementation
+5. Validate all arguments in handlers
+```
+
+### Scenario 2: React Performance
+```
+User asks: "Why is my component re-rendering too much?"
+
+Actions:
+1. Resolve library ID for React
+2. Fetch docs with topic: "hooks useCallback useMemo performance"
+3. Identify unnecessary re-renders
+4. Apply memoization patterns
+5. Test with React DevTools Profiler
+```
+
+### Scenario 3: Build Configuration
+```
+Working on: Electron app not building correctly
+
+Actions:
+1. Resolve library IDs for electron-vite and vite
+2. Fetch docs with topic: "electron build configuration"
+3. Review build settings
+4. Update electron.vite.config.ts
+5. Test build process
+```
+
+### Scenario 4: TypeScript Errors
+```
+Error: Complex generic type not resolving correctly
+
+Actions:
+1. Resolve library ID for TypeScript
+2. Fetch docs with topic: "generics conditional types"
+3. Understand type inference rules
+4. Refactor type definitions
+5. Verify with strict type checking
+```
+
+## Best Practices
+
+- Request docs **before** implementing complex features
+- Focus on specific topics rather than broad requests
+- Cache frequently used patterns in code examples
+- Reference official docs in complex code sections
+- Update rules when new patterns are discovered
