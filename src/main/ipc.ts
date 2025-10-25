@@ -45,7 +45,28 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   });
 
   ipcMain.handle('tracks/addFromPaths', async (_event: IpcMainInvokeEvent, paths: string[]): Promise<TrackInfo[]> => {
+    // Check if FFprobe is available before processing files
+    const ffprobePath = resolveBinary('ffprobe');
+    if (!ffprobePath) {
+      const errorMessage = process.platform === 'win32'
+        ? 'FFprobe not found.\n\n' +
+          'To fix this:\n' +
+          '1. Install FFmpeg via winget: winget install Gyan.FFmpeg\n' +
+          '2. Or download from https://ffmpeg.org/download.html\n' +
+          '3. Or specify the path in Settings'
+        : 'FFprobe not found.\n\n' +
+          'Please install FFmpeg or configure the path in Settings.';
+      
+      win.webContents.send('build/onProgress', {
+        phase: 'probe',
+        message: errorMessage,
+      } satisfies BuildProgress);
+      return [];
+    }
+    
     const added: TrackInfo[] = [];
+    const errors: string[] = [];
+    
     for (const filePath of paths) {
       try {
         const durationMs = await probeDuration(filePath);
@@ -55,12 +76,18 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
           durationMs,
         });
       } catch (error) {
-        win.webContents.send('build/onProgress', {
-          phase: 'probe',
-          message: `Failed to analyze ${path.basename(filePath)}: ${(error as Error).message}`,
-        } satisfies BuildProgress);
+        errors.push(`${path.basename(filePath)}: ${(error as Error).message}`);
       }
     }
+    
+    // Report errors if any
+    if (errors.length > 0) {
+      win.webContents.send('build/onProgress', {
+        phase: 'probe',
+        message: `Failed to analyze some files:\n${errors.join('\n')}`,
+      } satisfies BuildProgress);
+    }
+    
     if (added.length > 0) {
       const project = getProjectData();
       updateTracks([...project.tracks, ...added]);
@@ -167,19 +194,6 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   });
 
   ipcMain.handle('settings/get', (): AppSettings => {
-    const settings = getSettings();
-    if (!settings.ffmpegPath) {
-      const resolved = resolveBinary('ffmpeg');
-      if (resolved) {
-        setSettings({ ffmpegPath: resolved });
-      }
-    }
-    if (!settings.ffprobePath) {
-      const resolved = resolveBinary('ffprobe');
-      if (resolved) {
-        setSettings({ ffprobePath: resolved });
-      }
-    }
     return getSettings();
   });
 

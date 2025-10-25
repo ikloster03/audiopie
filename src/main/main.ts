@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import { app, BrowserWindow, Menu, nativeImage } from 'electron';
 import { registerIpcHandlers } from './ipc';
+import { initializeBinaries } from './settings';
 
 const isDev = !app.isPackaged;
 
@@ -76,6 +78,27 @@ app.whenReady().then(async () => {
   if (isDev) {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
   }
+  
+  // На Windows убедимся, что PATH содержит пользовательские переменные
+  if (process.platform === 'win32') {
+    try {
+      const userPath = execSync('powershell -Command "[Environment]::GetEnvironmentVariable(\'Path\', \'User\')"', { 
+        encoding: 'utf8',
+        timeout: 5000 
+      }).trim();
+      
+      if (userPath && !process.env.PATH?.includes(userPath)) {
+        process.env.PATH = `${process.env.PATH};${userPath}`;
+        console.log('[Main] Updated PATH with user environment variables');
+      }
+    } catch (error) {
+      console.warn('[Main] Failed to update PATH from user environment:', error);
+    }
+  }
+  
+  // Автоматически инициализируем пути к FFmpeg и FFprobe
+  initializeBinaries();
+  
   await createWindow();
 
   app.on('activate', () => {
