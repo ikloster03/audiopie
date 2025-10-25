@@ -15,4 +15,7 @@ linux:
   executableArgs:
     - --no-sandbox
 extraResources:
-  - assets/icon.png
+  - from: assets
+    to: .
+    filter:
+      - "**/*"

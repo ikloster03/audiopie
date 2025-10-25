@@ -190,35 +190,35 @@ export const buildAudiobook = async (
 
     const finalArgs = ['-hide_banner', '-y', '-i', mergedPath];
 
-  let coverPath: string | undefined;
-  if (metadata.coverPath && fs.existsSync(metadata.coverPath)) {
-    coverPath = metadata.coverPath;
-  }
+    let coverPath: string | undefined;
+    if (metadata.coverPath && fs.existsSync(metadata.coverPath)) {
+      coverPath = metadata.coverPath;
+    }
 
-  if (coverPath) {
-    finalArgs.push('-i', coverPath);
-  }
+    if (coverPath) {
+      finalArgs.push('-i', coverPath);
+    }
 
-  finalArgs.push('-i', metadataPath);
+    finalArgs.push('-i', metadataPath);
 
-  if (coverPath) {
-    finalArgs.push(
-      '-map',
-      '0',
-      '-map',
-      '1',
-      '-map_metadata',
-      '2',
-      '-c',
-      'copy',
-      '-disposition:1',
-      'attached_pic',
-    );
-  } else {
-    finalArgs.push('-map', '0', '-map_metadata', '1', '-c', 'copy');
-  }
+    if (coverPath) {
+      finalArgs.push(
+        '-map',
+        '0',
+        '-map',
+        '1',
+        '-map_metadata',
+        '2',
+        '-c',
+        'copy',
+        '-disposition:1',
+        'attached_pic',
+      );
+    } else {
+      finalArgs.push('-map', '0', '-map_metadata', '1', '-c', 'copy');
+    }
 
-  finalArgs.push('-movflags', '+faststart', '-f', 'mp4', options.outputPath);
+    finalArgs.push('-movflags', '+faststart', '-f', 'mp4', options.outputPath);
 
     onProgress({ phase: 'finalize', message: 'Writing final file…', percent: 95 });
 
@@ -235,8 +235,29 @@ export const buildAudiobook = async (
     if (!stat || stat.size === 0) {
       throw new Error('Output file was not created.');
     }
+    
+    // Очистка временных файлов
+    if (!options.tempDir) {
+      try {
+        await fs.promises.rm(tempRoot, { recursive: true, force: true });
+      } catch (error) {
+        console.warn('Failed to clean up temporary files:', error);
+      }
+    }
+    
     onProgress({ phase: 'finalize', message: 'Build complete', percent: 100 });
+  } catch (error) {
+    // Очистка временных файлов при ошибке
+    if (!options.tempDir) {
+      try {
+        await fs.promises.rm(tempRoot, { recursive: true, force: true });
+      } catch (cleanupError) {
+        console.warn('Failed to clean up temporary files:', cleanupError);
+      }
+    }
+    throw error;
   } finally {
     currentProcess = null;
+    cancelRequested = false;
   }
 };

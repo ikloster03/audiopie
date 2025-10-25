@@ -9,31 +9,41 @@
   </head>
   <body>
     <header class="toolbar">
-      <div class="brand">🍰 AudioPie</div>
+      <div class="brand">🎵 AudioPie</div>
       <div class="toolbar-actions">
-        <button id="add-tracks">Add Tracks</button>
-        <button id="save-project">Save Project</button>
-        <button id="open-project">Open Project</button>
-        <button id="build-project" class="primary">Build</button>
-        <button id="open-settings">Settings</button>
+        <button id="add-tracks">➕ Add Tracks</button>
+        <button id="save-project">💾 Save Project</button>
+        <button id="open-project">📂 Open Project</button>
+        <button id="build-project" class="primary">🔨 Build</button>
+        <button id="open-settings">⚙️ Settings</button>
       </div>
     </header>
     <main class="content">
       <section id="track-column" class="panel track-panel">
-        <h2>Tracks</h2>
-        <p class="hint">Drag MP3 files here or use “Add Tracks”.</p>
+        <h2>📚 Tracks</h2>
+        <p class="hint">
+          🎵 Drag and drop MP3 files here or click "Add Tracks"
+        </p>
       </section>
       <section class="panel detail-panel">
         <div class="tabs">
-          <button class="tab-button active" data-tab="metadata" id="tab-metadata">Metadata</button>
-          <button class="tab-button" data-tab="chapters" id="tab-chapters">Chapters</button>
+          <button
+            class="tab-button active"
+            data-tab="metadata"
+            id="tab-metadata"
+          >
+            📝 Metadata
+          </button>
+          <button class="tab-button" data-tab="chapters" id="tab-chapters">
+            📖 Chapters
+          </button>
         </div>
         <div class="tab-content active" data-tab-content="metadata">
           <div id="metadata-container"></div>
         </div>
         <div class="tab-content" data-tab-content="chapters">
           <div class="chapters-toolbar">
-            <button id="generate-chapters">Generate from tracks</button>
+            <button id="generate-chapters">✨ Generate from tracks</button>
           </div>
           <div id="chapter-column"></div>
         </div>

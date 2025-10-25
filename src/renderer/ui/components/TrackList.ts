@@ -53,10 +53,14 @@ export class TrackList {
     titleInput.className = 'track-title-input';
     titleInput.addEventListener('change', async () => {
       const newTitle = titleInput.value.trim() || track.displayTitle;
-      await window.audioPie.tracks.updateTitle(index, newTitle);
-      appState.tracks[index].displayTitle = newTitle;
-      appState.notify();
-      await this.refreshChapters();
+      // Найти текущий индекс, так как он мог измениться
+      const currentIndex = appState.tracks.indexOf(track);
+      if (currentIndex !== -1) {
+        await window.audioPie.tracks.updateTitle(currentIndex, newTitle);
+        appState.tracks[currentIndex].displayTitle = newTitle;
+        appState.notify();
+        await this.refreshChapters();
+      }
     });
 
     const duration = document.createElement('span');
@@ -68,10 +72,14 @@ export class TrackList {
     removeButton.textContent = '✕';
     removeButton.title = 'Remove track';
     removeButton.addEventListener('click', async () => {
-      await window.audioPie.tracks.remove([index]);
-      appState.tracks = appState.tracks.filter((_, i) => i !== index);
-      appState.notify();
-      await this.refreshChapters();
+      // Найти текущий индекс, так как он мог измениться
+      const currentIndex = appState.tracks.indexOf(track);
+      if (currentIndex !== -1) {
+        await window.audioPie.tracks.remove([currentIndex]);
+        appState.tracks = appState.tracks.filter((_, i) => i !== currentIndex);
+        appState.notify();
+        await this.refreshChapters();
+      }
     });
 
     li.append(handle, titleInput, duration, removeButton);

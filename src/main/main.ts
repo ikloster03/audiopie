@@ -7,11 +7,16 @@ const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
 const createWindow = async () => {
   const preloadPath = path.join(__dirname, '..', 'preload', 'preload.js');
+  
+  // Проверяем наличие иконки
+  const iconPath = path.join(app.getAppPath(), 'assets', 'icon.png');
+  const icon = fs.existsSync(iconPath) ? nativeImage.createFromPath(iconPath) : undefined;
+  
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     title: 'AudioPie',
-    icon: nativeImage.createFromPath(path.join(app.getAppPath(), 'assets', 'icon.png')),
+    ...(icon && { icon }),
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
