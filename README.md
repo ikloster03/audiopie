@@ -2,6 +2,15 @@
 
 AudioPie is a cross-platform Electron application for crafting `.m4b` audiobooks from a list of `.mp3` tracks. The app lets you edit audiobook metadata, manage chapter timing, and run FFmpeg/FFprobe pipelines from a friendly desktop UI.
 
+## Tech Stack
+
+- **Electron** - Desktop application framework
+- **React 18** - UI library with modern hooks
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **electron-vite** - Electron-optimized Vite configuration
+- **Sortable.js** - Drag & drop functionality
+
 ## Requirements
 
 - Node.js 18+
@@ -14,7 +23,7 @@ npm install
 npm run dev
 ```
 
-The `dev` script launches the TypeScript watchers for both the main and renderer processes and starts Electron in development mode.
+The `dev` script starts electron-vite dev server with hot module replacement (HMR) for the renderer process and hot reloading for the main process.
 
 ## Building installers
 

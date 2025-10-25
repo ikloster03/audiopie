@@ -3,7 +3,7 @@ import path from 'path';
 import { app, BrowserWindow, Menu, nativeImage } from 'electron';
 import { registerIpcHandlers } from './ipc';
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+const isDev = !app.isPackaged;
 
 const createWindow = async () => {
   const preloadPath = path.join(__dirname, '..', 'preload', 'preload.js');
@@ -26,10 +26,13 @@ const createWindow = async () => {
 
   registerIpcHandlers(mainWindow);
 
-  const distHtml = path.join(__dirname, '..', 'renderer', 'index.html');
-  const srcHtml = path.join(app.getAppPath(), 'src', 'renderer', 'index.html');
-  const htmlPath = fs.existsSync(distHtml) ? distHtml : srcHtml;
-  await mainWindow.loadFile(htmlPath);
+  // In dev mode, load from Vite dev server
+  if (isDev && process.env.ELECTRON_RENDERER_URL) {
+    await mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
+  } else {
+    const htmlPath = path.join(__dirname, '..', 'renderer', 'index.html');
+    await mainWindow.loadFile(htmlPath);
+  }
 
   if (isDev) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });

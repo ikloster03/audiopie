@@ -1,7 +1,7 @@
 appId: com.example.audiopie
 productName: AudioPie
 files:
-  - dist/**/*
+  - dist-electron/**/*
   - package.json
 mac:
   category: public.app-category.music
