@@ -2,6 +2,7 @@
   "appId": "com.example.audiopie",
   "productName": "AudioPie",
   "asar": true,
+  "publish": null,
   "directories": {
     "output": "release/${version}"
   },
