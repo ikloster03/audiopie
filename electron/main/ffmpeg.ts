@@ -251,7 +251,14 @@ export const buildAudiobook = async (
 
   try {
     // Этап 1: Кодирование и объединение треков
-    onProgress({ phase: 'encode', message: 'Encoding audio…', percent: 0 });
+    const totalSteps = 2;
+    onProgress({ 
+      phase: 'encode', 
+      message: 'Кодирование и объединение треков', 
+      percent: 0,
+      currentStep: 1,
+      totalSteps
+    });
 
     await new Promise<void>((resolve, reject) => {
       const command = createFfmpegCommand()
@@ -279,8 +286,14 @@ export const buildAudiobook = async (
               const minutes = parseFloat(parts[1]);
               const seconds = parseFloat(parts[2]);
               const currentMs = Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
-              const percent = Math.min(99, Math.round((currentMs / totalDuration) * 100));
-              onProgress({ phase: 'encode', percent, message: 'Encoding audio…' });
+              const percent = Math.min(49, Math.round((currentMs / totalDuration) * 50));
+              onProgress({ 
+                phase: 'encode', 
+                percent, 
+                message: 'Кодирование и объединение треков',
+                currentStep: 1,
+                totalSteps
+              });
             }
           }
         })
@@ -302,7 +315,13 @@ export const buildAudiobook = async (
     }
 
     // Этап 2: Добавление метаданных и обложки
-    onProgress({ phase: 'chapters', message: 'Applying chapters…', percent: 80 });
+    onProgress({ 
+      phase: 'finalize', 
+      message: 'Добавление метаданных, глав и обложки', 
+      percent: 50,
+      currentStep: 2,
+      totalSteps
+    });
 
     let coverPath: string | undefined;
     if (metadata.coverPath && fs.existsSync(metadata.coverPath)) {
@@ -342,7 +361,13 @@ export const buildAudiobook = async (
           fs.appendFileSync(logPath, `Finalize command: ${commandLine}\n`);
         })
         .on('progress', () => {
-          onProgress({ phase: 'finalize', message: 'Writing final file…', percent: 95 });
+          onProgress({ 
+            phase: 'finalize', 
+            message: 'Запись финального файла', 
+            percent: 80,
+            currentStep: 2,
+            totalSteps
+          });
         })
         .on('error', (err: Error) => {
           fs.appendFileSync(logPath, `Finalize error: ${err.message}\n`);
@@ -375,7 +400,13 @@ export const buildAudiobook = async (
       }
     }
     
-    onProgress({ phase: 'finalize', message: 'Build complete', percent: 100 });
+    onProgress({ 
+      phase: 'finalize', 
+      message: 'Аудиокнига успешно создана', 
+      percent: 100,
+      currentStep: 2,
+      totalSteps
+    });
   } catch (error) {
     // Очистка временных файлов при ошибке
     if (!options.tempDir) {

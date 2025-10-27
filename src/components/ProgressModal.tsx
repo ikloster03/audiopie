@@ -14,12 +14,20 @@ export const ProgressModal: React.FC = () => {
   }
 
   const percent = Math.min(100, Math.max(0, buildProgress.percent ?? 0));
+  
+  const getMessage = () => {
+    const baseMessage = buildProgress.message || buildProgress.phase;
+    if (buildProgress.currentStep && buildProgress.totalSteps) {
+      return `Этап ${buildProgress.currentStep} из ${buildProgress.totalSteps}: ${baseMessage}`;
+    }
+    return baseMessage;
+  };
 
   return (
     <div className="progress-overlay">
       <div className="progress-dialog">
         <p className="progress-message">
-          {buildProgress.message || buildProgress.phase}
+          {getMessage()}
         </p>
         <div className="progress-bar-wrapper">
           <div
@@ -27,7 +35,10 @@ export const ProgressModal: React.FC = () => {
             style={{ width: `${percent}%` }}
           />
         </div>
-        <button onClick={handleCancel}>Cancel</button>
+        <div className="progress-info">
+          <span>{percent}%</span>
+        </div>
+        <button onClick={handleCancel}>Отмена</button>
       </div>
     </div>
   );

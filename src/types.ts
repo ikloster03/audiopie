@@ -41,5 +41,7 @@ export type BuildProgress = {
   phase: 'probe' | 'encode' | 'chapters' | 'finalize';
   percent?: number;
   message?: string;
+  currentStep?: number;
+  totalSteps?: number;
 };
 

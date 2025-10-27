@@ -553,7 +553,7 @@ body {
   background: #f3f4f6;
   border-radius: 999px;
   overflow: hidden;
-  margin: 1.5rem 0;
+  margin: 1rem 0 0.5rem 0;
   position: relative;
 }
 
@@ -585,6 +585,27 @@ body {
   100% {
     transform: translateX(100%);
   }
+}
+
+.progress-info {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.progress-info span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-message {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .settings-form label {
