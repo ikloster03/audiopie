@@ -39,7 +39,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-build
-          path: release/**/*
+          path: |
+            release/**/*.exe
+            release/**/*.nupkg
+            release/**/*.blockmap
+            release/**/latest*.yml
 
   release:
     needs: build
@@ -53,12 +57,16 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: release
+          path: release-artifacts
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/**/*
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.nupkg
+            release-artifacts/**/*.blockmap
+            release-artifacts/**/latest*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
