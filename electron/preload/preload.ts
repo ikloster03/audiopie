@@ -21,6 +21,7 @@ const audioPieAPI = {
     get: (): Promise<BookMetadata> => ipcRenderer.invoke('metadata/get'),
     set: (partial: Partial<BookMetadata>): Promise<void> => ipcRenderer.invoke('metadata/set', partial),
     selectCover: (): Promise<string | undefined> => ipcRenderer.invoke('metadata/selectCover'),
+    getCoverDataUrl: (coverPath: string): Promise<string | null> => ipcRenderer.invoke('metadata/getCoverDataUrl', coverPath),
   },
   chapters: {
     autoFromTracks: (): Promise<Chapter[]> => ipcRenderer.invoke('chapters/autoFromTracks'),

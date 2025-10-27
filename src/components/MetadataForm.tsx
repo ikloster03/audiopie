@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { BookMetadata } from '../types';
 import { useAppContext } from '../context/AppContext';
 
@@ -22,6 +22,7 @@ const metadataFields: MetadataField[] = [
 
 export const MetadataForm: React.FC = () => {
   const { metadata, setMetadata } = useAppContext();
+  const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
 
   const handleChange = async (key: keyof BookMetadata, value: string) => {
     let processedValue: string | number | undefined = value;
@@ -48,7 +49,21 @@ export const MetadataForm: React.FC = () => {
   const handleCoverClear = async () => {
     await window.audioPie.metadata.set({ coverPath: undefined });
     setMetadata({ ...metadata, coverPath: undefined });
+    setCoverDataUrl(null);
   };
+
+  // Load cover image as data URL when coverPath changes
+  useEffect(() => {
+    const loadCover = async () => {
+      if (metadata.coverPath) {
+        const dataUrl = await window.audioPie.metadata.getCoverDataUrl(metadata.coverPath);
+        setCoverDataUrl(dataUrl);
+      } else {
+        setCoverDataUrl(null);
+      }
+    };
+    loadCover();
+  }, [metadata.coverPath]);
 
   return (
     <form className="metadata-form">
@@ -71,15 +86,31 @@ export const MetadataForm: React.FC = () => {
       ))}
 
       <div className="cover-section">
-        <button type="button" onClick={handleCoverSelect}>
-          Choose Cover
-        </button>
-        <button type="button" onClick={handleCoverClear}>
-          Clear
-        </button>
-        <span className="cover-label">
-          {metadata.coverPath || 'No cover selected'}
-        </span>
+        <div className="cover-actions">
+          <button type="button" onClick={handleCoverSelect}>
+            Choose Cover
+          </button>
+          {metadata.coverPath && (
+            <button type="button" onClick={handleCoverClear} className="clear-btn">
+              Clear
+            </button>
+          )}
+        </div>
+        {metadata.coverPath && coverDataUrl ? (
+          <div className="cover-preview">
+            <img src={coverDataUrl} alt="Book cover" />
+            <span className="cover-path">{metadata.coverPath.split(/[\\/]/).pop()}</span>
+          </div>
+        ) : metadata.coverPath ? (
+          <div className="cover-preview">
+            <div className="cover-loading">Loading...</div>
+            <span className="cover-path">{metadata.coverPath.split(/[\\/]/).pop()}</span>
+          </div>
+        ) : (
+          <div className="cover-empty">
+            <span>No cover selected</span>
+          </div>
+        )}
       </div>
     </form>
   );

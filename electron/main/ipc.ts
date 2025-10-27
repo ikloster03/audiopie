@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
 import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile } from './project';
 import { probeDuration, buildAudiobook, cancelBuild, isBusy } from './ffmpeg';
@@ -117,6 +118,26 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
       updateMetadata({ ...project.metadata, coverPath });
     }
     return coverPath;
+  });
+
+  ipcMain.handle('metadata/getCoverDataUrl', async (_event: IpcMainInvokeEvent, coverPath: string): Promise<string | null> => {
+    try {
+      if (!coverPath || !fs.existsSync(coverPath)) {
+        return null;
+      }
+      const buffer = await fs.promises.readFile(coverPath);
+      const ext = path.extname(coverPath).toLowerCase();
+      let mimeType = 'image/jpeg';
+      if (ext === '.png') {
+        mimeType = 'image/png';
+      } else if (ext === '.jpg' || ext === '.jpeg') {
+        mimeType = 'image/jpeg';
+      }
+      return `data:${mimeType};base64,${buffer.toString('base64')}`;
+    } catch (error) {
+      console.error('Failed to read cover file:', error);
+      return null;
+    }
   });
 
   ipcMain.handle('chapters/autoFromTracks', () => {
