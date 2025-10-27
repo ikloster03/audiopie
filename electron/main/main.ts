@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import { app, BrowserWindow, Menu, nativeImage } from 'electron';
 import { registerIpcHandlers } from './ipc';
 import { initializeBinaries } from './settings';
+import { initializeFFmpeg } from './ffmpeg';
 
 const isDev = !app.isPackaged;
 
@@ -33,7 +34,8 @@ const createWindow = async () => {
     const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:3000';
     await mainWindow.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    const htmlPath = path.join(__dirname, '../renderer/index.html');
+    // В production index.html находится в dist/index.html относительно корня приложения
+    const htmlPath = path.join(app.getAppPath(), 'dist', 'index.html');
     await mainWindow.loadFile(htmlPath);
   }
 
@@ -97,8 +99,11 @@ app.whenReady().then(async () => {
     }
   }
   
-  // Автоматически инициализируем пути к FFmpeg и FFprobe
+  // Автоматически инициализируем пути к FFmpeg и FFprobe (сохраняем в настройки)
   initializeBinaries();
+  
+  // Инициализируем FFmpeg (теперь с правильными путями из настроек)
+  initializeFFmpeg();
   
   await createWindow();
 

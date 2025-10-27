@@ -1,21 +1,121 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { app } from 'electron';
 import ffmpegStatic from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import type { FfmpegCommand } from 'fluent-ffmpeg';
 import { BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
-import { getDefaultTempDir } from './settings';
+import { getDefaultTempDir, getSettings, resolveBinary } from './settings';
 
-// Устанавливаем путь к ffmpeg из ffmpeg-static
-if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic);
-  // ffmpeg-static также предоставляет ffprobe
-  const ffprobePath = ffmpegStatic.replace('ffmpeg', 'ffprobe');
-  if (fs.existsSync(ffprobePath)) {
-    ffmpeg.setFfprobePath(ffprobePath);
+// Получаем правильный путь к ffmpeg с учетом настроек и упаковки в asar
+const getFFmpegPath = (): string | null => {
+  // 1. Сначала проверяем настройки пользователя
+  const settings = getSettings();
+  if (settings.ffmpegPath) {
+    console.log('[FFmpeg] Checking configured path:', settings.ffmpegPath);
+    if (fs.existsSync(settings.ffmpegPath)) {
+      console.log('[FFmpeg] Using configured FFmpeg');
+      return settings.ffmpegPath;
+    } else {
+      console.warn('[FFmpeg] Configured path does not exist');
+    }
   }
-}
+  
+  // 2. Пробуем найти через resolveBinary (PATH)
+  const resolved = resolveBinary('ffmpeg');
+  if (resolved) {
+    console.log('[FFmpeg] Found FFmpeg in system');
+    return resolved;
+  }
+  
+  // 3. Пробуем использовать ffmpeg-static
+  if (!ffmpegStatic) {
+    console.log('[FFmpeg] ffmpeg-static not available');
+    return null;
+  }
+  
+  // В production режиме, если приложение упаковано
+  if (app.isPackaged) {
+    // ffmpeg-static находится в app.asar.unpacked
+    const unpackedPath = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
+    console.log('[FFmpeg] Checking unpacked path:', unpackedPath);
+    if (fs.existsSync(unpackedPath)) {
+      return unpackedPath;
+    }
+  }
+  
+  // В dev режиме или если unpacked путь не найден
+  console.log('[FFmpeg] Checking static path:', ffmpegStatic);
+  if (fs.existsSync(ffmpegStatic)) {
+    return ffmpegStatic;
+  }
+  
+  return null;
+};
+
+const getFFprobePath = (): string | null => {
+  // 1. Проверяем настройки пользователя
+  const settings = getSettings();
+  if (settings.ffprobePath) {
+    console.log('[FFmpeg] Checking configured ffprobe:', settings.ffprobePath);
+    if (fs.existsSync(settings.ffprobePath)) {
+      console.log('[FFmpeg] Using configured FFprobe');
+      return settings.ffprobePath;
+    } else {
+      console.warn('[FFmpeg] Configured ffprobe path does not exist');
+    }
+  }
+  
+  // 2. Пробуем найти через resolveBinary (PATH)
+  const resolved = resolveBinary('ffprobe');
+  if (resolved) {
+    console.log('[FFmpeg] Found FFprobe in system');
+    return resolved;
+  }
+  
+  // 3. Пробуем найти рядом с ffmpeg
+  if (ffmpegPath) {
+    const ffprobePath = ffmpegPath.replace(/ffmpeg(.exe)?$/, 'ffprobe$1');
+    if (fs.existsSync(ffprobePath)) {
+      console.log('[FFmpeg] Found FFprobe next to FFmpeg');
+      return ffprobePath;
+    }
+  }
+  
+  return null;
+};
+
+let ffmpegPath: string | null = null;
+let ffprobePath: string | null = null;
+let initialized = false;
+
+// Функция для инициализации FFmpeg (должна вызываться после app.whenReady())
+export const initializeFFmpeg = (): void => {
+  if (initialized) return;
+  
+  console.log('[FFmpeg] Initializing...');
+  console.log('[FFmpeg] app.isPackaged:', app.isPackaged);
+  console.log('[FFmpeg] app.getAppPath():', app.getAppPath());
+  
+  ffmpegPath = getFFmpegPath();
+  if (ffmpegPath) {
+    console.log('[FFmpeg] Using FFmpeg at:', ffmpegPath);
+    ffmpeg.setFfmpegPath(ffmpegPath);
+    
+    ffprobePath = getFFprobePath();
+    if (ffprobePath) {
+      console.log('[FFmpeg] Using FFprobe at:', ffprobePath);
+      ffmpeg.setFfprobePath(ffprobePath);
+    } else {
+      console.warn('[FFmpeg] FFprobe not found');
+    }
+  } else {
+    console.error('[FFmpeg] FFmpeg binary not found');
+  }
+  
+  initialized = true;
+};
 
 let currentCommand: FfmpegCommand | null = null;
 let cancelRequested = false;
@@ -118,7 +218,7 @@ const writeMetadataFile = async (
 
 const createFfmpegCommand = (): FfmpegCommand => {
   const command = ffmpeg();
-  if (!ffmpegStatic) {
+  if (!ffmpegPath) {
     throw new Error('FFmpeg binary not found');
   }
   return command;
@@ -131,7 +231,7 @@ export const buildAudiobook = async (
   options: BuildOptions,
   onProgress: (progress: BuildProgress) => void,
 ): Promise<void> => {
-  if (!ffmpegStatic) {
+  if (!ffmpegPath) {
     throw new Error('FFmpeg binary not found');
   }
   
