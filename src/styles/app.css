@@ -531,6 +531,7 @@ body {
   font-size: 0.875rem;
   transition: all 0.2s ease;
   background: #f9fafb;
+  color: var(--text-primary);
 }
 
 .chapter-row input:focus {
