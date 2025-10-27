@@ -9,11 +9,13 @@ interface SettingsDialogProps {
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
   const { settings, setSettings } = useAppContext();
+  const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
   const [formData, setFormData] = useState<AppSettings>({
     ffmpegPath: '',
     ffprobePath: '',
     defaultBitrateKbps: 128,
-    defaultOutputDir: ''
+    defaultOutputDir: '',
+    ffmpegThreads: 0
   });
 
   useEffect(() => {
@@ -22,10 +24,17 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         ffmpegPath: settings.ffmpegPath || '',
         ffprobePath: settings.ffprobePath || '',
         defaultBitrateKbps: settings.defaultBitrateKbps || 128,
-        defaultOutputDir: settings.defaultOutputDir || ''
+        defaultOutputDir: settings.defaultOutputDir || '',
+        ffmpegThreads: settings.ffmpegThreads ?? 0
       });
     }
   }, [isOpen, settings]);
+
+  useEffect(() => {
+    if (isOpen) {
+      window.audioPie.settings.getMaxCpuCores().then(setMaxCpuCores);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +42,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
       ffmpegPath: formData.ffmpegPath || undefined,
       ffprobePath: formData.ffprobePath || undefined,
       defaultBitrateKbps: formData.defaultBitrateKbps,
-      defaultOutputDir: formData.defaultOutputDir || undefined
+      defaultOutputDir: formData.defaultOutputDir || undefined,
+      ffmpegThreads: formData.ffmpegThreads
     });
     setSettings(updated);
     onClose();
@@ -84,6 +94,19 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
             value={formData.defaultOutputDir}
             onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
           />
+        </label>
+        <label>
+          Parallel FFmpeg Processes
+          <input
+            type="number"
+            min="0"
+            max={maxCpuCores}
+            value={formData.ffmpegThreads}
+            onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
+          />
+          <small style={{ display: 'block', marginTop: '4px', color: '#666' }}>
+            How many tracks to encode simultaneously. 0 = Auto (all {maxCpuCores} cores), Max: {maxCpuCores}
+          </small>
         </label>
         <div className="actions">
           <button type="submit">Save</button>

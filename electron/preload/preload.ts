@@ -45,6 +45,7 @@ const audioPieAPI = {
   settings: {
     get: (): Promise<AppSettings> => ipcRenderer.invoke('settings/get'),
     set: (partial: Partial<AppSettings>): Promise<AppSettings> => ipcRenderer.invoke('settings/set', partial),
+    getMaxCpuCores: (): Promise<number> => ipcRenderer.invoke('settings/getMaxCpuCores'),
   },
 };
 

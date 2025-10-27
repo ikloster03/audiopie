@@ -3,7 +3,7 @@ import path from 'path';
 import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
 import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile } from './project';
 import { probeDuration, buildAudiobook, cancelBuild, isBusy } from './ffmpeg';
-import { getSettings, setSettings } from './settings';
+import { getSettings, setSettings, getMaxCpuCores } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 
 const sanitizeTitle = (filePath: string): string => {
@@ -181,5 +181,9 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   ipcMain.handle('settings/set', async (_event: IpcMainInvokeEvent, partial: Partial<AppSettings>) => {
     setSettings(partial);
     return getSettings();
+  });
+
+  ipcMain.handle('settings/getMaxCpuCores', (): number => {
+    return getMaxCpuCores();
   });
 };

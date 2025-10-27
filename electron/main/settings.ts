@@ -1,5 +1,6 @@
 import Store from 'electron-store';
 import path from 'path';
+import os from 'os';
 import { app } from 'electron';
 import { AppSettings } from './types';
 import fs from 'fs';
@@ -8,6 +9,7 @@ const store = new Store<AppSettings>({
   name: 'settings',
   defaults: {
     defaultBitrateKbps: 128,
+    ffmpegThreads: 0, // 0 = auto (uses all available cores)
   },
 });
 
@@ -23,6 +25,7 @@ export const getSettings = (): AppSettings => {
     ffprobePath: rawStore.get('ffprobePath'),
     defaultBitrateKbps: rawStore.get('defaultBitrateKbps'),
     defaultOutputDir: rawStore.get('defaultOutputDir'),
+    ffmpegThreads: rawStore.get('ffmpegThreads'),
   };
 };
 
@@ -117,6 +120,13 @@ export const resolveBinary = (tool: 'ffmpeg' | 'ffprobe'): string | undefined =>
 export const getDefaultTempDir = (): string => {
   const base = app.getPath('temp');
   return path.join(base, 'audiopie');
+};
+
+/**
+ * Получить максимальное количество доступных ядер процессора
+ */
+export const getMaxCpuCores = (): number => {
+  return os.cpus().length;
 };
 
 /**

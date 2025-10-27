@@ -35,6 +35,7 @@ export type AppSettings = {
   ffprobePath?: string;
   defaultBitrateKbps: number;
   defaultOutputDir?: string;
+  ffmpegThreads?: number;
 };
 
 export type BuildProgress = {

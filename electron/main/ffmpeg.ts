@@ -117,7 +117,7 @@ export const initializeFFmpeg = (): void => {
   initialized = true;
 };
 
-let currentCommand: FfmpegCommand | null = null;
+let currentCommands: FfmpegCommand[] = [];
 let cancelRequested = false;
 let libfdkAvailable: boolean | null = null;
 
@@ -125,13 +125,18 @@ const ensureDir = async (dir: string) => {
   await fs.promises.mkdir(dir, { recursive: true });
 };
 
-export const isBusy = (): boolean => currentCommand !== null;
+export const isBusy = (): boolean => currentCommands.length > 0;
 
 export const cancelBuild = () => {
   cancelRequested = true;
-  if (currentCommand) {
-    currentCommand.kill('SIGINT');
-  }
+  currentCommands.forEach((command) => {
+    try {
+      command.kill('SIGINT');
+    } catch (error) {
+      console.warn('Failed to kill ffmpeg process:', error);
+    }
+  });
+  currentCommands = [];
 };
 
 const detectLibfdk = async (): Promise<boolean> => {
@@ -224,6 +229,104 @@ const createFfmpegCommand = (): FfmpegCommand => {
   return command;
 };
 
+/**
+ * Параллельная обработка массива задач с ограничением количества одновременных выполнений
+ */
+const processInParallel = async <T, R>(
+  items: T[],
+  concurrency: number,
+  processor: (item: T, index: number) => Promise<R>,
+): Promise<R[]> => {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+  
+  const executeNext = async (): Promise<void> => {
+    while (index < items.length) {
+      const currentIndex = index++;
+      results[currentIndex] = await processor(items[currentIndex], currentIndex);
+    }
+  };
+  
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => executeNext());
+  await Promise.all(workers);
+  
+  return results;
+};
+
+/**
+ * Кодирование одного трека
+ */
+const encodeTrack = async (
+  inputPath: string,
+  outputPath: string,
+  bitrateKbps: number,
+  useLibfdk: boolean,
+  threads: number,
+  logPath: string,
+  onProgress?: (percent: number) => void,
+): Promise<void> => {
+  // Сначала получаем длительность файла для расчета прогресса
+  const trackDuration = await probeDuration(inputPath);
+  
+  return new Promise<void>((resolve, reject) => {
+    const command = createFfmpegCommand()
+      .input(inputPath)
+      .noVideo();
+
+    // Настройка потоков для кодирования
+    if (threads > 0) {
+      command.outputOptions(['-threads', String(threads)]);
+    }
+
+    if (useLibfdk) {
+      command.audioCodec('libfdk_aac').audioQuality(3);
+    } else {
+      command.audioCodec('aac').audioBitrate(`${bitrateKbps}k`);
+    }
+
+    const removeCommand = () => {
+      const index = currentCommands.indexOf(command);
+      if (index > -1) {
+        currentCommands.splice(index, 1);
+      }
+    };
+
+    command
+      .output(outputPath)
+      .on('start', (commandLine: string) => {
+        fs.appendFileSync(logPath, `Encode track command: ${commandLine}\n`);
+        if (onProgress) onProgress(0);
+      })
+      .on('progress', (progress: any) => {
+        if (onProgress && progress.timemark && trackDuration > 0) {
+          // Парсим timemark (формат: HH:MM:SS.MS)
+          const parts = progress.timemark.split(':');
+          if (parts.length === 3) {
+            const hours = parseFloat(parts[0]);
+            const minutes = parseFloat(parts[1]);
+            const seconds = parseFloat(parts[2]);
+            const currentMs = Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
+            const percent = Math.min(99, Math.round((currentMs / trackDuration) * 100));
+            onProgress(percent);
+          }
+        }
+      })
+      .on('error', (err: Error) => {
+        fs.appendFileSync(logPath, `Encode track error: ${err.message}\n`);
+        removeCommand();
+        reject(err);
+      })
+      .on('end', () => {
+        removeCommand();
+        if (onProgress) onProgress(100);
+        resolve();
+      });
+
+    currentCommands.push(command);
+    command.run();
+  });
+};
+
 export const buildAudiobook = async (
   tracks: TrackInfo[],
   chapters: Chapter[],
@@ -236,77 +339,156 @@ export const buildAudiobook = async (
   }
   
   cancelRequested = false;
-  const totalDuration = tracks.reduce((acc, t) => acc + (t.durationMs || 0), 0);
+  const settings = getSettings();
   const tempRoot = options.tempDir || path.join(getDefaultTempDir(), String(Date.now()));
   await ensureDir(tempRoot);
+  const encodedTracksDir = path.join(tempRoot, 'encoded');
+  await ensureDir(encodedTracksDir);
   const concatListPath = path.join(tempRoot, 'list.txt');
   const metadataPath = path.join(tempRoot, 'ffmetadata.txt');
   const mergedPath = path.join(tempRoot, 'merged.m4a');
   const logPath = path.join(tempRoot, 'ffmpeg.log');
   
-  await writeConcatList(tracks.map((t) => t.path), concatListPath);
   await writeMetadataFile(metadata, chapters, metadataPath);
 
   const useLibfdk = await detectLibfdk();
+  
+  // Определяем количество параллельных процессов FFmpeg
+  // 0 = авто (используем все доступные ядра)
+  const concurrency = settings.ffmpegThreads || os.cpus().length;
+  
+  // Распределяем потоки между параллельными процессами
+  // Например: 8 ядер, 4 трека параллельно = 2 потока на процесс
+  const threadsPerProcess = Math.max(1, Math.floor(os.cpus().length / Math.min(concurrency, tracks.length)));
+  
+  console.log(`[FFmpeg] Building with ${concurrency} parallel processes, ${threadsPerProcess} threads per process`);
 
   try {
-    // Этап 1: Кодирование и объединение треков
-    const totalSteps = 2;
+    // Этап 1: Параллельное кодирование треков
+    const totalSteps = 3;
     onProgress({ 
       phase: 'encode', 
-      message: 'Кодирование и объединение треков', 
+      message: `Параллельное кодирование треков (${concurrency} одновременно)`, 
       percent: 0,
       currentStep: 1,
       totalSteps
     });
 
+    // Отслеживаем прогресс каждого трека (0-100 для каждого)
+    const trackProgress: number[] = new Array(tracks.length).fill(0);
+    let completedTracks = 0;
+    let lastProgressUpdate = 0;
+    
+    const updateProgress = () => {
+      // Троттлинг: обновляем не чаще чем раз в 200мс
+      const now = Date.now();
+      if (now - lastProgressUpdate < 200) {
+        return;
+      }
+      lastProgressUpdate = now;
+      
+      // Вычисляем общий прогресс: сумма прогресса всех треков
+      const totalProgress = trackProgress.reduce((sum, progress) => sum + progress, 0);
+      const averageProgress = totalProgress / tracks.length;
+      // Масштабируем на 40% от общего процесса (этап 1 занимает 0-40%)
+      const percent = Math.round(averageProgress * 0.4);
+      
+      const inProgress = tracks.length - completedTracks;
+      const message = completedTracks === 0
+        ? `Кодирование треков: ${inProgress} в процессе`
+        : `Кодирование: ${completedTracks}/${tracks.length} завершено${inProgress > 0 ? `, ${inProgress} в процессе` : ''}`;
+      
+      onProgress({
+        phase: 'encode',
+        percent,
+        message,
+        currentStep: 1,
+        totalSteps
+      });
+    };
+    
+    const forceUpdateProgress = () => {
+      lastProgressUpdate = 0;
+      updateProgress();
+    };
+
+    const encodedPaths = await processInParallel(
+      tracks,
+      concurrency,
+      async (track, index) => {
+        if (cancelRequested) {
+          throw new Error('Build cancelled');
+        }
+        
+        const outputPath = path.join(encodedTracksDir, `track_${String(index).padStart(4, '0')}.m4a`);
+        
+        await encodeTrack(
+          track.path,
+          outputPath,
+          options.bitrateKbps,
+          useLibfdk,
+          threadsPerProcess,
+          logPath,
+          (progress: number) => {
+            // Обновляем прогресс конкретного трека (0-100)
+            trackProgress[index] = progress;
+            updateProgress();
+          }
+        );
+        
+        // Трек завершён
+        trackProgress[index] = 100;
+        completedTracks++;
+        forceUpdateProgress(); // Принудительное обновление при завершении
+        
+        return outputPath;
+      }
+    );
+
+    if (cancelRequested) {
+      throw new Error('Build cancelled');
+    }
+
+    // Этап 2: Объединение закодированных треков
+    onProgress({ 
+      phase: 'encode', 
+      message: 'Объединение закодированных треков', 
+      percent: 45,
+      currentStep: 2,
+      totalSteps
+    });
+
+    await writeConcatList(encodedPaths, concatListPath);
+
     await new Promise<void>((resolve, reject) => {
       const command = createFfmpegCommand()
         .input(concatListPath)
         .inputOptions(['-f', 'concat', '-safe', '0'])
-        .noVideo();
-
-      if (useLibfdk) {
-        command.audioCodec('libfdk_aac').audioQuality(3);
-      } else {
-        command.audioCodec('aac').audioBitrate(`${options.bitrateKbps}k`);
-      }
-
-      command
+        .noVideo()
+        .audioCodec('copy') // Без перекодирования, просто объединяем
         .output(mergedPath)
         .on('start', (commandLine: string) => {
-          fs.appendFileSync(logPath, `Encode command: ${commandLine}\n`);
+          fs.appendFileSync(logPath, `Merge command: ${commandLine}\n`);
         })
-        .on('progress', (progress: any) => {
-          if (progress.timemark && totalDuration > 0) {
-            // Parse timemark (format: HH:MM:SS.MS)
-            const parts = progress.timemark.split(':');
-            if (parts.length === 3) {
-              const hours = parseFloat(parts[0]);
-              const minutes = parseFloat(parts[1]);
-              const seconds = parseFloat(parts[2]);
-              const currentMs = Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
-              const percent = Math.min(49, Math.round((currentMs / totalDuration) * 50));
-              onProgress({ 
-                phase: 'encode', 
-                percent, 
-                message: 'Кодирование и объединение треков',
-                currentStep: 1,
-                totalSteps
-              });
-            }
-          }
+        .on('progress', () => {
+          onProgress({ 
+            phase: 'encode', 
+            percent: 47,
+            message: 'Объединение треков',
+            currentStep: 2,
+            totalSteps
+          });
         })
         .on('error', (err: Error) => {
-          fs.appendFileSync(logPath, `Encode error: ${err.message}\n`);
+          fs.appendFileSync(logPath, `Merge error: ${err.message}\n`);
           reject(err);
         })
         .on('end', () => {
-          fs.appendFileSync(logPath, 'Encode complete\n');
+          fs.appendFileSync(logPath, 'Merge complete\n');
           resolve();
         });
 
-      currentCommand = command;
+      currentCommands.push(command);
       command.run();
     });
 
@@ -314,12 +496,12 @@ export const buildAudiobook = async (
       throw new Error('Build cancelled');
     }
 
-    // Этап 2: Добавление метаданных и обложки
+    // Этап 3: Добавление метаданных и обложки
     onProgress({ 
       phase: 'finalize', 
       message: 'Добавление метаданных, глав и обложки', 
       percent: 50,
-      currentStep: 2,
+      currentStep: 3,
       totalSteps
     });
 
@@ -365,7 +547,7 @@ export const buildAudiobook = async (
             phase: 'finalize', 
             message: 'Запись финального файла', 
             percent: 80,
-            currentStep: 2,
+            currentStep: 3,
             totalSteps
           });
         })
@@ -378,7 +560,7 @@ export const buildAudiobook = async (
           resolve();
         });
 
-      currentCommand = command;
+      currentCommands.push(command);
       command.run();
     });
 
@@ -404,7 +586,7 @@ export const buildAudiobook = async (
       phase: 'finalize', 
       message: 'Аудиокнига успешно создана', 
       percent: 100,
-      currentStep: 2,
+      currentStep: 3,
       totalSteps
     });
   } catch (error) {
@@ -418,7 +600,7 @@ export const buildAudiobook = async (
     }
     throw error;
   } finally {
-    currentCommand = null;
+    currentCommands = [];
     cancelRequested = false;
   }
 };
