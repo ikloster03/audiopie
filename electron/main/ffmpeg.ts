@@ -1,12 +1,23 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import execa from 'execa';
-import type { ExecaChildProcess } from 'execa';
+import ffmpegStatic from 'ffmpeg-static';
+import ffmpeg from 'fluent-ffmpeg';
+import type { FfmpegCommand } from 'fluent-ffmpeg';
 import { BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
-import { resolveBinary, getDefaultTempDir } from './settings';
+import { getDefaultTempDir } from './settings';
 
-let currentProcess: ExecaChildProcess | null = null;
+// Устанавливаем путь к ffmpeg из ffmpeg-static
+if (ffmpegStatic) {
+  ffmpeg.setFfmpegPath(ffmpegStatic);
+  // ffmpeg-static также предоставляет ffprobe
+  const ffprobePath = ffmpegStatic.replace('ffmpeg', 'ffprobe');
+  if (fs.existsSync(ffprobePath)) {
+    ffmpeg.setFfprobePath(ffprobePath);
+  }
+}
+
+let currentCommand: FfmpegCommand | null = null;
 let cancelRequested = false;
 let libfdkAvailable: boolean | null = null;
 
@@ -14,47 +25,52 @@ const ensureDir = async (dir: string) => {
   await fs.promises.mkdir(dir, { recursive: true });
 };
 
-export const isBusy = (): boolean => currentProcess !== null;
+export const isBusy = (): boolean => currentCommand !== null;
 
 export const cancelBuild = () => {
   cancelRequested = true;
-  if (currentProcess) {
-    currentProcess.kill('SIGINT');
+  if (currentCommand) {
+    currentCommand.kill('SIGINT');
   }
 };
 
-const detectLibfdk = async (ffmpegPath: string): Promise<boolean> => {
+const detectLibfdk = async (): Promise<boolean> => {
   if (libfdkAvailable !== null) {
     return libfdkAvailable;
   }
-  try {
-    const { stdout } = await execa(ffmpegPath, ['-hide_banner', '-codecs'], { windowsHide: true });
-    libfdkAvailable = stdout.includes('libfdk_aac');
-  } catch (error) {
-    libfdkAvailable = false;
-  }
-  return libfdkAvailable ?? false;
+  
+  return new Promise((resolve) => {
+    const command = ffmpeg();
+    command.getAvailableCodecs((err: Error | null, codecs: Record<string, any>) => {
+      if (err || !codecs) {
+        libfdkAvailable = false;
+        resolve(false);
+        return;
+      }
+      
+      libfdkAvailable = 'libfdk_aac' in codecs;
+      resolve(libfdkAvailable ?? false);
+    });
+  });
 };
 
 export const probeDuration = async (filePath: string): Promise<number> => {
-  const ffprobePath = resolveBinary('ffprobe');
-  if (!ffprobePath) {
-    throw new Error('FFprobe not configured. Please set the path in settings.');
-  }
-  const { stdout } = await execa(ffprobePath, [
-    '-v',
-    'error',
-    '-show_entries',
-    'format=duration',
-    '-of',
-    'default=noprint_wrappers=1:nokey=1',
-    filePath,
-  ], { windowsHide: true });
-  const durationSeconds = parseFloat(stdout.trim());
-  if (Number.isNaN(durationSeconds)) {
-    throw new Error(`Unable to parse duration for ${filePath}`);
-  }
-  return Math.round(durationSeconds * 1000);
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err: Error | null, metadata: any) => {
+      if (err) {
+        reject(new Error(`Unable to probe file: ${err.message}`));
+        return;
+      }
+      
+      const duration = metadata?.format?.duration;
+      if (!duration || Number.isNaN(duration)) {
+        reject(new Error(`Unable to parse duration for ${filePath}`));
+        return;
+      }
+      
+      resolve(Math.round(duration * 1000));
+    });
+  });
 };
 
 const escapeForConcat = (filePath: string): string => {
@@ -100,24 +116,12 @@ const writeMetadataFile = async (
   await fs.promises.writeFile(metadataPath, content, 'utf-8');
 };
 
-const parseFfmpegTime = (line: string): number | undefined => {
-  const match = /time=(\d+):(\d+):(\d+\.\d+)/.exec(line);
-  if (!match) {
-    return undefined;
+const createFfmpegCommand = (): FfmpegCommand => {
+  const command = ffmpeg();
+  if (!ffmpegStatic) {
+    throw new Error('FFmpeg binary not found');
   }
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  const seconds = Number(match[3]);
-  return Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
-};
-
-const attachLogging = (child: ExecaChildProcess, logPath: string) => {
-  const stream = fs.createWriteStream(logPath, { flags: 'a' });
-  child.stdout?.on('data', (chunk: Buffer) => stream.write(chunk));
-  child.stderr?.on('data', (chunk: Buffer) => stream.write(chunk));
-  child.once('exit', () => {
-    stream.end();
-  });
+  return command;
 };
 
 export const buildAudiobook = async (
@@ -127,10 +131,10 @@ export const buildAudiobook = async (
   options: BuildOptions,
   onProgress: (progress: BuildProgress) => void,
 ): Promise<void> => {
-  const ffmpegPath = resolveBinary('ffmpeg');
-  if (!ffmpegPath) {
-    throw new Error('FFmpeg not configured. Please set the path in settings.');
+  if (!ffmpegStatic) {
+    throw new Error('FFmpeg binary not found');
   }
+  
   cancelRequested = false;
   const totalDuration = tracks.reduce((acc, t) => acc + (t.durationMs || 0), 0);
   const tempRoot = options.tempDir || path.join(getDefaultTempDir(), String(Date.now()));
@@ -139,98 +143,124 @@ export const buildAudiobook = async (
   const metadataPath = path.join(tempRoot, 'ffmetadata.txt');
   const mergedPath = path.join(tempRoot, 'merged.m4a');
   const logPath = path.join(tempRoot, 'ffmpeg.log');
+  
   await writeConcatList(tracks.map((t) => t.path), concatListPath);
   await writeMetadataFile(metadata, chapters, metadataPath);
 
-  const useLibfdk = await detectLibfdk(ffmpegPath);
-
-  const encodeArgs = [
-    '-hide_banner',
-    '-y',
-    '-f',
-    'concat',
-    '-safe',
-    '0',
-    '-i',
-    concatListPath,
-    '-vn',
-  ];
-  if (useLibfdk) {
-    encodeArgs.push('-c:a', 'libfdk_aac', '-vbr', '3');
-  } else {
-    encodeArgs.push('-c:a', 'aac', '-b:a', `${options.bitrateKbps}k`);
-  }
-  encodeArgs.push(mergedPath);
-
-  onProgress({ phase: 'encode', message: 'Encoding audio…', percent: 0 });
-
-  const encodeProcess = execa(ffmpegPath, encodeArgs, { windowsHide: true });
-  currentProcess = encodeProcess;
-  attachLogging(encodeProcess, logPath);
+  const useLibfdk = await detectLibfdk();
 
   try {
-    if (totalDuration > 0) {
-      encodeProcess.stderr?.on('data', (chunk: Buffer) => {
-        const text = chunk.toString();
-        const current = parseFfmpegTime(text);
-        if (current !== undefined) {
-          const percent = Math.min(99, Math.round((current / totalDuration) * 100));
-          onProgress({ phase: 'encode', percent, message: 'Encoding audio…' });
-        }
-      });
-    }
+    // Этап 1: Кодирование и объединение треков
+    onProgress({ phase: 'encode', message: 'Encoding audio…', percent: 0 });
 
-    await encodeProcess;
+    await new Promise<void>((resolve, reject) => {
+      const command = createFfmpegCommand()
+        .input(concatListPath)
+        .inputOptions(['-f', 'concat', '-safe', '0'])
+        .noVideo();
+
+      if (useLibfdk) {
+        command.audioCodec('libfdk_aac').audioQuality(3);
+      } else {
+        command.audioCodec('aac').audioBitrate(`${options.bitrateKbps}k`);
+      }
+
+      command
+        .output(mergedPath)
+        .on('start', (commandLine: string) => {
+          fs.appendFileSync(logPath, `Encode command: ${commandLine}\n`);
+        })
+        .on('progress', (progress: any) => {
+          if (progress.timemark && totalDuration > 0) {
+            // Parse timemark (format: HH:MM:SS.MS)
+            const parts = progress.timemark.split(':');
+            if (parts.length === 3) {
+              const hours = parseFloat(parts[0]);
+              const minutes = parseFloat(parts[1]);
+              const seconds = parseFloat(parts[2]);
+              const currentMs = Math.round(((hours * 60 + minutes) * 60 + seconds) * 1000);
+              const percent = Math.min(99, Math.round((currentMs / totalDuration) * 100));
+              onProgress({ phase: 'encode', percent, message: 'Encoding audio…' });
+            }
+          }
+        })
+        .on('error', (err: Error) => {
+          fs.appendFileSync(logPath, `Encode error: ${err.message}\n`);
+          reject(err);
+        })
+        .on('end', () => {
+          fs.appendFileSync(logPath, 'Encode complete\n');
+          resolve();
+        });
+
+      currentCommand = command;
+      command.run();
+    });
 
     if (cancelRequested) {
       throw new Error('Build cancelled');
     }
 
+    // Этап 2: Добавление метаданных и обложки
     onProgress({ phase: 'chapters', message: 'Applying chapters…', percent: 80 });
-
-    const finalArgs = ['-hide_banner', '-y', '-i', mergedPath];
 
     let coverPath: string | undefined;
     if (metadata.coverPath && fs.existsSync(metadata.coverPath)) {
       coverPath = metadata.coverPath;
     }
 
-    if (coverPath) {
-      finalArgs.push('-i', coverPath);
-    }
+    await new Promise<void>((resolve, reject) => {
+      const command = createFfmpegCommand()
+        .input(mergedPath);
 
-    finalArgs.push('-i', metadataPath);
+      if (coverPath) {
+        command.input(coverPath);
+      }
 
-    if (coverPath) {
-      finalArgs.push(
-        '-map',
-        '0',
-        '-map',
-        '1',
-        '-map_metadata',
-        '2',
-        '-c',
-        'copy',
-        '-disposition:1',
-        'attached_pic',
-      );
-    } else {
-      finalArgs.push('-map', '0', '-map_metadata', '1', '-c', 'copy');
-    }
+      command
+        .input(metadataPath)
+        .outputOptions([
+          '-map', '0:a',
+        ]);
 
-    finalArgs.push('-movflags', '+faststart', '-f', 'mp4', options.outputPath);
+      if (coverPath) {
+        command.outputOptions([
+          '-map', '1:v',
+          '-c:v', 'copy',
+          '-disposition:v:0', 'attached_pic',
+        ]);
+      }
 
-    onProgress({ phase: 'finalize', message: 'Writing final file…', percent: 95 });
+      command
+        .outputOptions([
+          '-map_metadata', coverPath ? '2' : '1',
+          '-c:a', 'copy',
+          '-movflags', '+faststart',
+        ])
+        .output(options.outputPath)
+        .on('start', (commandLine: string) => {
+          fs.appendFileSync(logPath, `Finalize command: ${commandLine}\n`);
+        })
+        .on('progress', () => {
+          onProgress({ phase: 'finalize', message: 'Writing final file…', percent: 95 });
+        })
+        .on('error', (err: Error) => {
+          fs.appendFileSync(logPath, `Finalize error: ${err.message}\n`);
+          reject(err);
+        })
+        .on('end', () => {
+          fs.appendFileSync(logPath, 'Finalize complete\n');
+          resolve();
+        });
 
-    const finalizeProcess = execa(ffmpegPath, finalArgs, { windowsHide: true });
-    currentProcess = finalizeProcess;
-    attachLogging(finalizeProcess, logPath);
-
-    await finalizeProcess;
+      currentCommand = command;
+      command.run();
+    });
 
     if (cancelRequested) {
       throw new Error('Build cancelled');
     }
+
     const stat = await fs.promises.stat(options.outputPath).catch(() => undefined);
     if (!stat || stat.size === 0) {
       throw new Error('Output file was not created.');
@@ -257,7 +287,7 @@ export const buildAudiobook = async (
     }
     throw error;
   } finally {
-    currentProcess = null;
+    currentCommand = null;
     cancelRequested = false;
   }
 };

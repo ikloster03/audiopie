@@ -2,6 +2,7 @@
   "appId": "com.example.audiopie",
   "productName": "AudioPie",
   "asar": true,
+  "asarUnpack": ["node_modules/ffmpeg-static/**/*"],
   "publish": null,
   "directories": {
     "output": "release/${version}"

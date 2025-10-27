@@ -3,7 +3,7 @@ import path from 'path';
 import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
 import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile } from './project';
 import { probeDuration, buildAudiobook, cancelBuild, isBusy } from './ffmpeg';
-import { getSettings, setSettings, resolveBinary } from './settings';
+import { getSettings, setSettings } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 
 const sanitizeTitle = (filePath: string): string => {
@@ -45,25 +45,6 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   });
 
   ipcMain.handle('tracks/addFromPaths', async (_event: IpcMainInvokeEvent, paths: string[]): Promise<TrackInfo[]> => {
-    // Check if FFprobe is available before processing files
-    const ffprobePath = resolveBinary('ffprobe');
-    if (!ffprobePath) {
-      const errorMessage = process.platform === 'win32'
-        ? 'FFprobe not found.\n\n' +
-          'To fix this:\n' +
-          '1. Install FFmpeg via winget: winget install Gyan.FFmpeg\n' +
-          '2. Or download from https://ffmpeg.org/download.html\n' +
-          '3. Or specify the path in Settings'
-        : 'FFprobe not found.\n\n' +
-          'Please install FFmpeg or configure the path in Settings.';
-      
-      win.webContents.send('build/onProgress', {
-        phase: 'probe',
-        message: errorMessage,
-      } satisfies BuildProgress);
-      return [];
-    }
-    
     const added: TrackInfo[] = [];
     const errors: string[] = [];
     
