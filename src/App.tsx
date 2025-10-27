@@ -8,7 +8,7 @@ import { useAppContext } from './context/AppContext';
 import type { BuildOptions } from './types';
 
 export const App: React.FC = () => {
-  const { tracks, setTracks, setChapters, metadata, settings } = useAppContext();
+  const { tracks, setTracks, setChapters, setMetadata, metadata, settings } = useAppContext();
   const [activeTab, setActiveTab] = useState<'metadata' | 'chapters'>('metadata');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -28,7 +28,7 @@ export const App: React.FC = () => {
     if (data) {
       setTracks(data.tracks);
       setChapters(data.chapters);
-      // metadata handled through context
+      setMetadata(data.metadata);
     }
   };
 
