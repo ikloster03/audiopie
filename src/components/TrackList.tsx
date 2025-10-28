@@ -2,6 +2,11 @@ import React, { useRef, useEffect } from 'react';
 import Sortable from 'sortablejs';
 import type { TrackInfo } from '../types';
 import { useAppContext } from '../context/AppContext';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { ScrollArea } from './ui/scroll-area';
+import { GripVertical, X, Clock } from 'lucide-react';
 
 interface TrackItemProps {
   track: TrackInfo;
@@ -24,29 +29,37 @@ const TrackItem: React.FC<TrackItemProps> = ({ track, index, onUpdateTitle, onRe
   };
 
   return (
-    <li data-index={index}>
-      <span className="drag-handle">☰</span>
-      <input
+    <div 
+      data-index={index}
+      className="group flex items-center gap-2 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all"
+    >
+      <GripVertical className="drag-handle h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing hover:text-primary transition-colors" />
+      <Input
         type="text"
         value={track.displayTitle}
-        className="track-title-input"
+        className="flex-1 h-9 text-sm"
         onChange={(e) => onUpdateTitle(index, e.target.value)}
       />
-      <span className="track-duration">{formatDuration(track.durationMs)}</span>
-      <button
-        className="track-remove"
+      <Badge variant="secondary" className="flex items-center gap-1">
+        <Clock className="h-3 w-3" />
+        {formatDuration(track.durationMs)}
+      </Badge>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
         title="Remove track"
         onClick={() => onRemove(index)}
       >
-        ✕
-      </button>
-    </li>
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
   );
 };
 
 export const TrackList: React.FC = () => {
   const { tracks, setTracks, setChapters } = useAppContext();
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const sortableRef = useRef<Sortable | null>(null);
 
   useEffect(() => {
@@ -58,8 +71,8 @@ export const TrackList: React.FC = () => {
           if (event.oldIndex === undefined || event.newIndex === undefined) {
             return;
           }
-          const items = Array.from(listRef.current!.querySelectorAll('li'));
-          const newOrder = items.map((item) => Number(item.dataset.index));
+          const items = Array.from(listRef.current!.querySelectorAll('[data-index]'));
+          const newOrder = items.map((item) => Number((item as HTMLElement).dataset.index));
           await window.audioPie.tracks.reorder(newOrder);
           const newTracks = newOrder.map((idx) => tracks[idx]);
           setTracks(newTracks);
@@ -98,17 +111,18 @@ export const TrackList: React.FC = () => {
   };
 
   return (
-    <ul className="track-list" ref={listRef}>
-      {tracks.map((track, index) => (
-        <TrackItem
-          key={`${track.path}-${index}`}
-          track={track}
-          index={index}
-          onUpdateTitle={handleUpdateTitle}
-          onRemove={handleRemove}
-        />
-      ))}
-    </ul>
+    <ScrollArea className="h-full pr-4">
+      <div className="space-y-2" ref={listRef}>
+        {tracks.map((track, index) => (
+          <TrackItem
+            key={`${track.path}-${index}`}
+            track={track}
+            index={index}
+            onUpdateTitle={handleUpdateTitle}
+            onRemove={handleRemove}
+          />
+        ))}
+      </div>
+    </ScrollArea>
   );
 };
-

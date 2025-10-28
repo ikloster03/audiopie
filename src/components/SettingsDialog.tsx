@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import type { AppSettings } from '../types';
 import { useAppContext } from '../context/AppContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Button } from './ui/button';
+import { ScrollArea } from './ui/scroll-area';
+import { Settings2 } from 'lucide-react';
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -53,69 +66,106 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="settings-overlay">
-      <form className="settings-form" onSubmit={handleSubmit}>
-        <h2>Settings</h2>
-        <label>
-          FFmpeg Path
-          <input
-            type="text"
-            value={formData.ffmpegPath}
-            onChange={(e) => handleChange('ffmpegPath', e.target.value)}
-          />
-        </label>
-        <label>
-          FFprobe Path
-          <input
-            type="text"
-            value={formData.ffprobePath}
-            onChange={(e) => handleChange('ffprobePath', e.target.value)}
-          />
-        </label>
-        <label>
-          Default Bitrate (kbps)
-          <input
-            type="number"
-            min="32"
-            max="512"
-            value={formData.defaultBitrateKbps}
-            onChange={(e) => handleChange('defaultBitrateKbps', Number(e.target.value))}
-          />
-        </label>
-        <label>
-          Default Output Directory
-          <input
-            type="text"
-            value={formData.defaultOutputDir}
-            onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
-          />
-        </label>
-        <label>
-          Parallel FFmpeg Processes
-          <input
-            type="number"
-            min="0"
-            max={maxCpuCores}
-            value={formData.ffmpegThreads}
-            onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
-          />
-          <small style={{ display: 'block', marginTop: '4px', color: '#666' }}>
-            How many tracks to encode simultaneously. 0 = Auto (all {maxCpuCores} cores), Max: {maxCpuCores}
-          </small>
-        </label>
-        <div className="actions">
-          <button type="submit">Save</button>
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5 text-primary" />
+            Settings
+          </DialogTitle>
+          <DialogDescription>
+            Configure application settings and preferences
+          </DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[50vh] pr-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="ffmpegPath">FFmpeg Path</Label>
+                <Input
+                  id="ffmpegPath"
+                  type="text"
+                  value={formData.ffmpegPath}
+                  onChange={(e) => handleChange('ffmpegPath', e.target.value)}
+                  placeholder="Leave empty for system default"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Path to FFmpeg executable. Leave empty to use system default.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ffprobePath">FFprobe Path</Label>
+                <Input
+                  id="ffprobePath"
+                  type="text"
+                  value={formData.ffprobePath}
+                  onChange={(e) => handleChange('ffprobePath', e.target.value)}
+                  placeholder="Leave empty for system default"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Path to FFprobe executable. Leave empty to use system default.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="defaultBitrateKbps">Default Bitrate (kbps)</Label>
+                <Input
+                  id="defaultBitrateKbps"
+                  type="number"
+                  min="32"
+                  max="512"
+                  value={formData.defaultBitrateKbps}
+                  onChange={(e) => handleChange('defaultBitrateKbps', Number(e.target.value))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Audio bitrate for encoded output (32-512 kbps)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="defaultOutputDir">Default Output Directory</Label>
+                <Input
+                  id="defaultOutputDir"
+                  type="text"
+                  value={formData.defaultOutputDir}
+                  onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
+                  placeholder="Leave empty for last used directory"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Default directory for saving built audiobooks
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ffmpegThreads">Parallel FFmpeg Processes</Label>
+                <Input
+                  id="ffmpegThreads"
+                  type="number"
+                  min="0"
+                  max={maxCpuCores}
+                  value={formData.ffmpegThreads}
+                  onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Number of tracks to encode simultaneously. 0 = Auto (all {maxCpuCores} cores), Max: {maxCpuCores}
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
   );
 };
-

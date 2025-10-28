@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import type { Chapter } from '../types';
 import { useAppContext } from '../context/AppContext';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { ScrollArea } from './ui/scroll-area';
+import { Sparkles, Clock } from 'lucide-react';
 
 interface ChapterRowProps {
   chapter: Chapter;
@@ -34,15 +39,20 @@ const ChapterRow: React.FC<ChapterRowProps> = ({ chapter, index, onUpdate }) => 
   };
 
   return (
-    <div className="chapter-row">
-      <input
+    <div className="flex items-center gap-3 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all">
+      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
+        {index + 1}
+      </div>
+      <Input
         type="text"
         value={title}
         onChange={handleChange}
+        className="flex-1 h-9 text-sm"
       />
-      <span className="chapter-timing">
+      <Badge variant="secondary" className="flex items-center gap-1 whitespace-nowrap">
+        <Clock className="h-3 w-3" />
         {formatDuration(chapter.startMs)} – {formatDuration(chapter.endMs)}
-      </span>
+      </Badge>
     </div>
   );
 };
@@ -69,25 +79,58 @@ export const ChapterList: React.FC = () => {
     scheduleUpdate(updatedChapters);
   };
 
+  const handleGenerateChapters = async () => {
+    const chapters = await window.audioPie.chapters.autoFromTracks();
+    setChapters(chapters);
+  };
+
   if (chapters.length === 0) {
     return (
-      <div className="chapter-list">
-        <p className="empty">No chapters yet. Generate them from tracks.</p>
+      <div className="flex-1 flex flex-col">
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleGenerateChapters} size="sm" variant="outline">
+            <Sparkles className="h-4 w-4" />
+            Generate from tracks
+          </Button>
+        </div>
+        <div className="flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8">
+          <div className="text-center">
+            <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+            <p className="text-sm text-muted-foreground font-medium mb-1">
+              No chapters yet
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Generate chapters from your tracks
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="chapter-list">
-      {chapters.map((chapter, index) => (
-        <ChapterRow
-          key={`${chapter.title}-${index}`}
-          chapter={chapter}
-          index={index}
-          onUpdate={handleUpdate}
-        />
-      ))}
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-muted-foreground">
+          {chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}
+        </p>
+        <Button onClick={handleGenerateChapters} size="sm" variant="outline">
+          <Sparkles className="h-4 w-4" />
+          Regenerate
+        </Button>
+      </div>
+      <ScrollArea className="flex-1 pr-4">
+        <div className="space-y-2">
+          {chapters.map((chapter, index) => (
+            <ChapterRow
+              key={`${chapter.title}-${index}`}
+              chapter={chapter}
+              index={index}
+              onUpdate={handleUpdate}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
-

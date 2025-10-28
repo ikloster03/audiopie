@@ -1,5 +1,16 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
+import { Progress } from './ui/progress';
+import { Button } from './ui/button';
+import { Loader2 } from 'lucide-react';
 
 export const ProgressModal: React.FC = () => {
   const { buildProgress, isBuildModalVisible, setIsBuildModalVisible } = useAppContext();
@@ -24,23 +35,36 @@ export const ProgressModal: React.FC = () => {
   };
 
   return (
-    <div className="progress-overlay">
-      <div className="progress-dialog">
-        <p className="progress-message">
-          {getMessage()}
-        </p>
-        <div className="progress-bar-wrapper">
-          <div
-            className="progress-bar"
-            style={{ width: `${percent}%` }}
-          />
+    <Dialog open={isBuildModalVisible} onOpenChange={setIsBuildModalVisible}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            Building Audiobook
+          </DialogTitle>
+          <DialogDescription>
+            Please wait while we process your audiobook...
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">
+              {getMessage()}
+            </p>
+            <Progress value={percent} className="h-3" />
+            <p className="text-xs text-muted-foreground text-right font-mono">
+              {percent}%
+            </p>
+          </div>
         </div>
-        <div className="progress-info">
-          <span>{percent}%</span>
-        </div>
-        <button onClick={handleCancel}>Отмена</button>
-      </div>
-    </div>
+
+        <DialogFooter>
+          <Button onClick={handleCancel} variant="outline">
+            Отмена
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
-
