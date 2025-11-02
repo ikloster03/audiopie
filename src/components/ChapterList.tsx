@@ -123,7 +123,7 @@ export const ChapterList: React.FC = () => {
         <div className="space-y-2">
           {chapters.map((chapter, index) => (
             <ChapterRow
-              key={`${chapter.title}-${index}`}
+              key={index}
               chapter={chapter}
               index={index}
               onUpdate={handleUpdate}

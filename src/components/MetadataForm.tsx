@@ -32,7 +32,7 @@ export const MetadataForm: React.FC = () => {
   const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
   const [isLoadingCover, setIsLoadingCover] = useState(false);
 
-  const handleChange = async (key: keyof BookMetadata, value: string) => {
+  const handleChange = (key: keyof BookMetadata, value: string) => {
     let processedValue: string | number | undefined = value;
 
     if ((key === 'seriesIndex' || key === 'year') && value !== '') {
@@ -42,8 +42,11 @@ export const MetadataForm: React.FC = () => {
       processedValue = undefined;
     }
 
-    await window.audioPie.metadata.set({ [key]: processedValue } as Partial<BookMetadata>);
+    // Update local state immediately to prevent cursor jump
     setMetadata({ ...metadata, [key]: processedValue });
+    
+    // Persist to backend asynchronously
+    window.audioPie.metadata.set({ [key]: processedValue } as Partial<BookMetadata>);
   };
 
   const handleCoverSelect = async () => {
