@@ -55,6 +55,15 @@ npm run build
 
 The built application will be in the `release/{version}` directory.
 
+## Dev Container
+
+- Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension in VS Code.
+- Open the project folder and run `Dev Containers: Reopen in Container` from the command palette.
+- The container is based on the Node.js 20 devcontainer image with the system libraries needed to run Electron.
+- Dependencies install automatically via `npm install` during container setup.
+- Vite runs on port `5173`; forward it in VS Code if you start the dev server inside the container.
+- Use `xvfb-run npm run dev` when launching the Electron app from inside the container.
+
 ## Scripts
 
 - `npm run dev` - Start development server with hot reload

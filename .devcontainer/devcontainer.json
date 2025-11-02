@@ -1,0 +1,23 @@
+{
+  "name": "AudioPie",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "VARIANT": "20-bookworm"
+    }
+  },
+  "remoteUser": "node",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [5173],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}
+
