@@ -109,7 +109,7 @@ export const App: React.FC = () => {
                 <FolderOpen className="h-4 w-4" />
                 Open
               </Button>
-              <Button onClick={handleBuild} size="sm">
+              <Button onClick={handleBuild} variant="outline" size="sm">
                 <Hammer className="h-4 w-4" />
                 Build
               </Button>
