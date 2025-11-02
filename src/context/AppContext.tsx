@@ -8,6 +8,7 @@ interface AppState {
   settings: AppSettings | null;
   buildProgress: BuildProgress | null;
   isBuildModalVisible: boolean;
+  isProjectOpen: boolean;
 }
 
 interface AppContextType extends AppState {
@@ -17,6 +18,9 @@ interface AppContextType extends AppState {
   setSettings: (settings: AppSettings | null) => void;
   setBuildProgress: (progress: BuildProgress | null) => void;
   setIsBuildModalVisible: (visible: boolean) => void;
+  openProject: () => void;
+  newProject: () => void;
+  closeProject: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,20 +44,36 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [buildProgress, setBuildProgress] = useState<BuildProgress | null>(null);
   const [isBuildModalVisible, setIsBuildModalVisible] = useState(false);
+  const [isProjectOpen, setIsProjectOpen] = useState(false);
 
-  // Load initial settings and metadata
+  // Load initial settings
   useEffect(() => {
     const loadInitialData = async () => {
-      const [loadedSettings, loadedMetadata] = await Promise.all([
-        window.audioPie.settings.get(),
-        window.audioPie.metadata.get()
-      ]);
+      const loadedSettings = await window.audioPie.settings.get();
       setSettings(loadedSettings);
-      setMetadata(loadedMetadata);
     };
 
     loadInitialData();
   }, []);
+
+  // Project management functions
+  const openProject = () => {
+    setIsProjectOpen(true);
+  };
+
+  const newProject = () => {
+    setTracks([]);
+    setChapters([]);
+    setMetadata({ title: 'Untitled Audiobook' });
+    setIsProjectOpen(true);
+  };
+
+  const closeProject = () => {
+    setTracks([]);
+    setChapters([]);
+    setMetadata({ title: 'Untitled Audiobook' });
+    setIsProjectOpen(false);
+  };
 
   // Subscribe to build progress
   useEffect(() => {
@@ -80,12 +100,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     settings,
     buildProgress,
     isBuildModalVisible,
+    isProjectOpen,
     setTracks,
     setChapters,
     setMetadata,
     setSettings,
     setBuildProgress,
-    setIsBuildModalVisible
+    setIsBuildModalVisible,
+    openProject,
+    newProject,
+    closeProject
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

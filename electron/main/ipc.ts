@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
-import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile } from './project';
+import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile, createNewProject } from './project';
 import { probeDuration, buildAudiobook, cancelBuild, isBusy } from './ffmpeg';
 import { getSettings, setSettings, getMaxCpuCores } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
@@ -193,6 +193,10 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   ipcMain.handle('project/open', async () => {
     await openProjectFromFile(win);
     return getProjectData();
+  });
+
+  ipcMain.handle('project/new', () => {
+    return createNewProject();
   });
 
   ipcMain.handle('settings/get', (): AppSettings => {

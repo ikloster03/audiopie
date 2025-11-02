@@ -42,6 +42,7 @@ const audioPieAPI = {
   project: {
     save: (path?: string): Promise<void> => ipcRenderer.invoke('project/save', path),
     open: (): Promise<{ tracks: TrackInfo[]; chapters: Chapter[]; metadata: BookMetadata }> => ipcRenderer.invoke('project/open'),
+    new: (): Promise<{ tracks: TrackInfo[]; chapters: Chapter[]; metadata: BookMetadata }> => ipcRenderer.invoke('project/new'),
   },
   settings: {
     get: (): Promise<AppSettings> => ipcRenderer.invoke('settings/get'),
