@@ -1,20 +1,37 @@
 name: Build and Release
 
-permissions:
-  contents: write
-  packages: write
-  issues: write
-
 on:
   push:
     tags:
       - "v*"
 
 jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Generate changelog
+        id: create_release
+        run: npx changelogithub --draft --name AudioPie-${{ steps.vars.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -43,6 +60,8 @@ jobs:
             release/**/*.exe
             release/**/*.nupkg
             release/**/*.blockmap
+            release/**/*.dmg
+            release/**/*.AppImage
             release/**/latest*.yml
 
   release:
@@ -66,6 +85,8 @@ jobs:
             release-artifacts/**/*.exe
             release-artifacts/**/*.nupkg
             release-artifacts/**/*.blockmap
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.AppImage
             release-artifacts/**/latest*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
