@@ -37,6 +37,11 @@ export const resetProject = () => {
   projectPath = undefined;
 };
 
+export const createNewProject = (): ProjectData => {
+  resetProject();
+  return projectData;
+};
+
 type SerializedProject = ProjectData & {
   version: number;
 };

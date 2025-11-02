@@ -4,15 +4,16 @@ import { ChapterList } from './components/ChapterList';
 import { MetadataForm } from './components/MetadataForm';
 import { ProgressModal } from './components/ProgressModal';
 import { SettingsDialog } from './components/SettingsDialog';
+import { ProjectManager } from './components/ProjectManager';
 import { useAppContext } from './context/AppContext';
 import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Music, Plus, Save, FolderOpen, Hammer, Settings } from 'lucide-react';
+import { Music, Plus, Save, FolderOpen, Hammer, Settings, X } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { tracks, setTracks, setChapters, setMetadata, metadata, settings } = useAppContext();
+  const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleAddTracks = async () => {
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
       setTracks(data.tracks);
       setChapters(data.chapters);
       setMetadata(data.metadata);
+      openProject();
     }
   };
 
@@ -84,6 +86,11 @@ export const App: React.FC = () => {
     return value.replace(/[^a-zA-Z0-9-_]+/g, '_');
   };
 
+  // If no project is open, show the project manager
+  if (!isProjectOpen) {
+    return <ProjectManager />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
@@ -112,6 +119,10 @@ export const App: React.FC = () => {
               <Button onClick={handleBuild} variant="outline" size="sm">
                 <Hammer className="h-4 w-4" />
                 Build
+              </Button>
+              <Button onClick={closeProject} variant="outline" size="sm">
+                <X className="h-4 w-4" />
+                Close
               </Button>
               <Button onClick={handleOpenSettings} variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
