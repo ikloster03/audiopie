@@ -9,7 +9,13 @@ export const ProjectManager: React.FC = () => {
 
   const handleOpenProject = async () => {
     const data = await window.audioPie.project.open();
-    if (data) {
+
+    if (
+      data &&
+      data.tracks.length > 0 &&
+      data.chapters.length > 0 &&
+      data.metadata.title !== 'Untitled Audiobook'
+    ) {
       setTracks(data.tracks);
       setChapters(data.chapters);
       setMetadata(data.metadata);
