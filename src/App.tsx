@@ -11,10 +11,12 @@ import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Music, Plus, Save, FolderOpen, Hammer, Settings, X, Moon, Sun } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
 
 export const App: React.FC = () => {
   const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject, theme, toggleTheme } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showEmptyProjectAlert, setShowEmptyProjectAlert] = useState(false);
 
   const handleAddTracks = async () => {
     const files = await window.audioPie.tracks.selectFiles();
@@ -24,6 +26,12 @@ export const App: React.FC = () => {
   };
 
   const handleSaveProject = async () => {
+    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook') {
+      setShowEmptyProjectAlert(true);
+      setTimeout(() => setShowEmptyProjectAlert(false), 5000); // Hide after 5 seconds
+      return;
+    }
+
     await window.audioPie.project.save();
   };
 
@@ -130,6 +138,18 @@ export const App: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Empty Project Alert - Toast Notification */}
+      {showEmptyProjectAlert && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
+          <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
+            <AlertTitle className="text-red-600 dark:text-red-400">You cannot save the project</AlertTitle>
+            <AlertDescription className="text-red-600 dark:text-red-400">
+              The project must contain at least one track and have a title other than "Untitled Audiobook".
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-6">
