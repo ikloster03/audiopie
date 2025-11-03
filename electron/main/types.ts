@@ -36,6 +36,7 @@ export type AppSettings = {
   defaultBitrateKbps: number;
   defaultOutputDir?: string;
   ffmpegThreads?: number;
+  theme?: 'light' | 'dark';
 };
 
 export type BuildProgress = {

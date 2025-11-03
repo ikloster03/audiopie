@@ -1,10 +1,11 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Card, CardContent } from './ui/card';
-import { Music, FolderOpen, Plus } from 'lucide-react';
+import { Button } from './ui/button';
+import { Music, FolderOpen, Plus, Moon, Sun } from 'lucide-react';
 
 export const ProjectManager: React.FC = () => {
-  const { setTracks, setChapters, setMetadata, openProject, newProject } = useAppContext();
+  const { setTracks, setChapters, setMetadata, openProject, newProject, theme, toggleTheme } = useAppContext();
 
   const handleOpenProject = async () => {
     const data = await window.audioPie.project.open();
@@ -22,7 +23,14 @@ export const ProjectManager: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-6 right-6">
+        <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+          {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+        </Button>
+      </div>
+
       <div className="max-w-2xl w-full">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-12">

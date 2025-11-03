@@ -13,7 +13,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
-import { Settings2 } from 'lucide-react';
+import { Settings2, Moon, Sun } from 'lucide-react';
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -21,14 +21,15 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
-  const { settings, setSettings } = useAppContext();
+  const { settings, setSettings, theme } = useAppContext();
   const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
   const [formData, setFormData] = useState<AppSettings>({
     ffmpegPath: '',
     ffprobePath: '',
     defaultBitrateKbps: 128,
     defaultOutputDir: '',
-    ffmpegThreads: 0
+    ffmpegThreads: 0,
+    theme: 'light'
   });
 
   useEffect(() => {
@@ -38,10 +39,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         ffprobePath: settings.ffprobePath || '',
         defaultBitrateKbps: settings.defaultBitrateKbps || 128,
         defaultOutputDir: settings.defaultOutputDir || '',
-        ffmpegThreads: settings.ffmpegThreads ?? 0
+        ffmpegThreads: settings.ffmpegThreads ?? 0,
+        theme: settings.theme || theme || 'light'
       });
     }
-  }, [isOpen, settings]);
+  }, [isOpen, settings, theme]);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,9 +58,18 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
       ffprobePath: formData.ffprobePath || undefined,
       defaultBitrateKbps: formData.defaultBitrateKbps,
       defaultOutputDir: formData.defaultOutputDir || undefined,
-      ffmpegThreads: formData.ffmpegThreads
+      ffmpegThreads: formData.ffmpegThreads,
+      theme: formData.theme
     });
     setSettings(updated);
+    
+    // Apply theme change immediately
+    if (formData.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
     onClose();
   };
 
@@ -151,6 +162,33 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                 />
                 <p className="text-xs text-muted-foreground">
                   Number of tracks to encode simultaneously. 0 = Auto (all {maxCpuCores} cores), Max: {maxCpuCores}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="theme">Theme</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={formData.theme === 'light' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => handleChange('theme', 'light')}
+                  >
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.theme === 'dark' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => handleChange('theme', 'dark')}
+                  >
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Choose your preferred color theme
                 </p>
               </div>
             </div>
