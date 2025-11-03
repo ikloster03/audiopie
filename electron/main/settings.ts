@@ -10,6 +10,7 @@ const store = new Store<AppSettings>({
   defaults: {
     defaultBitrateKbps: 128,
     ffmpegThreads: 0, // 0 = auto (uses all available cores)
+    theme: 'light',
   },
 });
 
@@ -26,6 +27,7 @@ export const getSettings = (): AppSettings => {
     defaultBitrateKbps: rawStore.get('defaultBitrateKbps'),
     defaultOutputDir: rawStore.get('defaultOutputDir'),
     ffmpegThreads: rawStore.get('ffmpegThreads'),
+    theme: rawStore.get('theme'),
   };
 };
 

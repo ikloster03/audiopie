@@ -9,6 +9,7 @@ interface AppState {
   buildProgress: BuildProgress | null;
   isBuildModalVisible: boolean;
   isProjectOpen: boolean;
+  theme: 'light' | 'dark';
 }
 
 interface AppContextType extends AppState {
@@ -21,6 +22,7 @@ interface AppContextType extends AppState {
   openProject: () => void;
   newProject: () => void;
   closeProject: () => void;
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,16 +47,37 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [buildProgress, setBuildProgress] = useState<BuildProgress | null>(null);
   const [isBuildModalVisible, setIsBuildModalVisible] = useState(false);
   const [isProjectOpen, setIsProjectOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Load initial settings
+  // Load initial settings and theme
   useEffect(() => {
     const loadInitialData = async () => {
       const loadedSettings = await window.audioPie.settings.get();
       setSettings(loadedSettings);
+      const initialTheme = loadedSettings.theme || 'light';
+      setTheme(initialTheme);
+      // Apply theme to document
+      if (initialTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     };
 
     loadInitialData();
   }, []);
+
+  // Sync theme when settings change
+  useEffect(() => {
+    if (settings && settings.theme && settings.theme !== theme) {
+      setTheme(settings.theme);
+      if (settings.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [settings, theme]);
 
   // Project management functions
   const openProject = () => {
@@ -73,6 +96,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setChapters([]);
     setMetadata({ title: 'Untitled Audiobook' });
     setIsProjectOpen(false);
+  };
+
+  // Theme management
+  const toggleTheme = async () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    
+    // Apply theme to document
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Save to settings
+    const updatedSettings = await window.audioPie.settings.set({
+      ...settings,
+      theme: newTheme,
+    });
+    setSettings(updatedSettings);
   };
 
   // Subscribe to build progress
@@ -101,6 +144,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     buildProgress,
     isBuildModalVisible,
     isProjectOpen,
+    theme,
     setTracks,
     setChapters,
     setMetadata,
@@ -109,7 +153,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setIsBuildModalVisible,
     openProject,
     newProject,
-    closeProject
+    closeProject,
+    toggleTheme
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

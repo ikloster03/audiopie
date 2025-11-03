@@ -10,10 +10,10 @@ import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Music, Plus, Save, FolderOpen, Hammer, Settings, X } from 'lucide-react';
+import { Music, Plus, Save, FolderOpen, Hammer, Settings, X, Moon, Sun } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject } = useAppContext();
+  const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject, theme, toggleTheme } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleAddTracks = async () => {
@@ -92,9 +92,9 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+      <header className="border-b bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -123,6 +123,9 @@ export const App: React.FC = () => {
               <Button onClick={closeProject} variant="outline" size="sm">
                 <X className="h-4 w-4" />
                 Close
+              </Button>
+              <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </Button>
               <Button onClick={handleOpenSettings} variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
