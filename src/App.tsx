@@ -16,7 +16,7 @@ import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
 export const App: React.FC = () => {
   const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject, theme, toggleTheme } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [showEmptyProjectAlert, setShowEmptyProjectAlert] = useState(false);
+  const [emptyProjectAlertType, setEmptyProjectAlertType] = useState<'save' | 'build' | null>(null);
 
   const handleAddTracks = async () => {
     const files = await window.audioPie.tracks.selectFiles();
@@ -27,8 +27,8 @@ export const App: React.FC = () => {
 
   const handleSaveProject = async () => {
     if (tracks.length === 0 || metadata.title === 'Untitled Audiobook') {
-      setShowEmptyProjectAlert(true);
-      setTimeout(() => setShowEmptyProjectAlert(false), 5000); // Hide after 5 seconds
+      setEmptyProjectAlertType('save');
+      setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
       return;
     }
 
@@ -46,6 +46,12 @@ export const App: React.FC = () => {
   };
 
   const handleBuild = async () => {
+    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook') {
+      setEmptyProjectAlertType('build');
+      setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
+      return;
+    }
+
     try {
       const currentSettings = settings || (await window.audioPie.settings.get());
       const defaultBitrate = currentSettings.defaultBitrateKbps || 128;
@@ -140,10 +146,21 @@ export const App: React.FC = () => {
       </header>
 
       {/* Empty Project Alert - Toast Notification */}
-      {showEmptyProjectAlert && (
+      {emptyProjectAlertType === 'save' && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
           <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
             <AlertTitle className="text-red-600 dark:text-red-400">You cannot save the project</AlertTitle>
+            <AlertDescription className="text-red-600 dark:text-red-400">
+              The project must contain at least one track and have a title other than "Untitled Audiobook".
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+      
+      {emptyProjectAlertType === 'build' && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
+          <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
+            <AlertTitle className="text-red-600 dark:text-red-400">You cannot build the project</AlertTitle>
             <AlertDescription className="text-red-600 dark:text-red-400">
               The project must contain at least one track and have a title other than "Untitled Audiobook".
             </AlertDescription>
