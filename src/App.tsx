@@ -112,10 +112,6 @@ export const App: React.FC = () => {
                 <Save className="h-4 w-4" />
                 Save
               </Button>
-              <Button onClick={handleOpenProject} variant="outline" size="sm">
-                <FolderOpen className="h-4 w-4" />
-                Open
-              </Button>
               <Button onClick={handleBuild} variant="outline" size="sm">
                 <Hammer className="h-4 w-4" />
                 Build
