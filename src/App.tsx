@@ -10,7 +10,7 @@ import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Music, Plus, Save, FolderOpen, Hammer, Settings, X, Moon, Sun } from 'lucide-react';
+import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
 
 export const App: React.FC = () => {
@@ -33,16 +33,6 @@ export const App: React.FC = () => {
     }
 
     await window.audioPie.project.save();
-  };
-
-  const handleOpenProject = async () => {
-    const data = await window.audioPie.project.open();
-    if (data) {
-      setTracks(data.tracks);
-      setChapters(data.chapters);
-      setMetadata(data.metadata);
-      openProject();
-    }
   };
 
   const handleBuild = async () => {
