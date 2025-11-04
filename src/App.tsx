@@ -14,7 +14,7 @@ import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun } from 'lucide-react'
 import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
 
 export const App: React.FC = () => {
-  const { tracks, setTracks, setChapters, setMetadata, metadata, settings, isProjectOpen, openProject, closeProject, theme, toggleTheme } = useAppContext();
+  const { tracks, setTracks, setChapters, metadata, settings, isProjectOpen, closeProject, theme, toggleTheme } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [emptyProjectAlertType, setEmptyProjectAlertType] = useState<'save' | 'build' | null>(null);
 
