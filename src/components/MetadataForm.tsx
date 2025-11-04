@@ -18,12 +18,7 @@ interface MetadataField {
 const metadataFields: MetadataField[] = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'author', label: 'Author', type: 'text' },
-  { key: 'narrator', label: 'Narrator', type: 'text' },
-  { key: 'series', label: 'Series', type: 'text' },
-  { key: 'seriesIndex', label: 'Series Index', type: 'number' },
-  { key: 'year', label: 'Year', type: 'number' },
   { key: 'genre', label: 'Genre', type: 'text' },
-  { key: 'publisher', label: 'Publisher', type: 'text' },
   { key: 'description', label: 'Description', type: 'textarea' },
 ];
 
