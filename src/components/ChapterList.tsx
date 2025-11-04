@@ -119,7 +119,7 @@ export const ChapterList: React.FC = () => {
           Regenerate
         </Button>
       </div>
-      <ScrollArea className="flex-1 pr-4">
+      <ScrollArea className="flex-1">
         <div className="space-y-2">
           {chapters.map((chapter, index) => (
             <ChapterRow
