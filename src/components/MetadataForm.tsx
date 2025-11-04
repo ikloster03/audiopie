@@ -87,7 +87,7 @@ export const MetadataForm: React.FC = () => {
   }, [metadata.coverPath]);
 
   return (
-    <ScrollArea className="h-full pr-4">
+    <ScrollArea className="h-full">
       <div className="space-y-6">
         {/* Cover Section */}
         <Card className="p-6">

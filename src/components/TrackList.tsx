@@ -111,7 +111,7 @@ export const TrackList: React.FC = () => {
   };
 
   return (
-    <ScrollArea className="h-full pr-4">
+    <ScrollArea className="h-full">
       <div className="space-y-2" ref={listRef}>
         {tracks.map((track, index) => (
           <TrackItem
