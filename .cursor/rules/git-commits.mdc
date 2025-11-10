@@ -1,12 +1,23 @@
 ---
+description: generation commit message
 alwaysApply: false
 ---
-
 # Git Commit Guidelines
+
+## 🤖 Automated Validation
+
+This project uses **commitlint** with git hooks to automatically validate commit messages.
+
+- **commitlint**: Enforces conventional commit format
+- **husky**: Manages git hooks to run validation before commits
+- Configuration: `.commitlintrc.json`
+
+All commits are automatically checked before being saved. Invalid commit messages will be rejected.
 
 ## Commit Message Format
 
 ### Conventional Commits
+
 Use the conventional commits format for all commit messages:
 
 ```
@@ -17,7 +28,16 @@ Use the conventional commits format for all commit messages:
 <footer>
 ```
 
+**Format requirements (enforced by commitlint):**
+- Type must be lowercase
+- Type must be from the allowed list (see below)
+- Subject is required after the colon
+- Scope is optional but recommended for clarity
+
 ### Types
+
+The following types are **enforced by commitlint**:
+
 - **feat**: New feature for the user
 - **fix**: Bug fix for the user
 - **refactor**: Code refactoring (no functional changes)
@@ -26,8 +46,14 @@ Use the conventional commits format for all commit messages:
 - **test**: Adding or updating tests
 - **chore**: Maintenance tasks (deps, config, build)
 - **perf**: Performance improvements
+- **build**: Changes to build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **revert**: Reverts a previous commit
 
 ### Scope (optional)
+
+Project-specific scopes for better organization:
+
 - `main`: Main process changes
 - `renderer`: Renderer process changes
 - `ipc`: IPC communication changes
@@ -35,10 +61,11 @@ Use the conventional commits format for all commit messages:
 - `ffmpeg`: FFmpeg integration
 - `build`: Build configuration
 - `deps`: Dependencies
+- `hooks`: Git hooks and commitlint configuration
 
 ### Examples
 
-**Good commits:**
+**✅ Good commits (will pass commitlint):**
 ```
 feat(ffmpeg): add progress streaming for encoding
 fix(ipc): validate file paths to prevent directory traversal
@@ -46,133 +73,90 @@ refactor(ui): extract track list logic into custom hook
 docs: update README with FFmpeg requirements
 style(renderer): format components with prettier
 chore(deps): update electron to v31
+build: configure electron-builder for Windows
+ci: add GitHub Actions workflow
+perf(ffmpeg): optimize audio encoding pipeline
+revert: revert "feat(ffmpeg): add experimental feature"
 ```
 
-**Bad commits:**
+**❌ Bad commits (will be rejected by commitlint):**
 ```
-fixed bug          # Not descriptive, no type
+fixed bug          # Missing type prefix
+FEAT: new feature  # Type must be lowercase
+feat : spacing     # Extra space before colon
+update             # Not descriptive, missing type
+feat(UI): change   # Scope should be lowercase
+asdfasdf           # Not a real message
 WIP                # Not meaningful
-updated files      # Too vague
-asdfasdf          # Not a real message
 ```
 
 ## Commit Best Practices
 
 ### Language
+
 - **Write ALL commit messages in English** (project requirement)
 - Use imperative mood ("add feature" not "added feature")
 - Be concise but descriptive
 - Explain WHY, not just WHAT
 
 ### Atomic Commits
+
 - Keep commits focused on a single logical change
 - Don't mix refactoring with features
 - Don't mix formatting with logic changes
 - Each commit should be buildable and testable
 
 ### Message Quality
-- First line (subject): max 50-72 characters
-- Body: wrap at 72 characters, explain context
-- Reference issues/PRs in footer if applicable
+
+- **Subject line**: max 50-72 characters, lowercase type
+- **Body**: wrap at 72 characters, explain context
+- **Footer**: reference issues/PRs if applicable (e.g., `Closes #123`)
 - Use bullets for multiple changes (if unavoidable)
 
 ### When to Commit
+
 - After completing a feature or fix
 - After refactoring a module
 - Before switching to another task
 - After each logical step in complex changes
 
 ### What NOT to Commit
+
 - Work in progress (unless marked as WIP and on feature branch)
 - Broken code or failing tests
 - Debug console.log statements
 - Commented-out code blocks
 - Temporary files or experiments
 - Sensitive data (keys, tokens, passwords)
-# Git Commit Guidelines
 
-## Commit Message Format
+## Testing Commit Messages
 
-### Conventional Commits
-Use the conventional commits format for all commit messages:
+You can test your commit messages before committing:
 
-```
-<type>(<scope>): <subject>
+```bash
+# Test a commit message
+echo "feat(ui): add new button" | npx commitlint
 
-<body>
-
-<footer>
+# This will show if the message passes validation
 ```
 
-### Types
-- **feat**: New feature for the user
-- **fix**: Bug fix for the user
-- **refactor**: Code refactoring (no functional changes)
-- **docs**: Documentation changes
-- **style**: Code formatting (no code logic changes)
-- **test**: Adding or updating tests
-- **chore**: Maintenance tasks (deps, config, build)
-- **perf**: Performance improvements
+## Bypassing Validation (Not Recommended)
 
-### Scope (optional)
-- `main`: Main process changes
-- `renderer`: Renderer process changes
-- `ipc`: IPC communication changes
-- `ui`: UI/component changes
-- `ffmpeg`: FFmpeg integration
-- `build`: Build configuration
-- `deps`: Dependencies
+In rare cases where you need to bypass commitlint:
 
-### Examples
-
-**Good commits:**
-```
-feat(ffmpeg): add progress streaming for encoding
-fix(ipc): validate file paths to prevent directory traversal
-refactor(ui): extract track list logic into custom hook
-docs: update README with FFmpeg requirements
-style(renderer): format components with prettier
-chore(deps): update electron to v31
+```bash
+git commit --no-verify -m "your message"
 ```
 
-**Bad commits:**
-```
-fixed bug          # Not descriptive, no type
-WIP                # Not meaningful
-updated files      # Too vague
-asdfasdf          # Not a real message
-```
+**⚠️ Warning:** Only use `--no-verify` in exceptional circumstances. The validation exists to maintain code quality and project standards.
 
-## Commit Best Practices
+## Configuration
 
-### Language
-- **Write ALL commit messages in English** (project requirement)
-- Use imperative mood ("add feature" not "added feature")
-- Be concise but descriptive
-- Explain WHY, not just WHAT
+The commitlint configuration is defined in `.commitlintrc.json`:
+- Extends `@commitlint/config-conventional`
+- Enforces the types listed above
+- Can be customized for project-specific needs
 
-### Atomic Commits
-- Keep commits focused on a single logical change
-- Don't mix refactoring with features
-- Don't mix formatting with logic changes
-- Each commit should be buildable and testable
-
-### Message Quality
-- First line (subject): max 50-72 characters
-- Body: wrap at 72 characters, explain context
-- Reference issues/PRs in footer if applicable
-- Use bullets for multiple changes (if unavoidable)
-
-### When to Commit
-- After completing a feature or fix
-- After refactoring a module
-- Before switching to another task
-- After each logical step in complex changes
-
-### What NOT to Commit
-- Work in progress (unless marked as WIP and on feature branch)
-- Broken code or failing tests
-- Debug console.log statements
-- Commented-out code blocks
-- Temporary files or experiments
-- Sensitive data (keys, tokens, passwords)
+For more information:
+- [Commitlint Documentation](https://commitlint.js.org/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
