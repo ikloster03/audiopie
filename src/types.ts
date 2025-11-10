@@ -37,6 +37,7 @@ export type AppSettings = {
   defaultOutputDir?: string;
   ffmpegThreads?: number;
   theme?: 'light' | 'dark';
+  language?: 'en' | 'ru';
 };
 
 export type BuildProgress = {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TrackList } from './components/TrackList';
 import { ChapterList } from './components/ChapterList';
 import { MetadataForm } from './components/MetadataForm';
@@ -10,11 +11,12 @@ import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun } from 'lucide-react';
+import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun, Languages } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
 
 export const App: React.FC = () => {
-  const { tracks, setTracks, setChapters, metadata, settings, isProjectOpen, closeProject, theme, toggleTheme } = useAppContext();
+  const { t } = useTranslation();
+  const { tracks, setTracks, setChapters, metadata, settings, isProjectOpen, closeProject, theme, toggleTheme, language, changeLanguage } = useAppContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [emptyProjectAlertType, setEmptyProjectAlertType] = useState<'save' | 'build' | null>(null);
 
@@ -26,7 +28,8 @@ export const App: React.FC = () => {
   };
 
   const handleSaveProject = async () => {
-    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook') {
+    const untitledCheck = t('common.untitledAudiobook');
+    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
       setEmptyProjectAlertType('save');
       setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
       return;
@@ -36,7 +39,8 @@ export const App: React.FC = () => {
   };
 
   const handleBuild = async () => {
-    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook') {
+    const untitledCheck = t('common.untitledAudiobook');
+    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
       setEmptyProjectAlertType('build');
       setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
       return;
@@ -104,28 +108,32 @@ export const App: React.FC = () => {
             <div className="flex items-center gap-3">
               <Music className="h-8 w-8 text-primary" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
-                AudioPie
+                {t('app.title')}
               </h1>
             </div>
             <div className="flex items-center gap-2">
               <Button onClick={handleAddTracks} variant="outline" size="sm">
                 <Plus className="h-4 w-4" />
-                Add Tracks
+                {t('header.addTracks')}
               </Button>
               <Button onClick={handleSaveProject} variant="outline" size="sm">
                 <Save className="h-4 w-4" />
-                Save
+                {t('header.save')}
               </Button>
               <Button onClick={handleBuild} variant="outline" size="sm">
                 <Hammer className="h-4 w-4" />
-                Build
+                {t('header.build')}
               </Button>
               <Button onClick={closeProject} variant="outline" size="sm">
                 <X className="h-4 w-4" />
-                Close
+                {t('header.close')}
               </Button>
-              <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+              <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? t('header.switchToDarkMode') : t('header.switchToLightMode')}>
                 {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </Button>
+              <Button onClick={() => changeLanguage(language === 'en' ? 'ru' : 'en')} variant="ghost" size="sm" title={language === 'en' ? 'Переключить на русский' : 'Switch to English'}>
+                <Languages className="h-4 w-4" />
+                <span className="ml-1 text-xs font-medium">{language.toUpperCase()}</span>
               </Button>
               <Button onClick={handleOpenSettings} variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
@@ -139,9 +147,9 @@ export const App: React.FC = () => {
       {emptyProjectAlertType === 'save' && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
           <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
-            <AlertTitle className="text-red-600 dark:text-red-400">You cannot save the project</AlertTitle>
+            <AlertTitle className="text-red-600 dark:text-red-400">{t('alerts.cannotSaveTitle')}</AlertTitle>
             <AlertDescription className="text-red-600 dark:text-red-400">
-              The project must contain at least one track and have a title other than "Untitled Audiobook".
+              {t('alerts.cannotSaveDesc')}
             </AlertDescription>
           </Alert>
         </div>
@@ -150,9 +158,9 @@ export const App: React.FC = () => {
       {emptyProjectAlertType === 'build' && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
           <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
-            <AlertTitle className="text-red-600 dark:text-red-400">You cannot build the project</AlertTitle>
+            <AlertTitle className="text-red-600 dark:text-red-400">{t('alerts.cannotBuildTitle')}</AlertTitle>
             <AlertDescription className="text-red-600 dark:text-red-400">
-              The project must contain at least one track and have a title other than "Untitled Audiobook".
+              {t('alerts.cannotBuildDesc')}
             </AlertDescription>
           </Alert>
         </div>
@@ -170,9 +178,9 @@ export const App: React.FC = () => {
             <CardContent className="p-6 flex-1 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <Music className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold">Tracks</h2>
+                <h2 className="text-lg font-semibold">{t('tracks.title')}</h2>
                 <span className="ml-auto text-sm text-muted-foreground">
-                  {tracks.length} {tracks.length === 1 ? 'track' : 'tracks'}
+                  {t('tracks.count', { count: tracks.length })}
                 </span>
               </div>
               {tracks.length === 0 ? (
@@ -180,10 +188,10 @@ export const App: React.FC = () => {
                   <div className="text-center">
                     <Music className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
                     <p className="text-sm text-muted-foreground font-medium mb-1">
-                      No tracks yet
+                      {t('tracks.noTracks')}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Drag & drop MP3 files or click "Add Tracks"
+                      {t('tracks.dragDrop')}
                     </p>
                   </div>
                 </div>
@@ -200,8 +208,8 @@ export const App: React.FC = () => {
             <CardContent className="p-6 flex-1 flex flex-col">
               <Tabs defaultValue="metadata" className="flex-1 flex flex-col">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="metadata">📝 Metadata</TabsTrigger>
-                  <TabsTrigger value="chapters">📖 Chapters</TabsTrigger>
+                  <TabsTrigger value="metadata">{t('metadata.tab')}</TabsTrigger>
+                  <TabsTrigger value="chapters">{t('chaptersTab.tab')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="metadata" className="flex-1 overflow-auto scrollbar-thin">
                   <MetadataForm />

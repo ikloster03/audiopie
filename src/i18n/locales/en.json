@@ -1,0 +1,98 @@
+{
+  "app": {
+    "title": "AudioPie",
+    "subtitle": "Build M4B audiobooks from MP3 tracks with chapter editing"
+  },
+  "header": {
+    "addTracks": "Add Tracks",
+    "save": "Save",
+    "build": "Build",
+    "close": "Close",
+    "settings": "Settings",
+    "switchToDarkMode": "Switch to dark mode",
+    "switchToLightMode": "Switch to light mode"
+  },
+  "projectManager": {
+    "openProject": "Open Project",
+    "openProjectDesc": "Continue working on an existing audiobook project",
+    "createNew": "Create New",
+    "createNewDesc": "Start a new audiobook project from scratch"
+  },
+  "tracks": {
+    "title": "Tracks",
+    "count": "{{count}} track",
+    "count_plural": "{{count}} tracks",
+    "noTracks": "No tracks yet",
+    "dragDrop": "Drag & drop MP3 files or click \"Add Tracks\"",
+    "removeTrack": "Remove track"
+  },
+  "chapters": {
+    "title": "Chapters",
+    "count": "{{count}} chapter",
+    "count_plural": "{{count}} chapters",
+    "noChapters": "No chapters yet",
+    "generateFromTracks": "Generate from tracks",
+    "generate": "Generate from tracks",
+    "regenerate": "Regenerate",
+    "generateDesc": "Generate chapters from your tracks"
+  },
+  "metadata": {
+    "tab": "📝 Metadata",
+    "title": "Title",
+    "author": "Author",
+    "genre": "Genre",
+    "description": "Description",
+    "bookCover": "Book Cover",
+    "noCover": "No cover selected",
+    "chooseCover": "Click button below to choose",
+    "changeCover": "Change Cover",
+    "chooseCoverButton": "Choose Cover",
+    "clear": "Clear",
+    "loadingCover": "Loading cover...",
+    "enterPlaceholder": "Enter {{field}}..."
+  },
+  "chaptersTab": {
+    "tab": "📖 Chapters"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Configure application settings and preferences",
+    "ffmpegPath": "FFmpeg Path",
+    "ffmpegPathDesc": "Path to FFmpeg executable. Leave empty to use system default.",
+    "ffmpegPathPlaceholder": "Leave empty for system default",
+    "ffprobePath": "FFprobe Path",
+    "ffprobePathDesc": "Path to FFprobe executable. Leave empty to use system default.",
+    "ffprobePathPlaceholder": "Leave empty for system default",
+    "defaultBitrate": "Default Bitrate (kbps)",
+    "defaultBitrateDesc": "Audio bitrate for encoded output (32-512 kbps)",
+    "defaultOutputDir": "Default Output Directory",
+    "defaultOutputDirDesc": "Default directory for saving built audiobooks",
+    "defaultOutputDirPlaceholder": "Leave empty for last used directory",
+    "ffmpegThreads": "Parallel FFmpeg Processes",
+    "ffmpegThreadsDesc": "Number of tracks to encode simultaneously. 0 = Auto (all {{cores}} cores), Max: {{cores}}",
+    "theme": "Theme",
+    "themeDesc": "Choose your preferred color theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "languageDesc": "Choose your preferred language",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes"
+  },
+  "build": {
+    "title": "Building Audiobook",
+    "description": "Please wait while we process your audiobook...",
+    "step": "Step {{current}} of {{total}}: {{message}}",
+    "cancel": "Cancel"
+  },
+  "alerts": {
+    "cannotSaveTitle": "You cannot save the project",
+    "cannotSaveDesc": "The project must contain at least one track and have a title other than \"Untitled Audiobook\".",
+    "cannotBuildTitle": "You cannot build the project",
+    "cannotBuildDesc": "The project must contain at least one track and have a title other than \"Untitled Audiobook\"."
+  },
+  "common": {
+    "untitledAudiobook": "Untitled Audiobook"
+  }
+}
+

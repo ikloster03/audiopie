@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Sortable from 'sortablejs';
 import type { TrackInfo } from '../types';
 import { useAppContext } from '../context/AppContext';
@@ -16,6 +17,8 @@ interface TrackItemProps {
 }
 
 const TrackItem: React.FC<TrackItemProps> = ({ track, index, onUpdateTitle, onRemove }) => {
+  const { t } = useTranslation();
+  
   const formatDuration = (ms: number): string => {
     const totalSeconds = Math.round(ms / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -48,7 +51,7 @@ const TrackItem: React.FC<TrackItemProps> = ({ track, index, onUpdateTitle, onRe
         variant="ghost"
         size="icon"
         className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
-        title="Remove track"
+        title={t('tracks.removeTrack')}
         onClick={() => onRemove(index)}
       >
         <X className="h-4 w-4" />

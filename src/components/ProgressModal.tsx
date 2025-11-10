@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import {
   Dialog,
@@ -13,6 +14,7 @@ import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 
 export const ProgressModal: React.FC = () => {
+  const { t } = useTranslation();
   const { buildProgress, isBuildModalVisible, setIsBuildModalVisible } = useAppContext();
 
   const handleCancel = async () => {
@@ -29,7 +31,11 @@ export const ProgressModal: React.FC = () => {
   const getMessage = () => {
     const baseMessage = buildProgress.message || buildProgress.phase;
     if (buildProgress.currentStep && buildProgress.totalSteps) {
-      return `Этап ${buildProgress.currentStep} из ${buildProgress.totalSteps}: ${baseMessage}`;
+      return t('build.step', { 
+        current: buildProgress.currentStep, 
+        total: buildProgress.totalSteps, 
+        message: baseMessage 
+      });
     }
     return baseMessage;
   };
@@ -40,10 +46,10 @@ export const ProgressModal: React.FC = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            Building Audiobook
+            {t('build.title')}
           </DialogTitle>
           <DialogDescription>
-            Please wait while we process your audiobook...
+            {t('build.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -61,7 +67,7 @@ export const ProgressModal: React.FC = () => {
 
         <DialogFooter>
           <Button onClick={handleCancel} variant="outline">
-            Отмена
+            {t('build.cancel')}
           </Button>
         </DialogFooter>
       </DialogContent>

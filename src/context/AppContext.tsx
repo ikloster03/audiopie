@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { TrackInfo, Chapter, BookMetadata, AppSettings, BuildProgress } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface AppState {
   tracks: TrackInfo[];
@@ -10,6 +11,7 @@ interface AppState {
   isBuildModalVisible: boolean;
   isProjectOpen: boolean;
   theme: 'light' | 'dark';
+  language: 'en' | 'ru';
 }
 
 interface AppContextType extends AppState {
@@ -23,6 +25,7 @@ interface AppContextType extends AppState {
   newProject: () => void;
   closeProject: () => void;
   toggleTheme: () => void;
+  changeLanguage: (lang: 'en' | 'ru') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,6 +43,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  const { i18n, t } = useTranslation();
   const [tracks, setTracks] = useState<TrackInfo[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [metadata, setMetadata] = useState<BookMetadata>({ title: 'Untitled Audiobook' });
@@ -48,6 +52,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isBuildModalVisible, setIsBuildModalVisible] = useState(false);
   const [isProjectOpen, setIsProjectOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [language, setLanguage] = useState<'en' | 'ru'>('en');
 
   // Load initial settings and theme
   useEffect(() => {
@@ -62,10 +67,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       } else {
         document.documentElement.classList.remove('dark');
       }
+      
+      // Set initial language
+      const initialLanguage = loadedSettings.language || (localStorage.getItem('audiopie-language') as 'en' | 'ru') || 'en';
+      setLanguage(initialLanguage);
+      i18n.changeLanguage(initialLanguage);
     };
 
     loadInitialData();
-  }, []);
+  }, [i18n]);
 
   // Sync theme when settings change
   useEffect(() => {
@@ -87,14 +97,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const newProject = () => {
     setTracks([]);
     setChapters([]);
-    setMetadata({ title: 'Untitled Audiobook' });
+    setMetadata({ title: t('common.untitledAudiobook') });
     setIsProjectOpen(true);
   };
 
   const closeProject = () => {
     setTracks([]);
     setChapters([]);
-    setMetadata({ title: 'Untitled Audiobook' });
+    setMetadata({ title: t('common.untitledAudiobook') });
     setIsProjectOpen(false);
   };
 
@@ -114,6 +124,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const updatedSettings = await window.audioPie.settings.set({
       ...settings,
       theme: newTheme,
+    });
+    setSettings(updatedSettings);
+  };
+
+  // Language management
+  const changeLanguage = async (lang: 'en' | 'ru') => {
+    setLanguage(lang);
+    i18n.changeLanguage(lang);
+    localStorage.setItem('audiopie-language', lang);
+    
+    // Save to settings
+    const updatedSettings = await window.audioPie.settings.set({
+      ...settings,
+      language: lang,
     });
     setSettings(updatedSettings);
   };
@@ -145,6 +169,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     isBuildModalVisible,
     isProjectOpen,
     theme,
+    language,
     setTracks,
     setChapters,
     setMetadata,
@@ -154,7 +179,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     openProject,
     newProject,
     closeProject,
-    toggleTheme
+    toggleTheme,
+    changeLanguage
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
