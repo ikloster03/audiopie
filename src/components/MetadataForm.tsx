@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { BookMetadata } from '../types';
 import { useAppContext } from '../context/AppContext';
 import { Input } from './ui/input';
@@ -9,23 +10,18 @@ import { Card } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
 import { ImagePlus, X, Loader2 } from 'lucide-react';
 
-interface MetadataField {
-  key: keyof BookMetadata;
-  label: string;
-  type: 'text' | 'number' | 'textarea';
-}
-
-const metadataFields: MetadataField[] = [
-  { key: 'title', label: 'Title', type: 'text' },
-  { key: 'author', label: 'Author', type: 'text' },
-  { key: 'genre', label: 'Genre', type: 'text' },
-  { key: 'description', label: 'Description', type: 'textarea' },
-];
-
 export const MetadataForm: React.FC = () => {
+  const { t } = useTranslation();
   const { metadata, setMetadata } = useAppContext();
   const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
   const [isLoadingCover, setIsLoadingCover] = useState(false);
+
+  const metadataFields = [
+    { key: 'title' as keyof BookMetadata, label: t('metadata.title'), type: 'text' as const },
+    { key: 'author' as keyof BookMetadata, label: t('metadata.author'), type: 'text' as const },
+    { key: 'genre' as keyof BookMetadata, label: t('metadata.genre'), type: 'text' as const },
+    { key: 'description' as keyof BookMetadata, label: t('metadata.description'), type: 'textarea' as const },
+  ];
 
   const handleChange = (key: keyof BookMetadata, value: string) => {
     let processedValue: string | number | undefined = value;
@@ -87,14 +83,14 @@ export const MetadataForm: React.FC = () => {
         {/* Cover Section */}
         <Card className="p-6">
           <div className="space-y-4">
-            <Label className="text-base font-semibold">Book Cover</Label>
+            <Label className="text-base font-semibold">{t('metadata.bookCover')}</Label>
             
             {metadata.coverPath && coverDataUrl ? (
               <div className="flex flex-col items-center gap-4">
                 <div className="relative group">
                   <img 
                     src={coverDataUrl} 
-                    alt="Book cover" 
+                    alt={t('metadata.bookCover')}
                     className="max-w-[200px] max-h-[200px] rounded-lg shadow-lg border object-contain"
                   />
                   <Button
@@ -113,13 +109,13 @@ export const MetadataForm: React.FC = () => {
             ) : isLoadingCover ? (
               <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20">
                 <Loader2 className="h-12 w-12 text-muted-foreground animate-spin mb-3" />
-                <p className="text-sm text-muted-foreground">Loading cover...</p>
+                <p className="text-sm text-muted-foreground">{t('metadata.loadingCover')}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20 hover:border-primary/50 transition-colors">
                 <ImagePlus className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                <p className="text-sm text-muted-foreground font-medium mb-1">No cover selected</p>
-                <p className="text-xs text-muted-foreground">Click button below to choose</p>
+                <p className="text-sm text-muted-foreground font-medium mb-1">{t('metadata.noCover')}</p>
+                <p className="text-xs text-muted-foreground">{t('metadata.chooseCover')}</p>
               </div>
             )}
             
@@ -131,7 +127,7 @@ export const MetadataForm: React.FC = () => {
                 disabled={isLoadingCover}
               >
                 <ImagePlus className="h-4 w-4" />
-                {metadata.coverPath ? 'Change Cover' : 'Choose Cover'}
+                {metadata.coverPath ? t('metadata.changeCover') : t('metadata.chooseCoverButton')}
               </Button>
               {metadata.coverPath && (
                 <Button 
@@ -140,7 +136,7 @@ export const MetadataForm: React.FC = () => {
                   disabled={isLoadingCover}
                 >
                   <X className="h-4 w-4" />
-                  Clear
+                  {t('metadata.clear')}
                 </Button>
               )}
             </div>
@@ -160,7 +156,7 @@ export const MetadataForm: React.FC = () => {
                   value={metadata[field.key] ? String(metadata[field.key]) : ''}
                   onChange={(e) => handleChange(field.key, e.target.value)}
                   className="min-h-[120px] resize-y"
-                  placeholder={`Enter ${field.label.toLowerCase()}...`}
+                  placeholder={t('metadata.enterPlaceholder', { field: field.label.toLowerCase() })}
                 />
               ) : (
                 <Input
@@ -168,7 +164,7 @@ export const MetadataForm: React.FC = () => {
                   type={field.type}
                   value={metadata[field.key] !== undefined ? String(metadata[field.key]) : ''}
                   onChange={(e) => handleChange(field.key, e.target.value)}
-                  placeholder={`Enter ${field.label.toLowerCase()}...`}
+                  placeholder={t('metadata.enterPlaceholder', { field: field.label.toLowerCase() })}
                 />
               )}
             </div>

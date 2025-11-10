@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Chapter } from '../types';
 import { useAppContext } from '../context/AppContext';
 import { Input } from './ui/input';
@@ -58,6 +59,7 @@ const ChapterRow: React.FC<ChapterRowProps> = ({ chapter, index, onUpdate }) => 
 };
 
 export const ChapterList: React.FC = () => {
+  const { t } = useTranslation();
   const { chapters, setChapters } = useAppContext();
   const [pendingUpdate, setPendingUpdate] = useState<NodeJS.Timeout | null>(null);
 
@@ -90,17 +92,17 @@ export const ChapterList: React.FC = () => {
         <div className="flex justify-end mb-4">
           <Button onClick={handleGenerateChapters} size="sm" variant="outline">
             <Sparkles className="h-4 w-4" />
-            Generate from tracks
+            {t('chapters.generate')}
           </Button>
         </div>
         <div className="flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8">
           <div className="text-center">
             <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
             <p className="text-sm text-muted-foreground font-medium mb-1">
-              No chapters yet
+              {t('chapters.noChapters')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Generate chapters from your tracks
+              {t('chapters.generateDesc')}
             </p>
           </div>
         </div>
@@ -112,11 +114,11 @@ export const ChapterList: React.FC = () => {
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-muted-foreground">
-          {chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}
+          {t('chapters.count', { count: chapters.length })}
         </p>
         <Button onClick={handleGenerateChapters} size="sm" variant="outline">
           <Sparkles className="h-4 w-4" />
-          Regenerate
+          {t('chapters.regenerate')}
         </Button>
       </div>
       <ScrollArea className="flex-1">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AppSettings } from '../types';
 import { useAppContext } from '../context/AppContext';
 import {
@@ -13,7 +14,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
-import { Settings2, Moon, Sun } from 'lucide-react';
+import { Settings2, Moon, Sun, Languages } from 'lucide-react';
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -21,7 +22,8 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
-  const { settings, setSettings, theme } = useAppContext();
+  const { t } = useTranslation();
+  const { settings, setSettings, theme, changeLanguage, language } = useAppContext();
   const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
   const [formData, setFormData] = useState<AppSettings>({
     ffmpegPath: '',
@@ -29,7 +31,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     defaultBitrateKbps: 128,
     defaultOutputDir: '',
     ffmpegThreads: 0,
-    theme: 'light'
+    theme: 'light',
+    language: 'en'
   });
 
   useEffect(() => {
@@ -40,10 +43,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         defaultBitrateKbps: settings.defaultBitrateKbps || 128,
         defaultOutputDir: settings.defaultOutputDir || '',
         ffmpegThreads: settings.ffmpegThreads ?? 0,
-        theme: settings.theme || theme || 'light'
+        theme: settings.theme || theme || 'light',
+        language: settings.language || language || 'en'
       });
     }
-  }, [isOpen, settings, theme]);
+  }, [isOpen, settings, theme, language]);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +63,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
       defaultBitrateKbps: formData.defaultBitrateKbps,
       defaultOutputDir: formData.defaultOutputDir || undefined,
       ffmpegThreads: formData.ffmpegThreads,
-      theme: formData.theme
+      theme: formData.theme,
+      language: formData.language
     });
     setSettings(updated);
     
@@ -68,6 +73,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+    
+    // Apply language change immediately
+    if (formData.language && formData.language !== language) {
+      changeLanguage(formData.language);
     }
     
     onClose();
@@ -83,10 +93,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5 text-primary" />
-            Settings
+            {t('settings.title')}
           </DialogTitle>
           <DialogDescription>
-            Configure application settings and preferences
+            {t('settings.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -94,35 +104,35 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="ffmpegPath">FFmpeg Path</Label>
+                <Label htmlFor="ffmpegPath">{t('settings.ffmpegPath')}</Label>
                 <Input
                   id="ffmpegPath"
                   type="text"
                   value={formData.ffmpegPath}
                   onChange={(e) => handleChange('ffmpegPath', e.target.value)}
-                  placeholder="Leave empty for system default"
+                  placeholder={t('settings.ffmpegPathPlaceholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Path to FFmpeg executable. Leave empty to use system default.
+                  {t('settings.ffmpegPathDesc')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ffprobePath">FFprobe Path</Label>
+                <Label htmlFor="ffprobePath">{t('settings.ffprobePath')}</Label>
                 <Input
                   id="ffprobePath"
                   type="text"
                   value={formData.ffprobePath}
                   onChange={(e) => handleChange('ffprobePath', e.target.value)}
-                  placeholder="Leave empty for system default"
+                  placeholder={t('settings.ffprobePathPlaceholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Path to FFprobe executable. Leave empty to use system default.
+                  {t('settings.ffprobePathDesc')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="defaultBitrateKbps">Default Bitrate (kbps)</Label>
+                <Label htmlFor="defaultBitrateKbps">{t('settings.defaultBitrate')}</Label>
                 <Input
                   id="defaultBitrateKbps"
                   type="number"
@@ -132,26 +142,26 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onChange={(e) => handleChange('defaultBitrateKbps', Number(e.target.value))}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Audio bitrate for encoded output (32-512 kbps)
+                  {t('settings.defaultBitrateDesc')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="defaultOutputDir">Default Output Directory</Label>
+                <Label htmlFor="defaultOutputDir">{t('settings.defaultOutputDir')}</Label>
                 <Input
                   id="defaultOutputDir"
                   type="text"
                   value={formData.defaultOutputDir}
                   onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
-                  placeholder="Leave empty for last used directory"
+                  placeholder={t('settings.defaultOutputDirPlaceholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Default directory for saving built audiobooks
+                  {t('settings.defaultOutputDirDesc')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ffmpegThreads">Parallel FFmpeg Processes</Label>
+                <Label htmlFor="ffmpegThreads">{t('settings.ffmpegThreads')}</Label>
                 <Input
                   id="ffmpegThreads"
                   type="number"
@@ -161,12 +171,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Number of tracks to encode simultaneously. 0 = Auto (all {maxCpuCores} cores), Max: {maxCpuCores}
+                  {t('settings.ffmpegThreadsDesc', { cores: maxCpuCores })}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
+                <Label htmlFor="theme">{t('settings.theme')}</Label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -175,7 +185,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                     onClick={() => handleChange('theme', 'light')}
                   >
                     <Sun className="h-4 w-4 mr-2" />
-                    Light
+                    {t('settings.light')}
                   </Button>
                   <Button
                     type="button"
@@ -184,21 +194,48 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                     onClick={() => handleChange('theme', 'dark')}
                   >
                     <Moon className="h-4 w-4 mr-2" />
-                    Dark
+                    {t('settings.dark')}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Choose your preferred color theme
+                  {t('settings.themeDesc')}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="language">{t('settings.language')}</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={formData.language === 'en' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => handleChange('language', 'en')}
+                  >
+                    <Languages className="h-4 w-4 mr-2" />
+                    English
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.language === 'ru' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => handleChange('language', 'ru')}
+                  >
+                    <Languages className="h-4 w-4 mr-2" />
+                    Русский
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t('settings.languageDesc')}
                 </p>
               </div>
             </div>
 
             <DialogFooter className="gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {t('settings.cancel')}
               </Button>
               <Button type="submit">
-                Save Changes
+                {t('settings.saveChanges')}
               </Button>
             </DialogFooter>
           </form>
