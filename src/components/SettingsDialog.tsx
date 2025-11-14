@@ -89,10 +89,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+      <DialogContent className="settings-dialog__content">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-primary" />
+          <DialogTitle className="settings-dialog__header-title">
+            <Settings2 className="settings-dialog__header-icon" />
             {t('settings.title')}
           </DialogTitle>
           <DialogDescription>
@@ -100,10 +100,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[50vh]">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
+        <ScrollArea className="settings-dialog__scroll-area">
+          <form onSubmit={handleSubmit} className="settings-dialog__form">
+            <div className="settings-dialog__fields">
+              <div className="settings-dialog__field">
                 <Label htmlFor="ffmpegPath">{t('settings.ffmpegPath')}</Label>
                 <Input
                   id="ffmpegPath"
@@ -112,12 +112,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onChange={(e) => handleChange('ffmpegPath', e.target.value)}
                   placeholder={t('settings.ffmpegPathPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.ffmpegPathDesc')}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="ffprobePath">{t('settings.ffprobePath')}</Label>
                 <Input
                   id="ffprobePath"
@@ -126,12 +126,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onChange={(e) => handleChange('ffprobePath', e.target.value)}
                   placeholder={t('settings.ffprobePathPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.ffprobePathDesc')}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="defaultBitrateKbps">{t('settings.defaultBitrate')}</Label>
                 <Input
                   id="defaultBitrateKbps"
@@ -141,12 +141,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   value={formData.defaultBitrateKbps}
                   onChange={(e) => handleChange('defaultBitrateKbps', Number(e.target.value))}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.defaultBitrateDesc')}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="defaultOutputDir">{t('settings.defaultOutputDir')}</Label>
                 <Input
                   id="defaultOutputDir"
@@ -155,12 +155,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
                   placeholder={t('settings.defaultOutputDirPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.defaultOutputDirDesc')}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="ffmpegThreads">{t('settings.ffmpegThreads')}</Label>
                 <Input
                   id="ffmpegThreads"
@@ -170,67 +170,67 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   value={formData.ffmpegThreads}
                   onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.ffmpegThreadsDesc', { cores: maxCpuCores })}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="theme">{t('settings.theme')}</Label>
-                <div className="flex gap-2">
+                <div className="settings-dialog__theme-buttons">
                   <Button
                     type="button"
                     variant={formData.theme === 'light' ? 'default' : 'outline'}
-                    className="flex-1"
+                    className="settings-dialog__theme-button"
                     onClick={() => handleChange('theme', 'light')}
                   >
-                    <Sun className="h-4 w-4 mr-2" />
+                    <Sun className="settings-dialog__theme-icon" />
                     {t('settings.light')}
                   </Button>
                   <Button
                     type="button"
                     variant={formData.theme === 'dark' ? 'default' : 'outline'}
-                    className="flex-1"
+                    className="settings-dialog__theme-button"
                     onClick={() => handleChange('theme', 'dark')}
                   >
-                    <Moon className="h-4 w-4 mr-2" />
+                    <Moon className="settings-dialog__theme-icon" />
                     {t('settings.dark')}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.themeDesc')}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="settings-dialog__field">
                 <Label htmlFor="language">{t('settings.language')}</Label>
-                <div className="flex gap-2">
+                <div className="settings-dialog__language-buttons">
                   <Button
                     type="button"
                     variant={formData.language === 'en' ? 'default' : 'outline'}
-                    className="flex-1"
+                    className="settings-dialog__language-button"
                     onClick={() => handleChange('language', 'en')}
                   >
-                    <Languages className="h-4 w-4 mr-2" />
+                    <Languages className="settings-dialog__language-icon" />
                     English
                   </Button>
                   <Button
                     type="button"
                     variant={formData.language === 'ru' ? 'default' : 'outline'}
-                    className="flex-1"
+                    className="settings-dialog__language-button"
                     onClick={() => handleChange('language', 'ru')}
                   >
-                    <Languages className="h-4 w-4 mr-2" />
+                    <Languages className="settings-dialog__language-icon" />
                     Русский
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="settings-dialog__field-description">
                   {t('settings.languageDesc')}
                 </p>
               </div>
             </div>
 
-            <DialogFooter className="gap-2">
+            <DialogFooter className="settings-dialog__footer">
               <Button type="button" variant="outline" onClick={onClose}>
                 {t('settings.cancel')}
               </Button>

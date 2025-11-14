@@ -78,55 +78,55 @@ export const MetadataForm: React.FC = () => {
   }, [metadata.coverPath]);
 
   return (
-    <ScrollArea className="h-full">
-      <div className="space-y-6">
+    <ScrollArea className="metadata-form">
+      <div className="metadata-form__container">
         {/* Cover Section */}
-        <Card className="p-6">
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">{t('metadata.bookCover')}</Label>
+        <Card className="metadata-form__cover-card">
+          <div className="metadata-form__cover-section">
+            <Label className="metadata-form__cover-label">{t('metadata.bookCover')}</Label>
             
             {metadata.coverPath && coverDataUrl ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="relative group">
+              <div className="metadata-form__cover-display">
+                <div className="metadata-form__cover-image-wrapper">
                   <img 
                     src={coverDataUrl} 
                     alt={t('metadata.bookCover')}
-                    className="max-w-[200px] max-h-[200px] rounded-lg shadow-lg border object-contain"
+                    className="metadata-form__cover-image"
                   />
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                    className="metadata-form__cover-remove"
                     onClick={handleCoverClear}
                   >
-                    <X className="h-4 w-4" />
+                    <X className="metadata-form__cover-remove-icon" />
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground text-center max-w-[250px] break-all bg-muted px-3 py-1.5 rounded">
+                <p className="metadata-form__cover-path">
                   {metadata.coverPath.split(/[\\/]/).pop()}
                 </p>
               </div>
             ) : isLoadingCover ? (
-              <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20">
-                <Loader2 className="h-12 w-12 text-muted-foreground animate-spin mb-3" />
-                <p className="text-sm text-muted-foreground">{t('metadata.loadingCover')}</p>
+              <div className="metadata-form__cover-loading">
+                <Loader2 className="metadata-form__cover-loading-icon" />
+                <p className="metadata-form__cover-loading-text">{t('metadata.loadingCover')}</p>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20 hover:border-primary/50 transition-colors">
-                <ImagePlus className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                <p className="text-sm text-muted-foreground font-medium mb-1">{t('metadata.noCover')}</p>
-                <p className="text-xs text-muted-foreground">{t('metadata.chooseCover')}</p>
+              <div className="metadata-form__cover-empty">
+                <ImagePlus className="metadata-form__cover-empty-icon" />
+                <p className="metadata-form__cover-empty-text">{t('metadata.noCover')}</p>
+                <p className="metadata-form__cover-empty-hint">{t('metadata.chooseCover')}</p>
               </div>
             )}
             
-            <div className="flex gap-2">
+            <div className="metadata-form__cover-actions">
               <Button 
                 onClick={handleCoverSelect} 
                 variant="outline" 
-                className="flex-1"
+                className="metadata-form__cover-select"
                 disabled={isLoadingCover}
               >
-                <ImagePlus className="h-4 w-4" />
+                <ImagePlus className="metadata-form__cover-select-icon" />
                 {metadata.coverPath ? t('metadata.changeCover') : t('metadata.chooseCoverButton')}
               </Button>
               {metadata.coverPath && (
@@ -135,7 +135,7 @@ export const MetadataForm: React.FC = () => {
                   variant="ghost"
                   disabled={isLoadingCover}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="metadata-form__cover-clear-icon" />
                   {t('metadata.clear')}
                 </Button>
               )}
@@ -144,10 +144,10 @@ export const MetadataForm: React.FC = () => {
         </Card>
 
         {/* Metadata Fields */}
-        <div className="grid gap-4">
+        <div className="metadata-form__fields">
           {metadataFields.map((field) => (
-            <div key={field.key} className="space-y-2">
-              <Label htmlFor={field.key} className="text-sm font-medium">
+            <div key={field.key} className="metadata-form__field">
+              <Label htmlFor={field.key} className="metadata-form__field-label">
                 {field.label}
               </Label>
               {field.type === 'textarea' ? (
@@ -155,7 +155,7 @@ export const MetadataForm: React.FC = () => {
                   id={field.key}
                   value={metadata[field.key] ? String(metadata[field.key]) : ''}
                   onChange={(e) => handleChange(field.key, e.target.value)}
-                  className="min-h-[120px] resize-y"
+                  className="metadata-form__field-textarea"
                   placeholder={t('metadata.enterPlaceholder', { field: field.label.toLowerCase() })}
                 />
               ) : (

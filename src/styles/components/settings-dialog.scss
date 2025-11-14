@@ -1,0 +1,75 @@
+/* SettingsDialog Component BEM Styles */
+
+.settings-dialog {
+  &__content {
+    @apply sm:max-w-[600px] max-h-[80vh];
+  }
+
+  &__header-title {
+    @apply flex items-center gap-2;
+  }
+
+  &__header-icon {
+    @apply h-5 w-5 text-primary;
+  }
+
+  &__scroll-area {
+    @apply max-h-[50vh];
+  }
+
+  &__form {
+    @apply space-y-6;
+  }
+
+  &__fields {
+    @apply space-y-4;
+  }
+
+  &__field {
+    @apply space-y-2;
+
+    &-label {
+      /* Label styles are inherited from ui/label */
+    }
+
+    &-input {
+      /* Input styles are inherited from ui/input */
+    }
+
+    &-description {
+      @apply text-xs text-muted-foreground;
+    }
+  }
+
+  /* Theme Toggle */
+  &__theme-buttons {
+    @apply flex gap-2;
+  }
+
+  &__theme-button {
+    @apply flex-1;
+  }
+
+  &__theme-icon {
+    @apply h-4 w-4 mr-2;
+  }
+
+  /* Language Toggle */
+  &__language-buttons {
+    @apply flex gap-2;
+  }
+
+  &__language-button {
+    @apply flex-1;
+  }
+
+  &__language-icon {
+    @apply h-4 w-4 mr-2;
+  }
+
+  /* Footer */
+  &__footer {
+    @apply gap-2;
+  }
+}
+

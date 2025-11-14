@@ -1,0 +1,116 @@
+/* MetadataForm Component BEM Styles */
+
+.metadata-form {
+  @apply h-full;
+
+  &__container {
+    @apply space-y-6;
+  }
+
+  /* Cover Section */
+  &__cover-card {
+    @apply p-6;
+  }
+
+  &__cover-section {
+    @apply space-y-4;
+  }
+
+  &__cover-label {
+    @apply text-base font-semibold;
+  }
+
+  /* Cover Display */
+  &__cover-display {
+    @apply flex flex-col items-center gap-4;
+  }
+
+  &__cover-image-wrapper {
+    @apply relative;
+
+    &:hover .metadata-form__cover-remove {
+      opacity: 1;
+    }
+  }
+
+  &__cover-image {
+    @apply max-w-[200px] max-h-[200px] rounded-lg shadow-lg border object-contain;
+  }
+
+  &__cover-remove {
+    @apply absolute top-2 right-2 opacity-0 transition-opacity h-8 w-8;
+
+    &-icon {
+      @apply h-4 w-4;
+    }
+  }
+
+  &__cover-path {
+    @apply text-xs text-muted-foreground text-center max-w-[250px] break-all bg-muted px-3 py-1.5 rounded;
+  }
+
+  /* Cover Loading State */
+  &__cover-loading {
+    @apply flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20;
+
+    &-icon {
+      @apply h-12 w-12 text-muted-foreground animate-spin mb-3;
+    }
+
+    &-text {
+      @apply text-sm text-muted-foreground;
+    }
+  }
+
+  /* Cover Empty State */
+  &__cover-empty {
+    @apply flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg bg-muted/20 hover:border-primary/50 transition-colors;
+
+    &-icon {
+      @apply h-12 w-12 text-muted-foreground/50 mb-3;
+    }
+
+    &-text {
+      @apply text-sm text-muted-foreground font-medium mb-1;
+    }
+
+    &-hint {
+      @apply text-xs text-muted-foreground;
+    }
+  }
+
+  /* Cover Actions */
+  &__cover-actions {
+    @apply flex gap-2;
+  }
+
+  &__cover-select {
+    @apply flex-1;
+
+    &-icon {
+      @apply h-4 w-4;
+    }
+  }
+
+  &__cover-clear-icon {
+    @apply h-4 w-4;
+  }
+
+  /* Metadata Fields */
+  &__fields {
+    @apply grid gap-4;
+  }
+
+  &__field {
+    @apply space-y-2;
+
+    &-label {
+      @apply text-sm font-medium;
+    }
+
+    &-textarea {
+      @apply min-h-[120px] resize-y;
+    }
+  }
+}
+

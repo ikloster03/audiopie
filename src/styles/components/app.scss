@@ -1,0 +1,136 @@
+/* App Component BEM Styles */
+
+.app {
+  @apply min-h-screen bg-background;
+
+  /* Header */
+  &__header {
+    @apply border-b bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10;
+
+    &-container {
+      @apply container mx-auto px-6 py-4;
+    }
+
+    &-content {
+      @apply flex items-center justify-between;
+    }
+  }
+
+  &__logo {
+    @apply flex items-center gap-3;
+
+    &-icon {
+      @apply h-8 w-8 text-primary;
+    }
+
+    &-title {
+      @apply text-2xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent;
+    }
+  }
+
+  &__actions {
+    @apply flex items-center gap-2;
+  }
+
+  /* Alert Notification */
+  &__alert {
+    @apply fixed bottom-6 right-6 z-50 duration-300;
+    animation: slideIn 0.3s ease-out;
+
+    &--destructive {
+      @apply max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950;
+    }
+
+    &-title {
+      @apply text-red-600 dark:text-red-400;
+    }
+
+    &-description {
+      @apply text-red-600 dark:text-red-400;
+    }
+  }
+
+  /* Main Content */
+  &__main {
+    @apply container mx-auto px-6 py-6;
+  }
+
+  &__content {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+  }
+
+  /* Tracks Panel */
+  &__tracks-panel {
+    @apply lg:col-span-1 flex flex-col;
+  }
+
+  &__tracks-content {
+    @apply p-6 flex-1 flex flex-col;
+  }
+
+  &__tracks-header {
+    @apply flex items-center gap-2 mb-4;
+  }
+
+  &__tracks-icon {
+    @apply h-5 w-5 text-primary;
+  }
+
+  &__tracks-title {
+    @apply text-lg font-semibold;
+  }
+
+  &__tracks-count {
+    @apply ml-auto text-sm text-muted-foreground;
+  }
+
+  &__tracks-empty {
+    @apply flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8;
+
+    &-content {
+      @apply text-center;
+    }
+
+    &-icon {
+      @apply h-12 w-12 mx-auto text-muted-foreground/50 mb-3;
+    }
+
+    &-text {
+      @apply text-sm text-muted-foreground font-medium mb-1;
+    }
+
+    &-hint {
+      @apply text-xs text-muted-foreground;
+    }
+  }
+
+  &__tracks-list {
+    @apply flex-1 overflow-hidden;
+  }
+
+  /* Details Panel */
+  &__details-panel {
+    @apply lg:col-span-2 flex flex-col;
+  }
+
+  &__details-content {
+    @apply p-6 flex-1 flex flex-col;
+  }
+
+  &__tabs {
+    @apply flex-1 flex flex-col;
+
+    &-list {
+      @apply grid w-full grid-cols-2 mb-4;
+    }
+
+    &-content {
+      @apply flex-1 overflow-auto;
+
+      &--chapters {
+        @apply flex-1 flex flex-col overflow-hidden;
+      }
+    }
+  }
+}
+

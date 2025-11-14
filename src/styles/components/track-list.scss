@@ -1,0 +1,43 @@
+/* TrackList Component BEM Styles */
+
+.track-list {
+  @apply h-full;
+
+  &__container {
+    @apply space-y-2;
+  }
+}
+
+/* Track Item */
+.track-item {
+  @apply flex items-center gap-2 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all;
+
+  &:hover .track-item__remove-button {
+    opacity: 1;
+  }
+
+  &__drag-handle {
+    @apply h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing hover:text-primary transition-colors;
+  }
+
+  &__input {
+    @apply flex-1 h-9 text-sm;
+  }
+
+  &__duration {
+    @apply flex items-center gap-1;
+
+    &-icon {
+      @apply h-3 w-3;
+    }
+  }
+
+  &__remove-button {
+    @apply h-8 w-8 opacity-0 transition-opacity text-destructive hover:text-destructive;
+  }
+
+  &__remove-icon {
+    @apply h-4 w-4;
+  }
+}
+

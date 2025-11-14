@@ -100,18 +100,18 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="app">
       {/* Header */}
-      <header className="border-b bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Music className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
+      <header className="app__header">
+        <div className="app__header-container">
+          <div className="app__header-content">
+            <div className="app__logo">
+              <Music className="app__logo-icon" />
+              <h1 className="app__logo-title">
                 {t('app.title')}
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="app__actions">
               <Button onClick={handleAddTracks} variant="outline" size="sm">
                 <Plus className="h-4 w-4" />
                 {t('header.addTracks')}
@@ -145,10 +145,10 @@ export const App: React.FC = () => {
 
       {/* Empty Project Alert - Toast Notification */}
       {emptyProjectAlertType === 'save' && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
-          <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
-            <AlertTitle className="text-red-600 dark:text-red-400">{t('alerts.cannotSaveTitle')}</AlertTitle>
-            <AlertDescription className="text-red-600 dark:text-red-400">
+        <div className="app__alert">
+          <Alert variant="destructive" className="app__alert--destructive">
+            <AlertTitle className="app__alert-title">{t('alerts.cannotSaveTitle')}</AlertTitle>
+            <AlertDescription className="app__alert-description">
               {t('alerts.cannotSaveDesc')}
             </AlertDescription>
           </Alert>
@@ -156,10 +156,10 @@ export const App: React.FC = () => {
       )}
       
       {emptyProjectAlertType === 'build' && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-right-5 duration-300">
-          <Alert variant="destructive" className="max-w-md shadow-lg border-2 border-red-600 bg-red-50 dark:bg-red-950">
-            <AlertTitle className="text-red-600 dark:text-red-400">{t('alerts.cannotBuildTitle')}</AlertTitle>
-            <AlertDescription className="text-red-600 dark:text-red-400">
+        <div className="app__alert">
+          <Alert variant="destructive" className="app__alert--destructive">
+            <AlertTitle className="app__alert-title">{t('alerts.cannotBuildTitle')}</AlertTitle>
+            <AlertDescription className="app__alert-description">
               {t('alerts.cannotBuildDesc')}
             </AlertDescription>
           </Alert>
@@ -167,36 +167,36 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="app__main">
+        <div className="app__content">
           {/* Tracks Panel */}
           <Card
-            className="lg:col-span-1 flex flex-col"
+            className="app__tracks-panel"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleTrackDrop}
           >
-            <CardContent className="p-6 flex-1 flex flex-col">
-              <div className="flex items-center gap-2 mb-4">
-                <Music className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold">{t('tracks.title')}</h2>
-                <span className="ml-auto text-sm text-muted-foreground">
+            <CardContent className="app__tracks-content">
+              <div className="app__tracks-header">
+                <Music className="app__tracks-icon" />
+                <h2 className="app__tracks-title">{t('tracks.title')}</h2>
+                <span className="app__tracks-count">
                   {t('tracks.count', { count: tracks.length })}
                 </span>
               </div>
               {tracks.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8">
-                  <div className="text-center">
-                    <Music className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-                    <p className="text-sm text-muted-foreground font-medium mb-1">
+                <div className="app__tracks-empty">
+                  <div className="app__tracks-empty-content">
+                    <Music className="app__tracks-empty-icon" />
+                    <p className="app__tracks-empty-text">
                       {t('tracks.noTracks')}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="app__tracks-empty-hint">
                       {t('tracks.dragDrop')}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 overflow-hidden">
+                <div className="app__tracks-list">
                   <TrackList />
                 </div>
               )}
@@ -204,17 +204,17 @@ export const App: React.FC = () => {
           </Card>
 
           {/* Details Panel */}
-          <Card className="lg:col-span-2 flex flex-col">
-            <CardContent className="p-6 flex-1 flex flex-col">
-              <Tabs defaultValue="metadata" className="flex-1 flex flex-col">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
+          <Card className="app__details-panel">
+            <CardContent className="app__details-content">
+              <Tabs defaultValue="metadata" className="app__tabs">
+                <TabsList className="app__tabs-list">
                   <TabsTrigger value="metadata">{t('metadata.tab')}</TabsTrigger>
                   <TabsTrigger value="chapters">{t('chaptersTab.tab')}</TabsTrigger>
                 </TabsList>
-                <TabsContent value="metadata" className="flex-1 overflow-auto scrollbar-thin">
+                <TabsContent value="metadata" className="app__tabs-content">
                   <MetadataForm />
                 </TabsContent>
-                <TabsContent value="chapters" className="flex-1 flex flex-col overflow-hidden">
+                <TabsContent value="chapters" className="app__tabs-content--chapters">
                   <ChapterList />
                 </TabsContent>
               </Tabs>

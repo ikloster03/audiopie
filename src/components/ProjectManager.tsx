@@ -31,9 +31,9 @@ export const ProjectManager: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative">
+    <div className="project-manager">
       {/* Theme and Language Toggle */}
-      <div className="absolute top-6 right-6 flex items-center gap-2">
+      <div className="project-manager__controls">
         <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? t('header.switchToDarkMode') : t('header.switchToLightMode')}>
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
@@ -43,38 +43,38 @@ export const ProjectManager: React.FC = () => {
         </Button>
       </div>
 
-      <div className="max-w-2xl w-full">
+      <div className="project-manager__container">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-12">
-          <Music className="h-16 w-16 text-primary" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
+        <div className="project-manager__logo">
+          <Music className="project-manager__logo-icon" />
+          <h1 className="project-manager__logo-title">
             {t('app.title')}
           </h1>
         </div>
 
         {/* Project Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="project-manager__cards">
           {/* Open Project Card */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={handleOpenProject}>
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <FolderOpen className="h-10 w-10 text-primary" />
+          <Card className="project-manager__card" onClick={handleOpenProject}>
+            <CardContent className="project-manager__card-content">
+              <div className="project-manager__card-icon-wrapper project-manager__card-icon-wrapper--open">
+                <FolderOpen className="project-manager__card-icon project-manager__card-icon--primary" />
               </div>
-              <h2 className="text-2xl font-semibold mb-2">{t('projectManager.openProject')}</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="project-manager__card-title">{t('projectManager.openProject')}</h2>
+              <p className="project-manager__card-description">
                 {t('projectManager.openProjectDesc')}
               </p>
             </CardContent>
           </Card>
 
           {/* Create New Card */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={handleNewProject}>
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="h-20 w-20 rounded-full bg-orange-500/10 flex items-center justify-center mb-4 group-hover:bg-orange-500/20 transition-colors">
-                <Plus className="h-10 w-10 text-orange-500" />
+          <Card className="project-manager__card" onClick={handleNewProject}>
+            <CardContent className="project-manager__card-content">
+              <div className="project-manager__card-icon-wrapper project-manager__card-icon-wrapper--new">
+                <Plus className="project-manager__card-icon project-manager__card-icon--orange" />
               </div>
-              <h2 className="text-2xl font-semibold mb-2">{t('projectManager.createNew')}</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="project-manager__card-title">{t('projectManager.createNew')}</h2>
+              <p className="project-manager__card-description">
                 {t('projectManager.createNewDesc')}
               </p>
             </CardContent>
@@ -82,7 +82,7 @@ export const ProjectManager: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-muted-foreground mt-8">
+        <p className="project-manager__footer">
           {t('app.subtitle')}
         </p>
       </div>

@@ -34,27 +34,27 @@ const TrackItem: React.FC<TrackItemProps> = ({ track, index, onUpdateTitle, onRe
   return (
     <div 
       data-index={index}
-      className="group flex items-center gap-2 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all"
+      className="track-item"
     >
-      <GripVertical className="drag-handle h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing hover:text-primary transition-colors" />
+      <GripVertical className="drag-handle track-item__drag-handle" />
       <Input
         type="text"
         value={track.displayTitle}
-        className="flex-1 h-9 text-sm"
+        className="track-item__input"
         onChange={(e) => onUpdateTitle(index, e.target.value)}
       />
-      <Badge variant="secondary" className="flex items-center gap-1">
-        <Clock className="h-3 w-3" />
+      <Badge variant="secondary" className="track-item__duration">
+        <Clock className="track-item__duration-icon" />
         {formatDuration(track.durationMs)}
       </Badge>
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+        className="track-item__remove-button"
         title={t('tracks.removeTrack')}
         onClick={() => onRemove(index)}
       >
-        <X className="h-4 w-4" />
+        <X className="track-item__remove-icon" />
       </Button>
     </div>
   );
@@ -114,8 +114,8 @@ export const TrackList: React.FC = () => {
   };
 
   return (
-    <ScrollArea className="h-full">
-      <div className="space-y-2" ref={listRef}>
+    <ScrollArea className="track-list">
+      <div className="track-list__container" ref={listRef}>
         {tracks.map((track, index) => (
           <TrackItem
             key={`${track.path}-${index}`}

@@ -40,18 +40,18 @@ const ChapterRow: React.FC<ChapterRowProps> = ({ chapter, index, onUpdate }) => 
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all">
-      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
+    <div className="chapter-row">
+      <div className="chapter-row__number">
         {index + 1}
       </div>
       <Input
         type="text"
         value={title}
         onChange={handleChange}
-        className="flex-1 h-9 text-sm"
+        className="chapter-row__input"
       />
-      <Badge variant="secondary" className="flex items-center gap-1 whitespace-nowrap">
-        <Clock className="h-3 w-3" />
+      <Badge variant="secondary" className="chapter-row__duration">
+        <Clock className="chapter-row__duration-icon" />
         {formatDuration(chapter.startMs)} – {formatDuration(chapter.endMs)}
       </Badge>
     </div>
@@ -88,20 +88,20 @@ export const ChapterList: React.FC = () => {
 
   if (chapters.length === 0) {
     return (
-      <div className="flex-1 flex flex-col">
-        <div className="flex justify-end mb-4">
+      <div className="chapter-list__empty">
+        <div className="chapter-list__empty-actions">
           <Button onClick={handleGenerateChapters} size="sm" variant="outline">
             <Sparkles className="h-4 w-4" />
             {t('chapters.generate')}
           </Button>
         </div>
-        <div className="flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8">
-          <div className="text-center">
-            <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-            <p className="text-sm text-muted-foreground font-medium mb-1">
+        <div className="chapter-list__empty-content">
+          <div className="chapter-list__empty-inner">
+            <Sparkles className="chapter-list__empty-icon" />
+            <p className="chapter-list__empty-text">
               {t('chapters.noChapters')}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="chapter-list__empty-hint">
               {t('chapters.generateDesc')}
             </p>
           </div>
@@ -111,9 +111,9 @@ export const ChapterList: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">
+    <div className="chapter-list__container">
+      <div className="chapter-list__header">
+        <p className="chapter-list__count">
           {t('chapters.count', { count: chapters.length })}
         </p>
         <Button onClick={handleGenerateChapters} size="sm" variant="outline">
@@ -121,8 +121,8 @@ export const ChapterList: React.FC = () => {
           {t('chapters.regenerate')}
         </Button>
       </div>
-      <ScrollArea className="flex-1">
-        <div className="space-y-2">
+      <ScrollArea className="chapter-list__list">
+        <div className="chapter-list__items">
           {chapters.map((chapter, index) => (
             <ChapterRow
               key={index}
