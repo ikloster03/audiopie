@@ -42,10 +42,10 @@ export const ProgressModal: React.FC = () => {
 
   return (
     <Dialog open={isBuildModalVisible} onOpenChange={setIsBuildModalVisible}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="progress-modal__content" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <DialogTitle className="progress-modal__header-title">
+            <Loader2 className="progress-modal__spinner" />
             {t('build.title')}
           </DialogTitle>
           <DialogDescription>
@@ -53,13 +53,13 @@ export const ProgressModal: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">
+        <div className="progress-modal__body">
+          <div className="progress-modal__info">
+            <p className="progress-modal__message">
               {getMessage()}
             </p>
-            <Progress value={percent} className="h-3" />
-            <p className="text-xs text-muted-foreground text-right font-mono">
+            <Progress value={percent} className="progress-modal__bar" />
+            <p className="progress-modal__percentage">
               {percent}%
             </p>
           </div>

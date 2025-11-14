@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(9.8% 0.015 285.9);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(9.8% 0.015 285.9);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(9.8% 0.015 285.9);
+  --color-primary: oklch(66.4% 0.192 31.3);
+  --color-primary-foreground: oklch(100% 0 0);
+  --color-secondary: oklch(96.1% 0.001 247.9);
+  --color-secondary-foreground: oklch(17.8% 0.018 286.5);
+  --color-muted: oklch(96.1% 0.001 247.9);
+  --color-muted-foreground: oklch(53.9% 0.015 257.2);
+  --color-accent: oklch(66.4% 0.192 31.3);
+  --color-accent-foreground: oklch(100% 0 0);
+  --color-destructive: oklch(62.8% 0.258 27.6);
+  --color-destructive-foreground: oklch(98% 0.002 247.9);
+  --color-border: oklch(91.4% 0.003 256.8);
+  --color-input: oklch(91.4% 0.003 256.8);
+  --color-ring: oklch(66.4% 0.192 31.3);
+  
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+.dark {
+  --color-background: oklch(16.7% 0.019 265.8);
+  --color-foreground: oklch(91% 0.009 257.6);
+  --color-card: oklch(18.9% 0.019 265.8);
+  --color-card-foreground: oklch(91% 0.009 257.6);
+  --color-popover: oklch(18.9% 0.019 265.8);
+  --color-popover-foreground: oklch(91% 0.009 257.6);
+  --color-primary: oklch(66.4% 0.192 31.3);
+  --color-primary-foreground: oklch(100% 0 0);
+  --color-secondary: oklch(17.9% 0.014 286.1);
+  --color-secondary-foreground: oklch(91% 0.009 257.6);
+  --color-muted: oklch(17.7% 0.014 286.1);
+  --color-muted-foreground: oklch(63.9% 0.015 257.2);
+  --color-accent: oklch(66.4% 0.192 31.3);
+  --color-accent-foreground: oklch(100% 0 0);
+  --color-destructive: oklch(38.6% 0.136 26.5);
+  --color-destructive-foreground: oklch(91% 0.009 257.6);
+  --color-border: oklch(24.3% 0.013 264.7);
+  --color-input: oklch(24.3% 0.013 264.7);
+  --color-ring: oklch(66.4% 0.192 31.3);
+}
+
+/* Import BEM Component Styles */
+@import "./components/app.scss";
+@import "./components/project-manager.scss";
+@import "./components/track-list.scss";
+@import "./components/chapter-list.scss";
+@import "./components/metadata-form.scss";
+@import "./components/progress-modal.scss";
+@import "./components/settings-dialog.scss";
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded;
+
+    &:hover {
+      @apply bg-muted-foreground/30;
+    }
+  }
+}
+
+/* Custom animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+

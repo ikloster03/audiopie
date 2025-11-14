@@ -1,0 +1,86 @@
+/* ProjectManager Component BEM Styles */
+
+.project-manager {
+  @apply min-h-screen bg-background flex items-center justify-center p-6 relative;
+
+  /* Theme and Language Controls */
+  &__controls {
+    @apply absolute top-6 right-6 flex items-center gap-2;
+  }
+
+  &__container {
+    @apply max-w-2xl w-full;
+  }
+
+  /* Logo Section */
+  &__logo {
+    @apply flex items-center justify-center gap-3 mb-12;
+
+    &-icon {
+      @apply h-16 w-16 text-primary;
+    }
+
+    &-title {
+      @apply text-5xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent;
+    }
+  }
+
+  /* Project Cards */
+  &__cards {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+
+  &__card {
+    @apply hover:shadow-xl transition-shadow cursor-pointer;
+
+    &-content {
+      @apply p-8 flex flex-col items-center text-center;
+    }
+
+    &-icon-wrapper {
+      @apply h-20 w-20 rounded-full flex items-center justify-center mb-4 transition-colors;
+
+      &--open {
+        @apply bg-primary/10;
+      }
+
+      &--new {
+        @apply bg-orange-500/10;
+      }
+    }
+
+    &:hover .project-manager__card-icon-wrapper--open {
+      @apply bg-primary/20;
+    }
+
+    &:hover .project-manager__card-icon-wrapper--new {
+      @apply bg-orange-500/20;
+    }
+
+    &-icon {
+      @apply h-10 w-10;
+
+      &--primary {
+        @apply text-primary;
+      }
+
+      &--orange {
+        @apply text-orange-500;
+      }
+    }
+
+    &-title {
+      @apply text-2xl font-semibold mb-2;
+    }
+
+    &-description {
+      @apply text-sm text-muted-foreground;
+    }
+  }
+
+  /* Footer */
+  &__footer {
+    @apply text-center text-sm text-muted-foreground mt-8;
+  }
+}
+

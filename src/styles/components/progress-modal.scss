@@ -1,0 +1,36 @@
+/* ProgressModal Component BEM Styles */
+
+.progress-modal {
+  &__content {
+    @apply sm:max-w-md;
+  }
+
+  &__header-title {
+    @apply flex items-center gap-2;
+  }
+
+  &__spinner {
+    @apply h-5 w-5 animate-spin text-primary;
+  }
+
+  &__body {
+    @apply space-y-4 py-4;
+  }
+
+  &__info {
+    @apply space-y-2;
+  }
+
+  &__message {
+    @apply text-sm font-medium text-foreground;
+  }
+
+  &__bar {
+    @apply h-3;
+  }
+
+  &__percentage {
+    @apply text-xs text-muted-foreground text-right font-mono;
+  }
+}
+
