@@ -13,6 +13,7 @@ import { Card, CardContent } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun, Languages } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
+import audioPieLogo from '../assets/audiopie.svg';
 
 export const App: React.FC = () => {
   const { t } = useTranslation();
@@ -106,7 +107,7 @@ export const App: React.FC = () => {
         <div className="app__header-container">
           <div className="app__header-content">
             <div className="app__logo">
-              <Music className="app__logo-icon" />
+              <img src={audioPieLogo} alt="AudioPie Logo" className="app__logo-icon" />
               <h1 className="app__logo-title">
                 {t('app.title')}
               </h1>
