@@ -1,6 +1,7 @@
 {
   "appId": "com.example.audiopie",
   "productName": "AudioPie",
+  "icon": "assets/icon.png",
   "asar": true,
   "asarUnpack": ["node_modules/ffmpeg-static/**/*"],
   "publish": null,
