@@ -26,6 +26,33 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+
+  /* Animation keyframes */
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes exit {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  /* Animation utilities */
+  --animate-in: enter 0.2s ease-out;
+  --animate-out: exit 0.15s ease-in;
 }
 
 .dark {
@@ -60,6 +87,15 @@
 @import "./components/settings-dialog.scss";
 @import "./components/button.scss";
 @import "./components/alert.scss";
+@import "./components/badge.scss";
+@import "./components/card.scss";
+@import "./components/dialog.scss";
+@import "./components/input.scss";
+@import "./components/label.scss";
+@import "./components/progress.scss";
+@import "./components/scroll-area.scss";
+@import "./components/tabs.scss";
+@import "./components/textarea.scss";
 
 @layer base {
   * {
@@ -68,6 +104,71 @@
   body {
     @apply bg-background text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Custom animation utilities */
+@utility animate-in {
+  animation: enter var(--animate-in, 0.2s ease-out);
+}
+
+@utility animate-out {
+  animation: exit var(--animate-out, 0.15s ease-in);
+}
+
+@utility fade-in-0 {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@utility fade-out-0 {
+  animation: fadeOut 0.15s ease-in;
+}
+
+@utility zoom-in-95 {
+  animation: zoomIn95 0.2s ease-out;
+}
+
+@utility zoom-out-95 {
+  animation: zoomOut95 0.15s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoomIn95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoomOut95 {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
   }
 }
 

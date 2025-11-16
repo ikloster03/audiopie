@@ -1,0 +1,12 @@
+/* Progress Component BEM Styles */
+
+.progress {
+    /* Base progress styles */
+    @apply bg-primary/20 relative h-2 w-full overflow-hidden rounded-full;
+
+    /* Elements */
+    &__indicator {
+        @apply bg-primary h-full w-full flex-1 transition-all;
+    }
+}
+

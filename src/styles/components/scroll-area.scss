@@ -1,0 +1,31 @@
+/* Scroll Area Component BEM Styles */
+
+.scroll-area {
+    /* Base scroll area styles */
+    @apply relative;
+
+    /* Elements */
+    &__viewport {
+        @apply focus-visible:ring-ring/50 size-full rounded-[inherit];
+        @apply transition-[color,box-shadow] outline-none;
+        @apply focus-visible:ring-[3px] focus-visible:outline-1 p-2;
+    }
+
+    &__scrollbar {
+        @apply flex touch-none p-px transition-colors select-none;
+
+        /* Modifiers for orientation */
+        &--vertical {
+            @apply h-full w-2.5 border-l border-l-transparent;
+        }
+
+        &--horizontal {
+            @apply h-2.5 flex-col border-t border-t-transparent;
+        }
+    }
+
+    &__thumb {
+        @apply bg-border relative flex-1 rounded-full;
+    }
+}
+

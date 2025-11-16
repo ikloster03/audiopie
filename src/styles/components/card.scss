@@ -1,0 +1,33 @@
+/* Card Component BEM Styles */
+
+.card {
+    /* Base card styles */
+    @apply bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm;
+
+    /* Elements */
+    &__header {
+        @apply @container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6;
+        @apply has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6;
+    }
+
+    &__title {
+        @apply leading-none font-semibold;
+    }
+
+    &__description {
+        @apply text-muted-foreground text-sm;
+    }
+
+    &__action {
+        @apply col-start-2 row-span-2 row-start-1 self-start justify-self-end;
+    }
+
+    &__content {
+        @apply px-6;
+    }
+
+    &__footer {
+        @apply flex items-center px-6 [.border-t]:pt-6;
+    }
+}
+

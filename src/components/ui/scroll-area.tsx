@@ -1,6 +1,5 @@
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
-
 import { cn } from "@/lib/utils"
 
 function ScrollArea({
@@ -11,12 +10,12 @@ function ScrollArea({
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      className={cn("relative", className)}
+      className={cn("scroll-area", className)}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 p-2"
+        className="scroll-area__viewport"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
@@ -31,23 +30,23 @@ function ScrollBar({
   orientation = "vertical",
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>) {
+  // Build BEM class names
+  const bemClasses = cn(
+    "scroll-area__scrollbar",
+    orientation === "vertical" ? "scroll-area__scrollbar--vertical" : "scroll-area__scrollbar--horizontal",
+    className
+  )
+
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
-      className={cn(
-        "flex touch-none p-px transition-colors select-none",
-        orientation === "vertical" &&
-          "h-full w-2.5 border-l border-l-transparent",
-        orientation === "horizontal" &&
-          "h-2.5 flex-col border-t border-t-transparent",
-        className
-      )}
+      className={bemClasses}
       {...props}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-area-thumb"
-        className="bg-border relative flex-1 rounded-full"
+        className="scroll-area__thumb"
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   )
