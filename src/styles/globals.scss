@@ -77,25 +77,7 @@
   --color-ring: oklch(66.4% 0.192 31.3);
 }
 
-/* Import BEM Component Styles */
-@import "./components/app.scss";
-@import "./components/project-manager.scss";
-@import "./components/track-list.scss";
-@import "./components/chapter-list.scss";
-@import "./components/metadata-form.scss";
-@import "./components/progress-modal.scss";
-@import "./components/settings-dialog.scss";
-@import "./components/button.scss";
-@import "./components/alert.scss";
-@import "./components/badge.scss";
-@import "./components/card.scss";
-@import "./components/dialog.scss";
-@import "./components/input.scss";
-@import "./components/label.scss";
-@import "./components/progress.scss";
-@import "./components/scroll-area.scss";
-@import "./components/tabs.scss";
-@import "./components/textarea.scss";
+
 
 @layer base {
   * {
@@ -203,3 +185,22 @@
   }
 }
 
+/* Import BEM Component Styles */
+@import "./components/app.scss";
+@import "./components/project-manager.scss";
+@import "./components/track-list.scss";
+@import "./components/chapter-list.scss";
+@import "./components/metadata-form.scss";
+@import "./components/progress-modal.scss";
+@import "./components/settings-dialog.scss";
+@import "./components/button.scss";
+@import "./components/alert.scss";
+@import "./components/badge.scss";
+@import "./components/card.scss";
+@import "./components/dialog.scss";
+@import "./components/input.scss";
+@import "./components/label.scss";
+@import "./components/progress.scss";
+@import "./components/scroll-area.scss";
+@import "./components/tabs.scss";
+@import "./components/textarea.scss";
