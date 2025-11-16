@@ -20,7 +20,8 @@
     @apply flex items-center gap-3;
 
     &-icon {
-      @apply h-8 w-8 text-primary;
+      @apply h-8 w-8;
+      object-fit: contain;
     }
 
     &-title {

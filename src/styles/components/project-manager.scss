@@ -17,7 +17,8 @@
     @apply flex items-center justify-center gap-3 mb-12;
 
     &-icon {
-      @apply h-16 w-16 text-primary;
+      @apply h-16 w-16;
+      object-fit: contain;
     }
 
     &-title {

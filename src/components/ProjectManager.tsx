@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { Music, FolderOpen, Plus, Moon, Sun, Languages } from 'lucide-react';
+import { FolderOpen, Plus, Moon, Sun, Languages } from 'lucide-react';
+import audioPieLogo from '../../assets/audiopie.svg';
 
 export const ProjectManager: React.FC = () => {
   const { t } = useTranslation();
@@ -46,7 +47,7 @@ export const ProjectManager: React.FC = () => {
       <div className="project-manager__container">
         {/* Logo */}
         <div className="project-manager__logo">
-          <Music className="project-manager__logo-icon" />
+          <img src={audioPieLogo} alt="AudioPie Logo" className="project-manager__logo-icon" />
           <h1 className="project-manager__logo-title">
             {t('app.title')}
           </h1>
