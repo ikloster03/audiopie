@@ -51,13 +51,19 @@ export const saveProjectToFile = async (win: BrowserWindow, targetPath?: string)
   if (!filePath) {
     const result = await dialog.showSaveDialog(win, {
       title: 'Save AudioPie Project',
-      filters: [{ name: 'AudioPie Project', extensions: ['audiopie.json'] }],
+      filters: [{ name: 'AudioPie Project', extensions: ['audiopie'] }],
     });
     if (result.canceled || !result.filePath) {
       return;
     }
     filePath = result.filePath;
   }
+  
+  // Ensure the file has .audiopie extension
+  if (!filePath.endsWith('.audiopie')) {
+    filePath = filePath + '.audiopie';
+  }
+  
   const payload: SerializedProject = {
     version: 1,
     ...projectData,
@@ -69,7 +75,7 @@ export const saveProjectToFile = async (win: BrowserWindow, targetPath?: string)
 export const openProjectFromFile = async (win: BrowserWindow): Promise<void> => {
   const result = await dialog.showOpenDialog(win, {
     title: 'Open AudioPie Project',
-    filters: [{ name: 'AudioPie Project', extensions: ['audiopie.json'] }],
+    filters: [{ name: 'AudioPie Project', extensions: ['audiopie'] }],
     properties: ['openFile'],
   });
   if (result.canceled || !result.filePaths[0]) {
