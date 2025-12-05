@@ -1,6 +1,6 @@
 {
   "name": "audiopie",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "private": true,
   "description": "AudioPie - build m4b audiobooks from mp3 tracks with chapter editing",
   "license": "MIT",
