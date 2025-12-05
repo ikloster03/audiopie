@@ -93,6 +93,23 @@
   },
   "common": {
     "untitledAudiobook": "Untitled Audiobook"
+  },
+  "ffmpeg": {
+    "parallelEncoding": "Parallel track encoding ({{concurrency}} at once)",
+    "encodingInProgress": "Encoding tracks: {{inProgress}} in progress",
+    "encodingProgress": "Encoding: {{completed}}/{{total}} completed{{inProgressText}}",
+    "inProgressSuffix": ", {{count}} in progress",
+    "mergingTracks": "Merging encoded tracks",
+    "merging": "Merging tracks",
+    "finalizingMetadata": "Adding metadata, chapters and cover",
+    "writingFinal": "Writing final file",
+    "completed": "Audiobook successfully created",
+    "errors": {
+      "ffmpegNotFound": "FFmpeg binary not found",
+      "buildCancelled": "Build cancelled",
+      "outputNotCreated": "Output file was not created.",
+      "unableToProbe": "Unable to probe file: {{message}}",
+      "unableToParseDuration": "Unable to parse duration for {{filePath}}"
+    }
   }
 }
-
