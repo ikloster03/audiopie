@@ -7,6 +7,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import type { FfmpegCommand } from 'fluent-ffmpeg';
 import { BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 import { getDefaultTempDir, getSettings, resolveBinary } from './settings';
+import { t } from './i18n';
 
 // Получаем правильный путь к ffmpeg с учетом настроек и упаковки в asar
 const getFFmpegPath = (): string | null => {
@@ -163,13 +164,13 @@ export const probeDuration = async (filePath: string): Promise<number> => {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err: Error | null, metadata: any) => {
       if (err) {
-        reject(new Error(`Unable to probe file: ${err.message}`));
+        reject(new Error(t('ffmpeg.errors.unableToProbe', { message: err.message })));
         return;
       }
       
       const duration = metadata?.format?.duration;
       if (!duration || Number.isNaN(duration)) {
-        reject(new Error(`Unable to parse duration for ${filePath}`));
+        reject(new Error(t('ffmpeg.errors.unableToParseDuration', { filePath })));
         return;
       }
       
@@ -224,7 +225,7 @@ const writeMetadataFile = async (
 const createFfmpegCommand = (): FfmpegCommand => {
   const command = ffmpeg();
   if (!ffmpegPath) {
-    throw new Error('FFmpeg binary not found');
+    throw new Error(t('ffmpeg.errors.ffmpegNotFound'));
   }
   return command;
 };
@@ -335,7 +336,7 @@ export const buildAudiobook = async (
   onProgress: (progress: BuildProgress) => void,
 ): Promise<void> => {
   if (!ffmpegPath) {
-    throw new Error('FFmpeg binary not found');
+    throw new Error(t('ffmpeg.errors.ffmpegNotFound'));
   }
   
   cancelRequested = false;
@@ -368,7 +369,7 @@ export const buildAudiobook = async (
     const totalSteps = 3;
     onProgress({ 
       phase: 'encode', 
-      message: `Параллельное кодирование треков (${concurrency} одновременно)`, 
+      message: t('ffmpeg.parallelEncoding', { concurrency }), 
       percent: 0,
       currentStep: 1,
       totalSteps
@@ -395,8 +396,12 @@ export const buildAudiobook = async (
       
       const inProgress = tracks.length - completedTracks;
       const message = completedTracks === 0
-        ? `Кодирование треков: ${inProgress} в процессе`
-        : `Кодирование: ${completedTracks}/${tracks.length} завершено${inProgress > 0 ? `, ${inProgress} в процессе` : ''}`;
+        ? t('ffmpeg.encodingInProgress', { inProgress })
+        : t('ffmpeg.encodingProgress', { 
+            completed: completedTracks, 
+            total: tracks.length,
+            inProgressText: inProgress > 0 ? t('ffmpeg.inProgressSuffix', { count: inProgress }) : ''
+          });
       
       onProgress({
         phase: 'encode',
@@ -417,7 +422,7 @@ export const buildAudiobook = async (
       concurrency,
       async (track, index) => {
         if (cancelRequested) {
-          throw new Error('Build cancelled');
+          throw new Error(t('ffmpeg.errors.buildCancelled'));
         }
         
         const outputPath = path.join(encodedTracksDir, `track_${String(index).padStart(4, '0')}.m4a`);
@@ -446,13 +451,13 @@ export const buildAudiobook = async (
     );
 
     if (cancelRequested) {
-      throw new Error('Build cancelled');
+      throw new Error(t('ffmpeg.errors.buildCancelled'));
     }
 
     // Этап 2: Объединение закодированных треков
     onProgress({ 
       phase: 'encode', 
-      message: 'Объединение закодированных треков', 
+      message: t('ffmpeg.mergingTracks'), 
       percent: 45,
       currentStep: 2,
       totalSteps
@@ -474,7 +479,7 @@ export const buildAudiobook = async (
           onProgress({ 
             phase: 'encode', 
             percent: 47,
-            message: 'Объединение треков',
+            message: t('ffmpeg.merging'),
             currentStep: 2,
             totalSteps
           });
@@ -493,13 +498,13 @@ export const buildAudiobook = async (
     });
 
     if (cancelRequested) {
-      throw new Error('Build cancelled');
+      throw new Error(t('ffmpeg.errors.buildCancelled'));
     }
 
     // Этап 3: Добавление метаданных и обложки
     onProgress({ 
       phase: 'finalize', 
-      message: 'Добавление метаданных, глав и обложки', 
+      message: t('ffmpeg.finalizingMetadata'), 
       percent: 50,
       currentStep: 3,
       totalSteps
@@ -545,7 +550,7 @@ export const buildAudiobook = async (
         .on('progress', () => {
           onProgress({ 
             phase: 'finalize', 
-            message: 'Запись финального файла', 
+            message: t('ffmpeg.writingFinal'), 
             percent: 80,
             currentStep: 3,
             totalSteps
@@ -565,12 +570,12 @@ export const buildAudiobook = async (
     });
 
     if (cancelRequested) {
-      throw new Error('Build cancelled');
+      throw new Error(t('ffmpeg.errors.buildCancelled'));
     }
 
     const stat = await fs.promises.stat(options.outputPath).catch(() => undefined);
     if (!stat || stat.size === 0) {
-      throw new Error('Output file was not created.');
+      throw new Error(t('ffmpeg.errors.outputNotCreated'));
     }
     
     // Очистка временных файлов
@@ -584,7 +589,7 @@ export const buildAudiobook = async (
     
     onProgress({ 
       phase: 'finalize', 
-      message: 'Аудиокнига успешно создана', 
+      message: t('ffmpeg.completed'), 
       percent: 100,
       currentStep: 3,
       totalSteps
