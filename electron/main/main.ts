@@ -5,6 +5,7 @@ import { app, BrowserWindow, Menu, nativeImage } from 'electron';
 import { registerIpcHandlers } from './ipc';
 import { initializeBinaries } from './settings';
 import { initializeFFmpeg } from './ffmpeg';
+import { initializeI18n } from './i18n';
 
 const isDev = !app.isPackaged;
 
@@ -98,6 +99,9 @@ app.whenReady().then(async () => {
       console.warn('[Main] Failed to update PATH from user environment:', error);
     }
   }
+  
+  // Инициализируем i18n для main process
+  initializeI18n();
   
   // Автоматически инициализируем пути к FFmpeg и FFprobe (сохраняем в настройки)
   initializeBinaries();

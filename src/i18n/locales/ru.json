@@ -97,6 +97,23 @@
   },
   "common": {
     "untitledAudiobook": "Без названия"
+  },
+  "ffmpeg": {
+    "parallelEncoding": "Параллельное кодирование треков ({{concurrency}} одновременно)",
+    "encodingInProgress": "Кодирование треков: {{inProgress}} в процессе",
+    "encodingProgress": "Кодирование: {{completed}}/{{total}} завершено{{inProgressText}}",
+    "inProgressSuffix": ", {{count}} в процессе",
+    "mergingTracks": "Объединение закодированных треков",
+    "merging": "Объединение треков",
+    "finalizingMetadata": "Добавление метаданных, глав и обложки",
+    "writingFinal": "Запись финального файла",
+    "completed": "Аудиокнига успешно создана",
+    "errors": {
+      "ffmpegNotFound": "FFmpeg binary not found",
+      "buildCancelled": "Build cancelled",
+      "outputNotCreated": "Output file was not created.",
+      "unableToProbe": "Unable to probe file: {{message}}",
+      "unableToParseDuration": "Unable to parse duration for {{filePath}}"
+    }
   }
 }
-
