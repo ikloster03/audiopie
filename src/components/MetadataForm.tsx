@@ -16,7 +16,7 @@ export const MetadataForm: React.FC = () => {
   const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
   const [isLoadingCover, setIsLoadingCover] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragCounter, setDragCounter] = useState(0);
+  const [_dragCounter, setDragCounter] = useState(0);
 
   const metadataFields = [
     { key: 'title' as keyof BookMetadata, label: t('metadata.title'), type: 'text' as const },

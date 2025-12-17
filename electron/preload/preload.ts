@@ -11,9 +11,9 @@ ipcRenderer.on('build/onProgress', (_event: IpcRendererEvent, progress: BuildPro
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Функция для отправки данных файла в главный процесс
-  sendFileToMain: (fileData) => ipcRenderer.invoke('send-file-to-main', fileData),
+  sendFileToMain: (fileData: any) => ipcRenderer.invoke('send-file-to-main', fileData),
   // Получение данных из главного процесса (если нужно)
-  onFileFromMain: (callback) => ipcRenderer.on('file-from-main', callback),
+  onFileFromMain: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on('file-from-main', callback),
 });
 
 const audioPieAPI = {
