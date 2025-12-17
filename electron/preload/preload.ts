@@ -9,6 +9,13 @@ ipcRenderer.on('build/onProgress', (_event: IpcRendererEvent, progress: BuildPro
   progressListeners.forEach((listener) => listener(progress));
 });
 
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Функция для отправки данных файла в главный процесс
+  sendFileToMain: (fileData: any) => ipcRenderer.invoke('send-file-to-main', fileData),
+  // Получение данных из главного процесса (если нужно)
+  onFileFromMain: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on('file-from-main', callback),
+});
+
 const audioPieAPI = {
   tracks: {
     selectFiles: (): Promise<string[]> => ipcRenderer.invoke('tracks/selectFiles'),
@@ -22,6 +29,7 @@ const audioPieAPI = {
     set: (partial: Partial<BookMetadata>): Promise<void> => ipcRenderer.invoke('metadata/set', partial),
     selectCover: (): Promise<string | undefined> => ipcRenderer.invoke('metadata/selectCover'),
     getCoverDataUrl: (coverPath: string): Promise<string | null> => ipcRenderer.invoke('metadata/getCoverDataUrl', coverPath),
+    setCoverFromPath: (filePath: string): Promise<string | undefined> => ipcRenderer.invoke('metadata/setCoverFromPath', filePath),
   },
   chapters: {
     autoFromTracks: (): Promise<Chapter[]> => ipcRenderer.invoke('chapters/autoFromTracks'),
