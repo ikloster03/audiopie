@@ -1,12 +1,12 @@
-import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, type IpcMainInvokeEvent } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
 import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile, createNewProject } from './project';
-import { probeDuration, buildAudiobook, cancelBuild, isBusy } from './ffmpeg';
+import { probeDuration, buildAudiobook, cancelBuild, isBusy, type BuildResult } from './ffmpeg';
 import { getSettings, setSettings, getMaxCpuCores } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
-import { changeLanguage } from './i18n';
+import { changeLanguage, t } from './i18n';
 
 const sanitizeTitle = (filePath: string): string => {
   return path.basename(filePath).replace(/\.[^/.]+$/, '');
@@ -185,9 +185,35 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
     if (!options.outputPath) {
       throw new Error('Output path is required.');
     }
-    await buildAudiobook(tracks, chapters.length > 0 ? chapters : computeChaptersFromTracks(tracks), metadata, options, (progress) => {
+    const result: BuildResult = await buildAudiobook(tracks, chapters.length > 0 ? chapters : computeChaptersFromTracks(tracks), metadata, options, (progress) => {
       win.webContents.send('build/onProgress', progress satisfies BuildProgress);
     });
+    
+    // Показываем системное уведомление о завершении сборки
+    const formatDuration = (ms: number): string => {
+      const totalSec = Math.round(ms / 1000);
+      const minutes = Math.floor(totalSec / 60);
+      const seconds = totalSec % 60;
+      return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+    };
+    
+    const formatSize = (bytes: number): string => {
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    };
+    
+    if (Notification.isSupported()) {
+      const notification = new Notification({
+        title: t('notification.buildComplete'),
+        body: t('notification.buildCompleteBody', {
+          title: metadata.title,
+          duration: formatDuration(result.durationMs),
+          size: formatSize(result.outputSizeBytes),
+        }),
+        silent: false,
+      });
+      notification.show();
+    }
+    
     return undefined;
   });
 

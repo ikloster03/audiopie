@@ -112,5 +112,9 @@
       "unableToProbe": "Unable to probe file: {{message}}",
       "unableToParseDuration": "Unable to parse duration for {{filePath}}"
     }
+  },
+  "notification": {
+    "buildComplete": "Audiobook Build Complete",
+    "buildCompleteBody": "\"{{title}}\" completed in {{duration}} ({{size}})"
   }
 }
