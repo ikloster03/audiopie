@@ -328,16 +328,28 @@ const encodeTrack = async (
   });
 };
 
+export interface BuildResult {
+  durationMs: number;
+  outputPath: string;
+  outputSizeBytes: number;
+}
+
 export const buildAudiobook = async (
   tracks: TrackInfo[],
   chapters: Chapter[],
   metadata: BookMetadata,
   options: BuildOptions,
   onProgress: (progress: BuildProgress) => void,
-): Promise<void> => {
+): Promise<BuildResult> => {
   if (!ffmpegPath) {
     throw new Error(t('ffmpeg.errors.ffmpegNotFound'));
   }
+  
+  const buildStartTime = Date.now();
+  console.log(`[FFmpeg] ====== Build started at ${new Date(buildStartTime).toLocaleTimeString()} ======`);
+  console.log(`[FFmpeg] Title: ${metadata.title}`);
+  console.log(`[FFmpeg] Tracks: ${tracks.length}`);
+  console.log(`[FFmpeg] Output: ${options.outputPath}`);
   
   cancelRequested = false;
   const settings = getSettings();
@@ -587,6 +599,18 @@ export const buildAudiobook = async (
       }
     }
     
+    // Вычисляем время сборки
+    const buildEndTime = Date.now();
+    const buildDurationMs = buildEndTime - buildStartTime;
+    const buildDurationSec = Math.round(buildDurationMs / 1000);
+    const minutes = Math.floor(buildDurationSec / 60);
+    const seconds = buildDurationSec % 60;
+    const durationStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+    
+    console.log(`[FFmpeg] ====== Build completed at ${new Date(buildEndTime).toLocaleTimeString()} ======`);
+    console.log(`[FFmpeg] Duration: ${durationStr}`);
+    console.log(`[FFmpeg] Output size: ${(stat.size / (1024 * 1024)).toFixed(2)} MB`);
+    
     onProgress({ 
       phase: 'finalize', 
       message: t('ffmpeg.completed'), 
@@ -594,6 +618,12 @@ export const buildAudiobook = async (
       currentStep: 3,
       totalSteps
     });
+    
+    return {
+      durationMs: buildDurationMs,
+      outputPath: options.outputPath,
+      outputSizeBytes: stat.size,
+    };
   } catch (error) {
     // Очистка временных файлов при ошибке
     if (!options.tempDir) {
