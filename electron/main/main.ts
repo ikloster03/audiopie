@@ -9,6 +9,16 @@ import { initializeI18n } from './i18n';
 
 const isDev = !app.isPackaged;
 
+console.log('Electron version:', process.versions.electron);
+console.log('Node version:', process.versions.node);
+console.log('Chrome version:', process.versions.chrome);
+console.log('V8 version:', process.versions.v8);
+console.log('OS:', process.platform);
+console.log('Arch:', process.arch);
+console.log('App path:', app.getAppPath());
+console.log('Is packaged:', app.isPackaged);
+console.log('Is dev:', isDev);
+
 const createWindow = async () => {
   const preloadPath = path.join(__dirname, '../preload/preload.js');
   
@@ -41,6 +51,7 @@ const createWindow = async () => {
   }
 
   if (isDev) {
+    console.log('Opening dev tools');
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 

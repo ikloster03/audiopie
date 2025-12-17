@@ -141,6 +141,26 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
     }
   });
 
+  ipcMain.handle('metadata/setCoverFromPath', async (_event: IpcMainInvokeEvent, filePath: string): Promise<string | undefined> => {
+    try {
+      if (!filePath || !fs.existsSync(filePath)) {
+        return undefined;
+      }
+      // Проверяем, что это изображение
+      const ext = path.extname(filePath).toLowerCase();
+      if (!['.jpg', '.jpeg', '.png'].includes(ext)) {
+        return undefined;
+      }
+      // Используем путь напрямую (файл уже на диске)
+      const project = getProjectData();
+      updateMetadata({ ...project.metadata, coverPath: filePath });
+      return filePath;
+    } catch (error) {
+      console.error('Failed to set cover from path:', error);
+      return undefined;
+    }
+  });
+
   ipcMain.handle('chapters/autoFromTracks', () => {
     const project = getProjectData();
     const chapters = computeChaptersFromTracks(project.tracks);

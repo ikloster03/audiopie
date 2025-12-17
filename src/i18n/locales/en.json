@@ -49,7 +49,8 @@
     "chooseCoverButton": "Choose Cover",
     "clear": "Clear",
     "loadingCover": "Loading cover...",
-    "enterPlaceholder": "Enter {{field}}..."
+    "enterPlaceholder": "Enter {{field}}...",
+    "dropImageHere": "Drop image here"
   },
   "chaptersTab": {
     "tab": "📖 Chapters"
