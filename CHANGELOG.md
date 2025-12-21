@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.2
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.1...v0.6.2)
+
+### 🚀 Enhancements
+
+- **i18n:** Enhance localization loading with improved path resolution and logging ([ab98a81](https://github.com/ikloster03/audiopie/commit/ab98a81))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.1
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.0...v0.6.1)
