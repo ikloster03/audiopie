@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.6.1
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.0...v0.6.1)
+
+### 🚀 Enhancements
+
+- Update versioning scripts to use changelogen for releases ([85ad811](https://github.com/ikloster03/audiopie/commit/85ad811))
+
+### 📖 Documentation
+
+- Add CHANGELOG.md for version history and updates ([059b6ee](https://github.com/ikloster03/audiopie/commit/059b6ee))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.0
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.5.5...v0.6.0)
