@@ -8,7 +8,15 @@
   "directories": {
     "output": "release/${version}"
   },
-  "files": ["dist", "dist-electron"],
+  "files": [
+    "dist",
+    "dist-electron",
+    {
+      "from": "src/i18n/locales",
+      "to": "src/i18n/locales",
+      "filter": ["*.json"]
+    }
+  ],
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
     "target": ["dmg"],

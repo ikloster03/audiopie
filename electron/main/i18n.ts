@@ -15,15 +15,29 @@ export const initializeI18n = (): void => {
   // Загружаем переводы из JSON файлов
   const localesPath = getLocalesPath();
   
+  console.log('[i18n] Initializing with locales path:', localesPath);
+  
   try {
     const ruPath = path.join(localesPath, 'ru.json');
     const enPath = path.join(localesPath, 'en.json');
     
+    console.log('[i18n] Looking for ru.json at:', ruPath);
+    console.log('[i18n] ru.json exists:', fs.existsSync(ruPath));
+    console.log('[i18n] Looking for en.json at:', enPath);
+    console.log('[i18n] en.json exists:', fs.existsSync(enPath));
+    
     if (fs.existsSync(ruPath)) {
       translations['ru'] = JSON.parse(fs.readFileSync(ruPath, 'utf-8'));
+      console.log('[i18n] Loaded Russian translations, keys:', Object.keys(translations['ru']));
+    } else {
+      console.error('[i18n] Russian translations not found at:', ruPath);
     }
+    
     if (fs.existsSync(enPath)) {
       translations['en'] = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
+      console.log('[i18n] Loaded English translations, keys:', Object.keys(translations['en']));
+    } else {
+      console.error('[i18n] English translations not found at:', enPath);
     }
     
     // Получаем язык из настроек
@@ -31,6 +45,7 @@ export const initializeI18n = (): void => {
     currentLanguage = settings.language || 'en';
     
     console.log('[i18n] Initialized with language:', currentLanguage);
+    console.log('[i18n] Available languages:', Object.keys(translations));
   } catch (error) {
     console.error('[i18n] Failed to load translations:', error);
   }
@@ -42,7 +57,23 @@ export const initializeI18n = (): void => {
 const getLocalesPath = (): string => {
   if (app.isPackaged) {
     // В production режиме, файлы находятся в asar
-    return path.join(process.resourcesPath, 'app.asar', 'src', 'i18n', 'locales');
+    // Пробуем несколько возможных путей
+    const paths = [
+      path.join(process.resourcesPath, 'app.asar', 'dist', 'renderer', 'i18n', 'locales'),
+      path.join(process.resourcesPath, 'app.asar', 'src', 'i18n', 'locales'),
+      path.join(__dirname, '../../src/i18n/locales'),
+    ];
+    
+    for (const testPath of paths) {
+      const ruPath = path.join(testPath, 'ru.json');
+      if (fs.existsSync(ruPath)) {
+        console.log('[i18n] Found locales at:', testPath);
+        return testPath;
+      }
+    }
+    
+    console.error('[i18n] Could not find locales directory in production');
+    return paths[0]; // Fallback
   } else {
     // В dev режиме
     return path.join(__dirname, '../../src/i18n/locales');
@@ -68,6 +99,7 @@ export const t = (key: string, params?: Record<string, any>): string => {
           value = value[k2];
         } else {
           // Если и в английском нет, возвращаем ключ
+          console.warn(`[i18n] Translation key not found: ${key}`);
           return key;
         }
       }
@@ -76,14 +108,21 @@ export const t = (key: string, params?: Record<string, any>): string => {
   }
   
   if (typeof value !== 'string') {
+    console.warn(`[i18n] Translation value is not a string for key: ${key}, value:`, value);
     return key;
   }
   
   // Интерполяция параметров
   if (params) {
-    return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
-      return params[paramKey] !== undefined ? String(params[paramKey]) : match;
+    const result = value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
+      const paramValue = params[paramKey];
+      if (paramValue !== undefined && paramValue !== null) {
+        return String(paramValue);
+      }
+      console.warn(`[i18n] Missing parameter "${paramKey}" for key "${key}"`);
+      return match;
     });
+    return result;
   }
   
   return value;
