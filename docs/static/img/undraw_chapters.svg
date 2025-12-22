@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="chapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="80" fill="url(#chapGrad)" opacity="0.1"/>
+  <!-- Chapter list container -->
+  <rect x="35" y="35" width="130" height="130" rx="8" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+  <!-- Chapter 1 -->
+  <rect x="45" y="50" width="110" height="28" rx="4" fill="#6366f1" opacity="0.2"/>
+  <circle cx="58" cy="64" r="8" fill="#6366f1"/>
+  <text x="58" y="68" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">1</text>
+  <rect x="72" y="58" width="70" height="8" rx="2" fill="#6366f1"/>
+  <rect x="72" y="68" width="40" height="4" rx="1" fill="#a5b4fc"/>
+  <!-- Chapter 2 -->
+  <rect x="45" y="86" width="110" height="28" rx="4" fill="#8b5cf6" opacity="0.2"/>
+  <circle cx="58" cy="100" r="8" fill="#8b5cf6"/>
+  <text x="58" y="104" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">2</text>
+  <rect x="72" y="94" width="60" height="8" rx="2" fill="#8b5cf6"/>
+  <rect x="72" y="104" width="50" height="4" rx="1" fill="#c4b5fd"/>
+  <!-- Chapter 3 -->
+  <rect x="45" y="122" width="110" height="28" rx="4" fill="#a78bfa" opacity="0.2"/>
+  <circle cx="58" cy="136" r="8" fill="#a78bfa"/>
+  <text x="58" y="140" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">3</text>
+  <rect x="72" y="130" width="55" height="8" rx="2" fill="#a78bfa"/>
+  <rect x="72" y="140" width="35" height="4" rx="1" fill="#ddd6fe"/>
+  <!-- Drag indicator -->
+  <g transform="translate(140, 55)">
+    <rect x="0" y="0" width="3" height="3" rx="1" fill="#94a3b8"/>
+    <rect x="6" y="0" width="3" height="3" rx="1" fill="#94a3b8"/>
+    <rect x="0" y="6" width="3" height="3" rx="1" fill="#94a3b8"/>
+    <rect x="6" y="6" width="3" height="3" rx="1" fill="#94a3b8"/>
+  </g>
+</svg>
