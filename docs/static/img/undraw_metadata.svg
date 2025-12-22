@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="metaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="80" fill="url(#metaGrad)" opacity="0.1"/>
+  <!-- Book cover preview -->
+  <rect x="30" y="40" width="60" height="80" rx="4" fill="url(#metaGrad)"/>
+  <rect x="35" y="45" width="50" height="50" rx="2" fill="white" opacity="0.3"/>
+  <!-- Book icon on cover -->
+  <path d="M50 60 L50 85 L70 75 L70 60 Z" fill="white" opacity="0.8"/>
+  <path d="M70 60 L70 75 L80 85 L80 60 Z" fill="white" opacity="0.6"/>
+  <!-- Title on cover -->
+  <rect x="38" y="100" width="44" height="6" rx="1" fill="white" opacity="0.9"/>
+  <rect x="42" y="110" width="36" height="4" rx="1" fill="white" opacity="0.6"/>
+  <!-- Metadata form -->
+  <rect x="100" y="40" width="70" height="120" rx="4" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+  <!-- Title field -->
+  <text x="108" y="58" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">Title</text>
+  <rect x="108" y="62" width="54" height="14" rx="2" fill="#f3f4f6" stroke="#d1d5db"/>
+  <rect x="112" y="67" width="40" height="4" rx="1" fill="#6366f1"/>
+  <!-- Author field -->
+  <text x="108" y="88" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">Author</text>
+  <rect x="108" y="92" width="54" height="14" rx="2" fill="#f3f4f6" stroke="#d1d5db"/>
+  <rect x="112" y="97" width="32" height="4" rx="1" fill="#8b5cf6"/>
+  <!-- Genre field -->
+  <text x="108" y="118" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">Genre</text>
+  <rect x="108" y="122" width="54" height="14" rx="2" fill="#f3f4f6" stroke="#d1d5db"/>
+  <rect x="112" y="127" width="28" height="4" rx="1" fill="#a78bfa"/>
+  <!-- Tags -->
+  <g transform="translate(108, 145)">
+    <rect x="0" y="0" width="24" height="10" rx="5" fill="#6366f1" opacity="0.2"/>
+    <text x="12" y="7" font-family="Arial, sans-serif" font-size="6" fill="#6366f1" text-anchor="middle">Sci-Fi</text>
+    <rect x="28" y="0" width="26" height="10" rx="5" fill="#8b5cf6" opacity="0.2"/>
+    <text x="41" y="7" font-family="Arial, sans-serif" font-size="6" fill="#8b5cf6" text-anchor="middle">Cover</text>
+  </g>
+</svg>
