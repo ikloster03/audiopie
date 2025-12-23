@@ -1,6 +1,10 @@
+**English** | [Русский](README_RU.md)
+
 # AudioPie
 
-AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.
+AudioPie — build M4B audiobooks from MP3 tracks with chapter editing.
+
+📚 **[Documentation](https://audiopie.ikloster.tech)**
 
 ## Features
 
@@ -9,14 +13,15 @@ AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.
 - 🎨 Metadata editing support
 - 🔧 FFmpeg integration
 - 💾 Project save/load functionality
+- 🌍 Multilingual (English & Russian)
 
 ## Tech Stack
 
-- ⚡️ **Vite** - Next generation frontend tooling
-- ⚛️ **React 18** - UI framework
-- 🖥 **Electron** - Cross-platform desktop apps
-- 📘 **TypeScript** - Type safety
-- 🎨 **CSS** - Styling
+- ⚡️ **Vite** — Next generation frontend tooling
+- ⚛️ **React 18** — UI framework
+- 🖥 **Electron** — Cross-platform desktop apps
+- 📘 **TypeScript** — Type safety
+- 🎨 **SCSS** — Styling
 
 ## Project Structure
 
@@ -27,7 +32,7 @@ AudioPie - build m4b audiobooks from mp3 tracks with chapter editing.
 ├── src/              # React application (renderer)
 │   ├── components/   # React components
 │   ├── context/      # React context
-│   └── styles/       # CSS styles
+│   └── styles/       # SCSS styles
 ├── public/           # Static assets
 ├── build/            # App icons
 └── assets/           # Additional resources (FFmpeg, etc.)
@@ -57,9 +62,9 @@ The built application will be in the `release/{version}` directory.
 
 ## Scripts
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build application for production
-- `npm run preview` - Preview production build
+- `npm run dev` — Start development server with hot reload
+- `npm run build` — Build application for production
+- `npm run preview` — Preview production build
 
 ## Requirements
 
@@ -68,7 +73,7 @@ The built application will be in the `release/{version}` directory.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License — see [LICENSE](LICENSE) file for details
 
 ## Author
 
