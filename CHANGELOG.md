@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.4
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.3...v0.6.4)
+
+### 🚀 Enhancements
+
+- **menu:** Implement dynamic menu rebuilding and add "About" dialog functionality ([acb6648](https://github.com/ikloster03/audiopie/commit/acb6648))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.3
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.2...v0.6.3)
