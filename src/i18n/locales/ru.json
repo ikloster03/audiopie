@@ -120,5 +120,12 @@
   "notification": {
     "buildComplete": "Сборка аудиокниги завершена",
     "buildCompleteBody": "\"{{title}}\" завершена за {{duration}} ({{size}})"
+  },
+  "about": {
+    "title": "О программе AudioPie",
+    "menuItem": "О программе",
+    "version": "Версия",
+    "os": "ОС",
+    "copy": "Копировать"
   }
 }

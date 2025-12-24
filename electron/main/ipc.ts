@@ -7,6 +7,7 @@ import { probeDuration, buildAudiobook, cancelBuild, isBusy, type BuildResult } 
 import { getSettings, setSettings, getMaxCpuCores } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 import { changeLanguage, t } from './i18n';
+import { rebuildMenu } from './menu';
 
 const sanitizeTitle = (filePath: string): string => {
   return path.basename(filePath).replace(/\.[^/.]+$/, '');
@@ -253,9 +254,10 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   ipcMain.handle('settings/set', async (_event: IpcMainInvokeEvent, partial: Partial<AppSettings>) => {
     setSettings(partial);
     
-    // Если изменился язык, обновляем его в main process
+    // Если изменился язык, обновляем его в main process и пересоздаём меню
     if (partial.language) {
       changeLanguage(partial.language);
+      rebuildMenu();
     }
     
     return getSettings();
