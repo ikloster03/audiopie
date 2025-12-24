@@ -116,5 +116,12 @@
   "notification": {
     "buildComplete": "Audiobook Build Complete",
     "buildCompleteBody": "\"{{title}}\" completed in {{duration}} ({{size}})"
+  },
+  "about": {
+    "title": "About AudioPie",
+    "menuItem": "About",
+    "version": "Version",
+    "os": "OS",
+    "copy": "Copy"
   }
 }

@@ -1,11 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { app, BrowserWindow, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, nativeImage } from 'electron';
 import { registerIpcHandlers } from './ipc';
 import { initializeBinaries } from './settings';
 import { initializeFFmpeg } from './ffmpeg';
 import { initializeI18n } from './i18n';
+import { initMenu, rebuildMenu } from './menu';
 
 const isDev = !app.isPackaged;
 
@@ -38,6 +39,9 @@ const createWindow = async () => {
     },
   });
 
+  // Инициализируем модуль меню
+  initMenu(mainWindow, icon, isDev);
+
   registerIpcHandlers(mainWindow);
 
   // In dev mode, load from Vite dev server
@@ -55,38 +59,7 @@ const createWindow = async () => {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
-  const template = Menu.buildFromTemplate([
-    {
-      label: 'File',
-      submenu: [
-        { role: 'quit' },
-      ],
-    },
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        ...(isDev ? [{ role: 'toggleDevTools' as const }] : []),
-        { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
-        { role: 'togglefullscreen' },
-      ],
-    },
-    {
-      role: 'help',
-      submenu: [
-        {
-          label: 'Learn More',
-          click: () => {
-            mainWindow.webContents.send('app/openHelp');
-          },
-        },
-      ],
-    },
-  ]);
-  Menu.setApplicationMenu(template);
+  rebuildMenu();
 };
 
 app.whenReady().then(async () => {
