@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.6.3
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.2...v0.6.3)
+
+### 🚀 Enhancements
+
+- Initialize Docusaurus documentation with configuration, structure, and localization support ([ce3cc3b](https://github.com/ikloster03/audiopie/commit/ce3cc3b))
+- Add Russian localization to README and create README_RU.md for multilingual support ([4094d1c](https://github.com/ikloster03/audiopie/commit/4094d1c))
+- Conditionally enable DevTools in development mode ([f3de5f8](https://github.com/ikloster03/audiopie/commit/f3de5f8))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.2
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.1...v0.6.2)
