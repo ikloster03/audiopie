@@ -12,6 +12,9 @@
   "scripts": {
     "build": "tsc && vite build && electron-builder",
     "dev": "vite",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky",
     "preview": "vite preview",
@@ -41,6 +44,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/vite": "^4.1.16",
     "@types/node": "^20.19.24",
@@ -48,6 +52,7 @@
     "@types/react-dom": "^18.3.0",
     "@types/sortablejs": "^1.15.8",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^4.0.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "electron": "^31.2.0",
@@ -59,6 +64,7 @@
     "typescript": "^5.5.3",
     "vite": "^5.3.3",
     "vite-plugin-electron": "^0.28.7",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vitest": "^4.0.16"
   }
 }
