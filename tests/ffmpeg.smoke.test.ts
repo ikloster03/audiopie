@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from '@ffprobe-installer/ffprobe';
 import ffmpeg from 'fluent-ffmpeg';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -12,15 +12,23 @@ const TEST_MP3 = path.join(TEST_DIR, 'test.mp3');
 const TEST_M4A = path.join(TEST_DIR, 'test.m4a');
 const TEST_OUTPUT = path.join(TEST_DIR, 'output.m4b');
 
+// Duration test constants
+const EXPECTED_DURATION_MS = 3000;
+const TOLERANCE_MS = 500;
+
 describe('FFmpeg Smoke E2E Tests', () => {
   beforeAll(async () => {
+    // Validate FFmpeg binaries are available
+    if (!ffmpegStatic) {
+      throw new Error('FFmpeg binary not available - skipping smoke tests');
+    }
+    if (!ffprobeStatic.path) {
+      throw new Error('FFprobe binary not available - skipping smoke tests');
+    }
+
     // Set up FFmpeg and FFprobe paths
-    if (ffmpegStatic) {
-      ffmpeg.setFfmpegPath(ffmpegStatic);
-    }
-    if (ffprobeStatic.path) {
-      ffmpeg.setFfprobePath(ffprobeStatic.path);
-    }
+    ffmpeg.setFfmpegPath(ffmpegStatic);
+    ffmpeg.setFfprobePath(ffprobeStatic.path);
 
     // Create test directory
     await fs.promises.mkdir(TEST_DIR, { recursive: true });
@@ -35,7 +43,7 @@ describe('FFmpeg Smoke E2E Tests', () => {
         .audioBitrate('128k')
         .output(TEST_MP3)
         .on('end', () => resolve())
-        .on('error', (err) => reject(err))
+        .on('error', (err: Error) => reject(err))
         .run();
     });
   });
@@ -44,35 +52,35 @@ describe('FFmpeg Smoke E2E Tests', () => {
     // Clean up test directory
     try {
       await fs.promises.rm(TEST_DIR, { recursive: true, force: true });
-    } catch {
-      // Ignore cleanup errors
+    } catch (error) {
+      console.warn('Failed to cleanup test directory:', error);
     }
   });
 
   it('should have ffmpeg-static available', () => {
-    expect(ffmpegStatic).toBeTruthy();
-    expect(fs.existsSync(ffmpegStatic as string)).toBe(true);
+    expect(typeof ffmpegStatic).toBe('string');
+    expect(fs.existsSync(ffmpegStatic!)).toBe(true);
   });
 
   it('should probe audio file duration', async () => {
     const duration = await new Promise<number>((resolve, reject) => {
-      ffmpeg.ffprobe(TEST_MP3, (err, metadata) => {
+      ffmpeg.ffprobe(TEST_MP3, (err: Error | null, metadata: { format?: { duration?: number } }) => {
         if (err) {
           reject(err);
           return;
         }
-        const duration = metadata?.format?.duration;
-        if (!duration || Number.isNaN(duration)) {
+        const rawDuration = metadata?.format?.duration;
+        if (!rawDuration || Number.isNaN(rawDuration)) {
           reject(new Error('Unable to parse duration'));
           return;
         }
-        resolve(Math.round(duration * 1000));
+        resolve(Math.round(rawDuration * 1000));
       });
     });
 
     // Should be approximately 3 seconds (3000ms), allow some tolerance
-    expect(duration).toBeGreaterThan(2500);
-    expect(duration).toBeLessThan(3500);
+    expect(duration).toBeGreaterThan(EXPECTED_DURATION_MS - TOLERANCE_MS);
+    expect(duration).toBeLessThan(EXPECTED_DURATION_MS + TOLERANCE_MS);
   });
 
   it('should encode MP3 to M4A (AAC)', async () => {
@@ -84,7 +92,7 @@ describe('FFmpeg Smoke E2E Tests', () => {
         .audioBitrate('128k')
         .output(TEST_M4A)
         .on('end', () => resolve())
-        .on('error', (err) => reject(err))
+        .on('error', (err: Error) => reject(err))
         .run();
     });
 
@@ -144,8 +152,9 @@ title=Chapter 2
 
     // Verify metadata was applied by probing the output using ffprobe directly
     // (fluent-ffmpeg's ffprobe wrapper doesn't include chapters by default)
-    const ffprobeOutput = execSync(
-      `"${ffprobeStatic.path}" -v quiet -print_format json -show_format -show_chapters "${TEST_OUTPUT}"`,
+    const ffprobeOutput = execFileSync(
+      ffprobeStatic.path,
+      ['-v', 'quiet', '-print_format', 'json', '-show_format', '-show_chapters', TEST_OUTPUT],
       { encoding: 'utf-8' }
     );
     const metadata = JSON.parse(ffprobeOutput);
