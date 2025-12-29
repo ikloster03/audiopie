@@ -74,14 +74,13 @@ audiopie/
 │   ├── main.tsx                 # React entry point
 │   ├── types.ts                 # Shared TypeScript types
 │   ├── components/              # React components
-│   │   ├── App.tsx              # Main UI layout
 │   │   ├── ProjectManager.tsx   # Project open/create screen
 │   │   ├── TrackList.tsx        # Track management (drag-drop)
 │   │   ├── ChapterList.tsx      # Chapter editing
 │   │   ├── MetadataForm.tsx     # Metadata editing with cover
 │   │   ├── ProgressModal.tsx    # Build progress dialog
 │   │   ├── SettingsDialog.tsx   # Application settings
-│   │   └── ui/                  # Shadcn/ui components (12 files)
+│   │   └── ui/                  # Shadcn/ui components (11 files)
 │   ├── context/
 │   │   └── AppContext.tsx       # Global state management
 │   ├── i18n/
@@ -91,7 +90,7 @@ audiopie/
 │   │   └── utils.ts             # Utility functions (cn for classNames)
 │   └── styles/                  # SCSS styles
 │       ├── globals.scss         # Global styles, theme variables
-│       └── components/          # BEM component styles (19 .scss files)
+│       └── components/          # BEM component styles (18 .scss files)
 │
 ├── tests/                       # Test suites
 │   └── ffmpeg.smoke.test.ts     # FFmpeg E2E smoke tests
@@ -595,6 +594,8 @@ import '@/styles/components/track-list.scss';
 | `src/components/ChapterList.tsx` | Chapter editing | ~120 |
 | `src/components/MetadataForm.tsx` | Metadata form | ~200 |
 
+**Note:** Lines of Code (LOC) counts are approximate and may become outdated as the project evolves. These estimates were last verified on 2025-12-29.
+
 ---
 
 ## Common Tasks
@@ -980,7 +981,27 @@ When contributing, prioritize:
 
 ---
 
+## Document Change History
+
+### Version 0.6.4 - 2025-12-29
+- **Initial Release:** Comprehensive CLAUDE.md guide created
+- Fixed file path references (src/App.tsx location)
+- Corrected component counts (11 Shadcn/ui components, 18 SCSS files)
+- Added LOC count disclaimer with verification date
+- Added this change history section
+
+### Future Updates
+This document should be updated when:
+- Major architectural changes occur
+- New dependencies or technologies are added
+- File structure significantly changes
+- New development workflows are established
+- Testing strategies evolve
+
+---
+
 **For questions or clarifications about this codebase, consult this guide first. If unclear, examine existing code patterns before making changes.**
 
-**Last updated by:** Claude Code
+**Last updated:** 2025-12-29
+**Maintained by:** Claude Code
 **Update frequency:** Keep synchronized with major architectural changes
