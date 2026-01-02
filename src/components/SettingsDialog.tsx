@@ -23,7 +23,7 @@ interface SettingsDialogProps {
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const { settings, setSettings, theme, changeLanguage, language } = useAppContext();
+  const { settings, setSettings, theme, changeLanguage, language, updateState } = useAppContext();
   const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
   const [formData, setFormData] = useState<AppSettings>({
@@ -58,12 +58,21 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (updateState?.status === 'not-available' ||
+        updateState?.status === 'available' ||
+        updateState?.status === 'error') {
+      setIsCheckingUpdates(false);
+    }
+  }, [updateState]);
+
   const handleCheckForUpdates = async () => {
     setIsCheckingUpdates(true);
     try {
       await window.audioPie.update.checkNow();
-    } finally {
-      setTimeout(() => setIsCheckingUpdates(false), 3000);
+    } catch (error) {
+      console.error('Failed to check for updates:', error);
+      setIsCheckingUpdates(false);
     }
   };
 

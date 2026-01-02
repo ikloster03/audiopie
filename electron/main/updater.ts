@@ -1,14 +1,15 @@
 import { app, BrowserWindow } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, type UpdateInfo as ElectronUpdateInfo } from 'electron-updater';
 import { getSettings, setSettings } from './settings';
 import type { UpdateInfo, UpdateState } from './types';
 
 let mainWindow: BrowserWindow | null = null;
 let updateCheckInterval: NodeJS.Timeout | null = null;
 let isCheckingForUpdates = false;
+let isDownloading = false;
 
-const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 часов
-const UPDATE_CHECK_DEBOUNCE_MS = 24 * 60 * 60 * 1000; // 24 часа
+const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const UPDATE_CHECK_DEBOUNCE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export const initializeUpdater = (win: BrowserWindow): void => {
   mainWindow = win;
@@ -39,6 +40,7 @@ const setupUpdateListeners = (): void => {
 
   autoUpdater.on('update-available', (info) => {
     console.log('[Updater] Update available:', info.version);
+    isCheckingForUpdates = false;
     sendUpdateState({
       status: 'available',
       info: mapUpdateInfo(info),
@@ -47,6 +49,7 @@ const setupUpdateListeners = (): void => {
 
   autoUpdater.on('update-not-available', (info) => {
     console.log('[Updater] No updates available. Current version:', info.version);
+    isCheckingForUpdates = false;
     sendUpdateState({ status: 'not-available' });
   });
 
@@ -65,6 +68,7 @@ const setupUpdateListeners = (): void => {
 
   autoUpdater.on('update-downloaded', (info) => {
     console.log('[Updater] Update downloaded:', info.version);
+    isDownloading = false;
     sendUpdateState({
       status: 'downloaded',
       info: mapUpdateInfo(info),
@@ -78,16 +82,17 @@ const setupUpdateListeners = (): void => {
       error: error.message,
     });
     isCheckingForUpdates = false;
+    isDownloading = false;
   });
 };
 
-const mapUpdateInfo = (info: any): UpdateInfo => ({
+const mapUpdateInfo = (info: ElectronUpdateInfo): UpdateInfo => ({
   version: info.version,
   releaseDate: info.releaseDate,
-  releaseNotes: info.releaseNotes,
-  files: info.files?.map((f: any) => ({
+  releaseNotes: info.releaseNotes as string | undefined,
+  files: info.files?.map((f) => ({
     url: f.url,
-    size: f.size,
+    size: f.size ?? 0,
   })) || [],
 });
 
@@ -110,7 +115,7 @@ const checkForUpdatesOnStartup = async (): Promise<void> => {
 
   setTimeout(() => {
     checkForUpdatesNow();
-  }, 10000); // Задержка 10 секунд
+  }, 10000); // 10 second delay
 };
 
 const startPeriodicUpdateChecks = (): void => {
@@ -154,21 +159,27 @@ export const checkForUpdatesNow = async (): Promise<void> => {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error('[Updater] Failed to check for updates:', error);
+    isCheckingForUpdates = false;
     sendUpdateState({
       status: 'error',
       error: (error as Error).message,
     });
-  } finally {
-    isCheckingForUpdates = false;
   }
 };
 
 export const downloadUpdate = async (): Promise<void> => {
+  if (isDownloading) {
+    console.log('[Updater] Download already in progress');
+    return;
+  }
+
   try {
+    isDownloading = true;
     console.log('[Updater] Starting download...');
     await autoUpdater.downloadUpdate();
   } catch (error) {
     console.error('[Updater] Failed to download update:', error);
+    isDownloading = false;
     sendUpdateState({
       status: 'error',
       error: (error as Error).message,

@@ -20,7 +20,11 @@ export const UpdateNotificationDialog: React.FC = () => {
   const updateInfo = updateState?.info;
 
   const handleDownload = async () => {
-    await window.audioPie.update.download();
+    try {
+      await window.audioPie.update.download();
+    } catch (error) {
+      console.error('Failed to start download:', error);
+    }
   };
 
   const handleDismiss = () => {

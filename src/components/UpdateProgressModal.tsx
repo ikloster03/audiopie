@@ -25,7 +25,11 @@ export const UpdateProgressModal: React.FC = () => {
   const updateInfo = updateState?.info;
 
   const handleInstall = () => {
-    window.audioPie.update.installAndRestart();
+    try {
+      window.audioPie.update.installAndRestart();
+    } catch (error) {
+      console.error('Failed to install update:', error);
+    }
   };
 
   const handleLater = () => {
