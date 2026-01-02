@@ -1,2 +1,5 @@
-npx --no -- commitlint --edit $1
+# Загрузка nvm для macOS
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+npx --no -- commitlint --edit $1
