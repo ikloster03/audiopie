@@ -4,7 +4,12 @@
   "icon": "assets/icon.png",
   "asar": true,
   "asarUnpack": ["node_modules/ffmpeg-static/**/*"],
-  "publish": null,
+  "publish": {
+    "provider": "github",
+    "owner": "ikloster03",
+    "repo": "audiopie",
+    "releaseType": "release"
+  },
   "directories": {
     "output": "release/${version}"
   },

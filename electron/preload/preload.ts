@@ -1,12 +1,18 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from '../main/types';
+import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo, UpdateState } from '../main/types';
 
 type ProgressListener = (progress: BuildProgress) => void;
+type UpdateListener = (state: UpdateState) => void;
 
 const progressListeners = new Set<ProgressListener>();
+const updateListeners = new Set<UpdateListener>();
 
 ipcRenderer.on('build/onProgress', (_event: IpcRendererEvent, progress: BuildProgress) => {
   progressListeners.forEach((listener) => listener(progress));
+});
+
+ipcRenderer.on('update:stateChanged', (_event: IpcRendererEvent, state: UpdateState) => {
+  updateListeners.forEach((listener) => listener(state));
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -56,6 +62,19 @@ const audioPieAPI = {
     get: (): Promise<AppSettings> => ipcRenderer.invoke('settings/get'),
     set: (partial: Partial<AppSettings>): Promise<AppSettings> => ipcRenderer.invoke('settings/set', partial),
     getMaxCpuCores: (): Promise<number> => ipcRenderer.invoke('settings/getMaxCpuCores'),
+  },
+  update: {
+    checkNow: (): Promise<void> => ipcRenderer.invoke('update/checkNow'),
+    download: (): Promise<void> => ipcRenderer.invoke('update/download'),
+    installAndRestart: (): Promise<void> => ipcRenderer.invoke('update/installAndRestart'),
+    setAutoUpdateEnabled: (enabled: boolean): Promise<void> =>
+      ipcRenderer.invoke('update/setAutoUpdateEnabled', enabled),
+    onStateChanged: (listener: UpdateListener) => {
+      updateListeners.add(listener);
+      return () => {
+        updateListeners.delete(listener);
+      };
+    },
   },
 };
 

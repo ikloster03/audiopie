@@ -77,6 +77,10 @@
     "dark": "Dark",
     "language": "Language",
     "languageDesc": "Choose your preferred language",
+    "autoCheckForUpdates": "Automatic Updates",
+    "autoCheckForUpdatesLabel": "Automatically check for updates",
+    "autoCheckForUpdatesDesc": "AudioPie will check for updates on startup (once per day) and every 6 hours while running",
+    "checkForUpdates": "Check for Updates",
     "cancel": "Cancel",
     "saveChanges": "Save Changes"
   },
@@ -116,6 +120,29 @@
   "notification": {
     "buildComplete": "Audiobook Build Complete",
     "buildCompleteBody": "\"{{title}}\" completed in {{duration}} ({{size}})"
+  },
+  "update": {
+    "available": {
+      "title": "Update Available",
+      "description": "A new version of AudioPie is available (v{{version}})",
+      "newVersion": "New Version",
+      "releaseDate": "Release Date",
+      "releaseNotes": "What's New",
+      "download": "Download Update",
+      "later": "Remind Me Later"
+    },
+    "downloading": {
+      "title": "Downloading Update",
+      "description": "Please wait while the update is being downloaded..."
+    },
+    "downloaded": {
+      "title": "Update Downloaded",
+      "description": "The update has been downloaded successfully",
+      "ready": "Version {{version}} is ready to install",
+      "instruction": "The application will restart to complete the installation",
+      "installNow": "Install and Restart",
+      "later": "Install Later"
+    }
   },
   "about": {
     "title": "About AudioPie",

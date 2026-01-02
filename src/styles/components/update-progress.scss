@@ -1,0 +1,62 @@
+.update-progress {
+  &__content {
+    @apply max-w-md;
+  }
+
+  &__header-title {
+    @apply flex items-center gap-2;
+  }
+
+  &__spinner {
+    @apply w-5 h-5 animate-spin text-primary;
+  }
+
+  &__header-icon {
+    @apply w-5 h-5 text-primary;
+  }
+
+  &__body {
+    @apply py-4;
+  }
+
+  &__info {
+    @apply space-y-4;
+  }
+
+  &__bar {
+    @apply w-full h-2;
+  }
+
+  &__stats {
+    @apply flex flex-col gap-1 text-sm text-muted-foreground;
+  }
+
+  &__percentage {
+    @apply text-lg font-semibold text-foreground;
+  }
+
+  &__size,
+  &__speed {
+    @apply text-sm;
+  }
+
+  &__ready {
+    @apply space-y-2;
+  }
+
+  &__ready-message {
+    @apply text-base font-medium text-foreground;
+  }
+
+  &__ready-instruction {
+    @apply text-sm text-muted-foreground;
+  }
+
+  &__footer {
+    @apply flex gap-2;
+  }
+
+  &__button-icon {
+    @apply w-4 h-4 mr-2;
+  }
+}

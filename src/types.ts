@@ -38,6 +38,8 @@ export type AppSettings = {
   ffmpegThreads?: number;
   theme?: 'light' | 'dark';
   language?: 'en' | 'ru';
+  autoCheckForUpdates?: boolean;
+  lastUpdateCheck?: number;
 };
 
 export type BuildProgress = {
@@ -47,4 +49,11 @@ export type BuildProgress = {
   currentStep?: number;
   totalSteps?: number;
 };
+
+export type {
+  UpdateInfo,
+  UpdateProgress,
+  UpdateStatus,
+  UpdateState,
+} from '../electron/main/types';
 

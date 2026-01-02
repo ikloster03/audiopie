@@ -67,6 +67,32 @@
     @apply h-4 w-4 mr-2;
   }
 
+  /* Update Settings */
+  &__update-check {
+    @apply flex flex-col gap-3;
+  }
+
+  &__update-toggle {
+    @apply flex items-center gap-2;
+  }
+
+  &__checkbox {
+    @apply w-4 h-4 rounded border-input cursor-pointer;
+    @apply checked:bg-primary checked:border-primary;
+  }
+
+  &__check-updates-button {
+    @apply w-full sm:w-auto;
+  }
+
+  &__refresh-icon {
+    @apply w-4 h-4 mr-2;
+
+    &--spinning {
+      @apply animate-spin;
+    }
+  }
+
   /* Footer */
   &__footer {
     @apply gap-2;

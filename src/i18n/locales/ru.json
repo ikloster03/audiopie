@@ -81,6 +81,10 @@
     "dark": "Темная",
     "language": "Язык",
     "languageDesc": "Выберите предпочитаемый язык",
+    "autoCheckForUpdates": "Автоматические обновления",
+    "autoCheckForUpdatesLabel": "Автоматически проверять обновления",
+    "autoCheckForUpdatesDesc": "AudioPie будет проверять обновления при запуске (раз в день) и каждые 6 часов во время работы",
+    "checkForUpdates": "Проверить обновления",
     "cancel": "Отмена",
     "saveChanges": "Сохранить изменения"
   },
@@ -120,6 +124,29 @@
   "notification": {
     "buildComplete": "Сборка аудиокниги завершена",
     "buildCompleteBody": "\"{{title}}\" завершена за {{duration}} ({{size}})"
+  },
+  "update": {
+    "available": {
+      "title": "Доступно обновление",
+      "description": "Доступна новая версия AudioPie (v{{version}})",
+      "newVersion": "Новая версия",
+      "releaseDate": "Дата выпуска",
+      "releaseNotes": "Что нового",
+      "download": "Скачать обновление",
+      "later": "Напомнить позже"
+    },
+    "downloading": {
+      "title": "Загрузка обновления",
+      "description": "Пожалуйста, подождите, пока обновление загружается..."
+    },
+    "downloaded": {
+      "title": "Обновление загружено",
+      "description": "Обновление успешно загружено",
+      "ready": "Версия {{version}} готова к установке",
+      "instruction": "Приложение будет перезапущено для завершения установки",
+      "installNow": "Установить и перезапустить",
+      "later": "Установить позже"
+    }
   },
   "about": {
     "title": "О программе AudioPie",
