@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.6
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.5...v0.6.6)
+
+### 🩹 Fixes
+
+- Remove GitHub publish configuration from electron-builder.json ([3311d08](https://github.com/ikloster03/audiopie/commit/3311d08))
+- **husky:** Add NVM loading for macOS in commit-msg and pre-push hooks ([109f0e1](https://github.com/ikloster03/audiopie/commit/109f0e1))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.5
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.4...v0.6.5)
