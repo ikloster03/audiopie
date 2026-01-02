@@ -38,6 +38,8 @@ export type AppSettings = {
   ffmpegThreads?: number;
   theme?: 'light' | 'dark';
   language?: 'en' | 'ru';
+  autoCheckForUpdates?: boolean;
+  lastUpdateCheck?: number;
 };
 
 export type BuildProgress = {
@@ -46,4 +48,36 @@ export type BuildProgress = {
   message?: string;
   currentStep?: number;
   totalSteps?: number;
+};
+
+export type UpdateInfo = {
+  version: string;
+  releaseDate: string;
+  releaseNotes?: string;
+  files: Array<{
+    url: string;
+    size: number;
+  }>;
+};
+
+export type UpdateProgress = {
+  bytesPerSecond: number;
+  percent: number;
+  transferred: number;
+  total: number;
+};
+
+export type UpdateStatus =
+  | 'checking'
+  | 'available'
+  | 'not-available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error';
+
+export type UpdateState = {
+  status: UpdateStatus;
+  info?: UpdateInfo;
+  progress?: UpdateProgress;
+  error?: string;
 };

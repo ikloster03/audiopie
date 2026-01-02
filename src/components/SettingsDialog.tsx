@@ -14,7 +14,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
-import { Settings2, Moon, Sun, Languages } from 'lucide-react';
+import { Settings2, Moon, Sun, Languages, RefreshCw } from 'lucide-react';
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -23,8 +23,9 @@ interface SettingsDialogProps {
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const { settings, setSettings, theme, changeLanguage, language } = useAppContext();
+  const { settings, setSettings, theme, changeLanguage, language, updateState } = useAppContext();
   const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
   const [formData, setFormData] = useState<AppSettings>({
     ffmpegPath: '',
     ffprobePath: '',
@@ -32,7 +33,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     defaultOutputDir: '',
     ffmpegThreads: 0,
     theme: 'light',
-    language: 'en'
+    language: 'en',
+    autoCheckForUpdates: true
   });
 
   useEffect(() => {
@@ -44,7 +46,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         defaultOutputDir: settings.defaultOutputDir || '',
         ffmpegThreads: settings.ffmpegThreads ?? 0,
         theme: settings.theme || theme || 'light',
-        language: settings.language || language || 'en'
+        language: settings.language || language || 'en',
+        autoCheckForUpdates: settings.autoCheckForUpdates ?? true
       });
     }
   }, [isOpen, settings, theme, language]);
@@ -55,6 +58,24 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (updateState?.status === 'not-available' ||
+        updateState?.status === 'available' ||
+        updateState?.status === 'error') {
+      setIsCheckingUpdates(false);
+    }
+  }, [updateState]);
+
+  const handleCheckForUpdates = async () => {
+    setIsCheckingUpdates(true);
+    try {
+      await window.audioPie.update.checkNow();
+    } catch (error) {
+      console.error('Failed to check for updates:', error);
+      setIsCheckingUpdates(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const updated = await window.audioPie.settings.set({
@@ -64,9 +85,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
       defaultOutputDir: formData.defaultOutputDir || undefined,
       ffmpegThreads: formData.ffmpegThreads,
       theme: formData.theme,
-      language: formData.language
+      language: formData.language,
+      autoCheckForUpdates: formData.autoCheckForUpdates
     });
     setSettings(updated);
+
+    // Apply auto-update setting
+    await window.audioPie.update.setAutoUpdateEnabled(formData.autoCheckForUpdates ?? true);
     
     // Apply theme change immediately
     if (formData.theme === 'dark') {
@@ -83,7 +108,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     onClose();
   };
 
-  const handleChange = (key: keyof AppSettings, value: string | number) => {
+  const handleChange = (key: keyof AppSettings, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -172,6 +197,35 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                 />
                 <p className="settings-dialog__field-description">
                   {t('settings.ffmpegThreadsDesc', { cores: maxCpuCores })}
+                </p>
+              </div>
+
+              <div className="settings-dialog__field">
+                <Label htmlFor="autoCheckForUpdates">{t('settings.autoCheckForUpdates')}</Label>
+                <div className="settings-dialog__update-check">
+                  <div className="settings-dialog__update-toggle">
+                    <input
+                      id="autoCheckForUpdates"
+                      type="checkbox"
+                      checked={formData.autoCheckForUpdates ?? true}
+                      onChange={(e) => handleChange('autoCheckForUpdates', e.target.checked)}
+                      className="settings-dialog__checkbox"
+                    />
+                    <span>{t('settings.autoCheckForUpdatesLabel')}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCheckForUpdates}
+                    disabled={isCheckingUpdates}
+                    className="settings-dialog__check-updates-button"
+                  >
+                    <RefreshCw className={`settings-dialog__refresh-icon ${isCheckingUpdates ? 'settings-dialog__refresh-icon--spinning' : ''}`} />
+                    {t('settings.checkForUpdates')}
+                  </Button>
+                </div>
+                <p className="settings-dialog__field-description">
+                  {t('settings.autoCheckForUpdatesDesc')}
                 </p>
               </div>
 

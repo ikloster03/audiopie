@@ -12,6 +12,8 @@ const store = new Store<AppSettings>({
     ffmpegThreads: 0, // 0 = auto (uses all available cores)
     theme: 'light',
     language: 'en',
+    autoCheckForUpdates: true,
+    lastUpdateCheck: 0,
   },
 });
 
@@ -30,6 +32,8 @@ export const getSettings = (): AppSettings => {
     ffmpegThreads: rawStore.get('ffmpegThreads'),
     theme: rawStore.get('theme'),
     language: rawStore.get('language'),
+    autoCheckForUpdates: rawStore.get('autoCheckForUpdates'),
+    lastUpdateCheck: rawStore.get('lastUpdateCheck'),
   };
 };
 

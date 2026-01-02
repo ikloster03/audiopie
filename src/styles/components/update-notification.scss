@@ -1,0 +1,46 @@
+.update-notification {
+  &__content {
+    @apply max-w-lg;
+  }
+
+  &__header-title {
+    @apply flex items-center gap-2;
+  }
+
+  &__header-icon {
+    @apply w-5 h-5 text-primary;
+  }
+
+  &__body {
+    @apply space-y-4 py-4;
+  }
+
+  &__info {
+    @apply space-y-2;
+  }
+
+  &__version,
+  &__date {
+    @apply text-sm text-foreground;
+  }
+
+  &__release-notes {
+    @apply mt-4 p-4 bg-secondary rounded-md;
+  }
+
+  &__release-notes-title {
+    @apply font-semibold text-sm mb-2;
+  }
+
+  &__release-notes-content {
+    @apply text-sm text-muted-foreground whitespace-pre-wrap max-h-48 overflow-y-auto;
+  }
+
+  &__footer {
+    @apply flex gap-2;
+  }
+
+  &__button-icon {
+    @apply w-4 h-4 mr-2;
+  }
+}

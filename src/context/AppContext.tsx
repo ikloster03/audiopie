@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { TrackInfo, Chapter, BookMetadata, AppSettings, BuildProgress } from '../types';
+import type { TrackInfo, Chapter, BookMetadata, AppSettings, BuildProgress, UpdateState } from '../types';
 import { useTranslation } from 'react-i18next';
 
 interface AppState {
@@ -12,6 +12,7 @@ interface AppState {
   isProjectOpen: boolean;
   theme: 'light' | 'dark';
   language: 'en' | 'ru';
+  updateState: UpdateState | null;
 }
 
 interface AppContextType extends AppState {
@@ -21,6 +22,7 @@ interface AppContextType extends AppState {
   setSettings: (settings: AppSettings | null) => void;
   setBuildProgress: (progress: BuildProgress | null) => void;
   setIsBuildModalVisible: (visible: boolean) => void;
+  setUpdateState: (state: UpdateState | null) => void;
   openProject: () => void;
   newProject: () => void;
   closeProject: () => void;
@@ -53,6 +55,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isProjectOpen, setIsProjectOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
+  const [updateState, setUpdateState] = useState<UpdateState | null>(null);
 
   // Load initial settings and theme
   useEffect(() => {
@@ -160,6 +163,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // Subscribe to update state changes
+  useEffect(() => {
+    const unsubscribe = window.audioPie.update.onStateChanged((state) => {
+      setUpdateState(state);
+    });
+
+    return unsubscribe;
+  }, []);
+
   const value: AppContextType = {
     tracks,
     chapters,
@@ -170,12 +182,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     isProjectOpen,
     theme,
     language,
+    updateState,
     setTracks,
     setChapters,
     setMetadata,
     setSettings,
     setBuildProgress,
     setIsBuildModalVisible,
+    setUpdateState,
     openProject,
     newProject,
     closeProject,

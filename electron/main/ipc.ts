@@ -8,6 +8,7 @@ import { getSettings, setSettings, getMaxCpuCores } from './settings';
 import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
 import { changeLanguage, t } from './i18n';
 import { rebuildMenu } from './menu';
+import { checkForUpdatesNow, downloadUpdate, installUpdateAndRestart, setAutoUpdateEnabled } from './updater';
 
 const sanitizeTitle = (filePath: string): string => {
   return path.basename(filePath).replace(/\.[^/.]+$/, '');
@@ -265,5 +266,22 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
 
   ipcMain.handle('settings/getMaxCpuCores', (): number => {
     return getMaxCpuCores();
+  });
+
+  // Update handlers
+  ipcMain.handle('update/checkNow', async (): Promise<void> => {
+    await checkForUpdatesNow();
+  });
+
+  ipcMain.handle('update/download', async (): Promise<void> => {
+    await downloadUpdate();
+  });
+
+  ipcMain.handle('update/installAndRestart', (): void => {
+    installUpdateAndRestart();
+  });
+
+  ipcMain.handle('update/setAutoUpdateEnabled', (_event: IpcMainInvokeEvent, enabled: boolean): void => {
+    setAutoUpdateEnabled(enabled);
   });
 };

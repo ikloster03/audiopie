@@ -6,6 +6,8 @@ import { MetadataForm } from './components/MetadataForm';
 import { ProgressModal } from './components/ProgressModal';
 import { SettingsDialog } from './components/SettingsDialog';
 import { ProjectManager } from './components/ProjectManager';
+import { UpdateNotificationDialog } from './components/UpdateNotificationDialog';
+import { UpdateProgressModal } from './components/UpdateProgressModal';
 import { useAppContext } from './context/AppContext';
 import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
@@ -225,6 +227,8 @@ export const App: React.FC = () => {
       </main>
 
       <ProgressModal />
+      <UpdateNotificationDialog />
+      <UpdateProgressModal />
       <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );

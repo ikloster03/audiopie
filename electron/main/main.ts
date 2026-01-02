@@ -7,6 +7,7 @@ import { initializeBinaries } from './settings';
 import { initializeFFmpeg } from './ffmpeg';
 import { initializeI18n } from './i18n';
 import { initMenu, rebuildMenu } from './menu';
+import { initializeUpdater, stopPeriodicUpdateChecks } from './updater';
 
 const isDev = !app.isPackaged;
 
@@ -43,6 +44,9 @@ const createWindow = async () => {
   initMenu(mainWindow, icon, isDev);
 
   registerIpcHandlers(mainWindow);
+
+  // Initialize auto-updater
+  initializeUpdater(mainWindow);
 
   // In dev mode, load from Vite dev server
   if (isDev) {
@@ -106,4 +110,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  stopPeriodicUpdateChecks();
 });
