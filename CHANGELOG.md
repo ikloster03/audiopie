@@ -1,5 +1,39 @@
 # Changelog
 
+## v0.6.5
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.4...v0.6.5)
+
+### 🚀 Enhancements
+
+- Add initial configuration and documentation files for AudioPie project ([f354195](https://github.com/ikloster03/audiopie/commit/f354195))
+- **update:** Implement automatic update functionality ([12de29e](https://github.com/ikloster03/audiopie/commit/12de29e))
+
+### 🩹 Fixes
+
+- ⚠️  Package lock version ([2dd7775](https://github.com/ikloster03/audiopie/commit/2dd7775))
+- **menu:** Enhance macOS menu with application-specific options and improve edit menu functionality ([b82b80c](https://github.com/ikloster03/audiopie/commit/b82b80c))
+- **tests:** Address code review feedback ([1fd7d4e](https://github.com/ikloster03/audiopie/commit/1fd7d4e))
+- **update:** Address code review feedback ([794ff2e](https://github.com/ikloster03/audiopie/commit/794ff2e))
+
+### 📖 Documentation
+
+- Add comprehensive CLAUDE.md guide for AI assistants ([aadd49d](https://github.com/ikloster03/audiopie/commit/aadd49d))
+- Fix technical inaccuracies in CLAUDE.md ([ca74fa7](https://github.com/ikloster03/audiopie/commit/ca74fa7))
+
+### ✅ Tests
+
+- **ffmpeg:** Add smoke e2e tests for FFmpeg integration ([4db3f16](https://github.com/ikloster03/audiopie/commit/4db3f16))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Package lock version ([2dd7775](https://github.com/ikloster03/audiopie/commit/2dd7775))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+- Claude <noreply@anthropic.com>
+
 ## v0.6.4
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.3...v0.6.4)
