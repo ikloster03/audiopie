@@ -11,6 +11,9 @@ import { initializeUpdater, stopPeriodicUpdateChecks } from './updater';
 
 const isDev = !app.isPackaged;
 
+// Устанавливаем имя приложения (важно для macOS dock в dev режиме)
+app.setName('AudioPie');
+
 console.log('Electron version:', process.versions.electron);
 console.log('Node version:', process.versions.node);
 console.log('Chrome version:', process.versions.chrome);
@@ -27,9 +30,16 @@ const createWindow = async () => {
   // Проверяем наличие иконки (ICO для Windows, PNG для macOS/Linux)
   const iconName = process.platform === 'win32' ? 'audiopie.ico' : 'audiopie.png';
   const iconPath = isDev 
-    ? path.join(app.getAppPath(), 'assets', iconName)
+    ? path.join(__dirname, '../../assets', iconName)  // В dev: dist-electron/main -> корень проекта
     : path.join(process.resourcesPath, iconName);
+  
+  console.log('Icon path:', iconPath, 'exists:', fs.existsSync(iconPath));
   const icon = fs.existsSync(iconPath) ? nativeImage.createFromPath(iconPath) : undefined;
+  
+  // На macOS устанавливаем иконку в dock
+  if (process.platform === 'darwin' && icon && app.dock) {
+    app.dock.setIcon(icon);
+  }
   
   const mainWindow = new BrowserWindow({
     width: 1280,
