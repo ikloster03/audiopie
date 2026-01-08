@@ -24,8 +24,11 @@ console.log('Is dev:', isDev);
 const createWindow = async () => {
   const preloadPath = path.join(__dirname, '../preload/preload.js');
   
-  // Проверяем наличие иконки
-  const iconPath = path.join(app.getAppPath(), 'assets', 'icon.png');
+  // Проверяем наличие иконки (ICO для Windows, PNG для macOS/Linux)
+  const iconName = process.platform === 'win32' ? 'audiopie.ico' : 'audiopie.png';
+  const iconPath = isDev 
+    ? path.join(app.getAppPath(), 'assets', iconName)
+    : path.join(process.resourcesPath, iconName);
   const icon = fs.existsSync(iconPath) ? nativeImage.createFromPath(iconPath) : undefined;
   
   const mainWindow = new BrowserWindow({

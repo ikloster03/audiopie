@@ -1,7 +1,6 @@
 {
   "appId": "com.example.audiopie",
   "productName": "AudioPie",
-  "icon": "assets/icon.png",
   "asar": true,
   "asarUnpack": ["node_modules/ffmpeg-static/**/*"],
   "publish": null,
@@ -20,7 +19,8 @@
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
     "target": ["dmg"],
-    "category": "public.app-category.music"
+    "category": "public.app-category.music",
+    "icon": "assets/audiopie.png"
   },
   "win": {
     "target": [
@@ -29,7 +29,8 @@
         "arch": ["x64"]
       }
     ],
-    "artifactName": "${productName}_${version}.${ext}"
+    "artifactName": "${productName}_${version}.${ext}",
+    "icon": "assets/audiopie.ico"
   },
   "nsis": {
     "oneClick": false,
@@ -40,7 +41,8 @@
   "linux": {
     "target": ["AppImage"],
     "artifactName": "${productName}_${version}.${ext}",
-    "category": "Audio"
+    "category": "Audio",
+    "icon": "assets/audiopie.png"
   },
   "extraResources": [
     {
