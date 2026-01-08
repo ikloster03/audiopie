@@ -1,33 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
   <defs>
     <linearGradient id="audioGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#F25942;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D94532;stop-opacity:1" />
     </linearGradient>
   </defs>
   <!-- Main circle background -->
-  <circle cx="100" cy="100" r="80" fill="url(#audioGrad)" opacity="0.1"/>
-  <!-- MP3 file icon -->
-  <rect x="50" y="45" width="45" height="55" rx="4" fill="#6366f1"/>
-  <path d="M80 45 L95 60 L95 100 L50 100 L50 45 Z" fill="#8b5cf6"/>
-  <polygon points="80,45 80,60 95,60" fill="#a78bfa"/>
+  <circle cx="100" cy="100" r="80" fill="#e5e7eb" opacity="0.5"/>
+  <!-- MP3 file icon (Source - Gray/Dark) -->
+  <rect x="50" y="45" width="45" height="55" rx="4" fill="#343a40"/>
+  <path d="M80 45 L95 60 L95 100 L50 100 L50 45 Z" fill="#495057"/>
+  <polygon points="80,45 80,60 95,60" fill="#6c757d"/>
   <text x="57" y="85" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">MP3</text>
-  <!-- Arrow -->
-  <path d="M105 75 L125 75 L125 68 L140 77.5 L125 87 L125 80 L105 80 Z" fill="#6366f1"/>
-  <!-- M4B file icon -->
-  <rect x="145" y="45" width="45" height="55" rx="4" fill="#10b981"/>
-  <path d="M175 45 L190 60 L190 100 L145 100 L145 45 Z" fill="#34d399"/>
-  <polygon points="175,45 175,60 190,60" fill="#6ee7b7"/>
+  <!-- Arrow (Black) -->
+  <path d="M105 75 L125 75 L125 68 L140 77.5 L125 87 L125 80 L105 80 Z" fill="#1a1b1e"/>
+  <!-- M4B file icon (Result - Orange) -->
+  <rect x="145" y="45" width="45" height="55" rx="4" fill="#F25942"/>
+  <path d="M175 45 L190 60 L190 100 L145 100 L145 45 Z" fill="#D94532"/>
+  <polygon points="175,45 175,60 190,60" fill="#FF8573"/>
   <text x="150" y="85" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">M4B</text>
-  <!-- Audio waves -->
+  <!-- Audio waves (Mixed) -->
   <g transform="translate(70, 115)">
-    <rect x="0" y="15" width="4" height="20" rx="2" fill="#6366f1"/>
-    <rect x="10" y="10" width="4" height="30" rx="2" fill="#6366f1"/>
-    <rect x="20" y="5" width="4" height="40" rx="2" fill="#8b5cf6"/>
-    <rect x="30" y="8" width="4" height="34" rx="2" fill="#6366f1"/>
-    <rect x="40" y="12" width="4" height="26" rx="2" fill="#6366f1"/>
-    <rect x="50" y="5" width="4" height="40" rx="2" fill="#8b5cf6"/>
-    <rect x="60" y="10" width="4" height="30" rx="2" fill="#6366f1"/>
-    <rect x="70" y="15" width="4" height="20" rx="2" fill="#6366f1"/>
+    <rect x="0" y="15" width="4" height="20" rx="2" fill="#F25942"/>
+    <rect x="10" y="10" width="4" height="30" rx="2" fill="#343a40"/>
+    <rect x="20" y="5" width="4" height="40" rx="2" fill="#F25942"/>
+    <rect x="30" y="8" width="4" height="34" rx="2" fill="#343a40"/>
+    <rect x="40" y="12" width="4" height="26" rx="2" fill="#F25942"/>
+    <rect x="50" y="5" width="4" height="40" rx="2" fill="#343a40"/>
+    <rect x="60" y="10" width="4" height="30" rx="2" fill="#F25942"/>
+    <rect x="70" y="15" width="4" height="20" rx="2" fill="#343a40"/>
   </g>
 </svg>
