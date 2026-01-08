@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.6.7
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.6...v0.6.7)
+
+### 🚀 Enhancements
+
+- **scripts:** Add ico generation ([bde950b](https://github.com/ikloster03/audiopie/commit/bde950b))
+- **docs:** Update README and logo for improved branding ([871d0f9](https://github.com/ikloster03/audiopie/commit/871d0f9))
+
+### 💅 Refactors
+
+- **electron-builder:** Add new icons ([4259001](https://github.com/ikloster03/audiopie/commit/4259001))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.6
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.5...v0.6.6)
