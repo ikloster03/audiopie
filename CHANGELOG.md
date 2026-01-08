@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.8
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.7...v0.6.8)
+
+### 🚀 Enhancements
+
+- **electron:** Set application name and update icon path for macOS ([f09d0e6](https://github.com/ikloster03/audiopie/commit/f09d0e6))
+- **branding:** Update logo and icons to new color scheme and design ([8c818c0](https://github.com/ikloster03/audiopie/commit/8c818c0))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.7
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.6...v0.6.7)
