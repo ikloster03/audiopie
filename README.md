@@ -1,5 +1,9 @@
 **English** | [Русский](README_RU.md)
 
+<p align="center">
+  <img src="assets/audiopie.svg" alt="AudioPie Logo" width="128" height="128">
+</p>
+
 # AudioPie
 
 AudioPie — build M4B audiobooks from MP3 tracks with chapter editing.

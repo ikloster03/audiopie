@@ -62,8 +62,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/audiopie-social-card.png',
+    // Social card (logo.svg used as fallback)
+    image: 'img/logo.svg',
     colorMode: {
       respectPrefersColorScheme: true,
     },
