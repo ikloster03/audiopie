@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.6.12
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.11...v0.6.12)
+
+### 🚀 Enhancements
+
+- **UpdateNotificationDialog:** Add HTML parsing for release notes ([28b0877](https://github.com/ikloster03/audiopie/commit/28b0877))
+- **electron-builder:** Add zip target for macOS builds ([0f99038](https://github.com/ikloster03/audiopie/commit/0f99038))
+- **updater:** Enhance update progress handling and localization ([fc7ddba](https://github.com/ikloster03/audiopie/commit/fc7ddba))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.11
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.10...v0.6.11)
