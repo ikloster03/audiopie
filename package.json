@@ -25,6 +25,9 @@
     "preview": "vite preview",
     "sort": "npx sort-package-json",
     "typecheck": "tsc --noEmit",
+    "icons:linux": "node scripts/generate-linux-icons.mjs",
+    "icons:win": "node scripts/svg-to-ico.mjs",
+    "icons": "npm run icons:linux && npm run icons:win",
     "version:major": "npx changelogen@latest --release --major --push",
     "version:minor": "npx changelogen@latest --release --minor --push",
     "version:patch": "npx changelogen@latest --release --patch --push"
