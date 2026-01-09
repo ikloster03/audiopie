@@ -31,7 +31,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
     ffprobePath: '',
     defaultBitrateKbps: 128,
     defaultOutputDir: '',
-    ffmpegThreads: 0,
+    ffmpegThreads: 1,
     theme: 'light',
     language: 'en',
     autoCheckForUpdates: true
@@ -44,7 +44,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         ffprobePath: settings.ffprobePath || '',
         defaultBitrateKbps: settings.defaultBitrateKbps || 128,
         defaultOutputDir: settings.defaultOutputDir || '',
-        ffmpegThreads: settings.ffmpegThreads ?? 0,
+        ffmpegThreads: settings.ffmpegThreads ?? 1,
         theme: settings.theme || theme || 'light',
         language: settings.language || language || 'en',
         autoCheckForUpdates: settings.autoCheckForUpdates ?? true
@@ -190,10 +190,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                 <Input
                   id="ffmpegThreads"
                   type="number"
-                  min="0"
+                  min="1"
                   max={maxCpuCores}
                   value={formData.ffmpegThreads}
-                  onChange={(e) => handleChange('ffmpegThreads', Number(e.target.value))}
+                  onChange={(e) => handleChange('ffmpegThreads', Math.max(1, Number(e.target.value)))}
                 />
                 <p className="settings-dialog__field-description">
                   {t('settings.ffmpegThreadsDesc', { cores: maxCpuCores })}

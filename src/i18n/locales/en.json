@@ -70,7 +70,7 @@
     "defaultOutputDirDesc": "Default directory for saving built audiobooks",
     "defaultOutputDirPlaceholder": "Leave empty for last used directory",
     "ffmpegThreads": "Parallel FFmpeg Processes",
-    "ffmpegThreadsDesc": "Number of tracks to encode simultaneously. 0 = Auto (all {{cores}} cores), Max: {{cores}}",
+    "ffmpegThreadsDesc": "Number of tracks to encode simultaneously (1-{{cores}})",
     "theme": "Theme",
     "themeDesc": "Choose your preferred color theme",
     "light": "Light",

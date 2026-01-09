@@ -9,7 +9,7 @@ const store = new Store<AppSettings>({
   name: 'settings',
   defaults: {
     defaultBitrateKbps: 128,
-    ffmpegThreads: 0, // 0 = auto (uses all available cores)
+    ffmpegThreads: 1,
     theme: 'light',
     language: 'en',
     autoCheckForUpdates: true,
