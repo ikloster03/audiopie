@@ -7,6 +7,7 @@ let mainWindow: BrowserWindow | null = null;
 let updateCheckInterval: NodeJS.Timeout | null = null;
 let isCheckingForUpdates = false;
 let isDownloading = false;
+let currentUpdateInfo: UpdateInfo | null = null;
 
 const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const UPDATE_CHECK_DEBOUNCE_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -41,9 +42,10 @@ const setupUpdateListeners = (): void => {
   autoUpdater.on('update-available', (info) => {
     console.log('[Updater] Update available:', info.version);
     isCheckingForUpdates = false;
+    currentUpdateInfo = mapUpdateInfo(info);
     sendUpdateState({
       status: 'available',
-      info: mapUpdateInfo(info),
+      info: currentUpdateInfo,
     });
   });
 
@@ -57,6 +59,7 @@ const setupUpdateListeners = (): void => {
     console.log(`[Updater] Download progress: ${progressObj.percent.toFixed(2)}%`);
     sendUpdateState({
       status: 'downloading',
+      info: currentUpdateInfo ?? undefined,
       progress: {
         bytesPerSecond: progressObj.bytesPerSecond,
         percent: progressObj.percent,
@@ -176,6 +179,19 @@ export const downloadUpdate = async (): Promise<void> => {
   try {
     isDownloading = true;
     console.log('[Updater] Starting download...');
+    
+    // Сразу отправляем состояние downloading с сохранением info
+    sendUpdateState({
+      status: 'downloading',
+      info: currentUpdateInfo ?? undefined,
+      progress: {
+        bytesPerSecond: 0,
+        percent: 0,
+        transferred: 0,
+        total: 0,
+      },
+    });
+    
     await autoUpdater.downloadUpdate();
   } catch (error) {
     console.error('[Updater] Failed to download update:', error);

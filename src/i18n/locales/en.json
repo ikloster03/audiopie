@@ -133,7 +133,8 @@
     },
     "downloading": {
       "title": "Downloading Update",
-      "description": "Please wait while the update is being downloaded..."
+      "description": "Please wait while the update is being downloaded...",
+      "preparing": "Preparing download..."
     },
     "downloaded": {
       "title": "Update Downloaded",

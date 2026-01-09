@@ -80,22 +80,30 @@ export const UpdateProgressModal: React.FC = () => {
         </DialogHeader>
 
         <div className="update-progress__body">
-          {isDownloading && progress && (
+          {isDownloading && (
             <div className="update-progress__info">
               <Progress
-                value={progress.percent}
+                value={progress?.percent ?? 0}
                 className="update-progress__bar"
               />
               <div className="update-progress__stats">
                 <p className="update-progress__percentage">
-                  {progress.percent.toFixed(1)}%
+                  {(progress?.percent ?? 0).toFixed(1)}%
                 </p>
-                <p className="update-progress__size">
-                  {formatBytes(progress.transferred)} / {formatBytes(progress.total)}
-                </p>
-                <p className="update-progress__speed">
-                  {formatSpeed(progress.bytesPerSecond)}
-                </p>
+                {progress && progress.total > 0 ? (
+                  <>
+                    <p className="update-progress__size">
+                      {formatBytes(progress.transferred)} / {formatBytes(progress.total)}
+                    </p>
+                    <p className="update-progress__speed">
+                      {formatSpeed(progress.bytesPerSecond)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="update-progress__size">
+                    {t('update.downloading.preparing')}
+                  </p>
+                )}
               </div>
             </div>
           )}
