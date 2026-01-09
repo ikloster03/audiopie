@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.6.13
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.12...v0.6.13)
+
+### 🚀 Enhancements
+
+- **i18n:** Add translation for menu ([55de971](https://github.com/ikloster03/audiopie/commit/55de971))
+- **electron-builder:** Add support for zip files in release artifacts ([80fa59c](https://github.com/ikloster03/audiopie/commit/80fa59c))
+
+### 🩹 Fixes
+
+- **build:** Include zip files in artifact upload process ([6bc4417](https://github.com/ikloster03/audiopie/commit/6bc4417))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.12
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.11...v0.6.12)
