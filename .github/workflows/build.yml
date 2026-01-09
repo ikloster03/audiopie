@@ -61,6 +61,7 @@ jobs:
             release/**/*.nupkg
             release/**/*.blockmap
             release/**/*.dmg
+            release/**/*.zip
             release/**/*.AppImage
             release/**/latest*.yml
   release:
