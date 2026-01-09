@@ -30,11 +30,26 @@ Alternatively, you can extract the `linux-unpacked` archive and run the `audiopi
 2. Run the installer and follow the instructions
 3. Launch AudioPie from the Start menu
 
+:::caution Windows SmartScreen Warning
+If Windows SmartScreen shows "Windows protected your PC", click **"More info"** → **"Run anyway"**. This happens because the app is not yet code-signed. Code signing is in progress.
+:::
+
 ### macOS
 
 1. Download the `.dmg` file from the releases page
 2. Open the DMG and drag AudioPie to your Applications folder
 3. Launch AudioPie from Launchpad or Spotlight
+
+:::caution macOS Security Warning
+If macOS shows "AudioPie is damaged and can't be opened", this is because the app is not yet code-signed. Code signing is in progress.
+
+**Solution**: Run in Terminal:
+```bash
+xattr -cr /Applications/AudioPie.app
+```
+
+Or go to **System Settings → Privacy & Security** and click **"Open Anyway"**.
+:::
 
 ## Build from Source
 
@@ -88,8 +103,12 @@ See the [FFmpeg Configuration](./configuration/ffmpeg) guide for more details.
 ### Application Won't Start
 
 - **Linux**: Make sure the AppImage has execute permissions
-- **macOS**: You may need to allow the app in System Preferences → Security & Privacy
-- **Windows**: If Windows Defender blocks the app, click "More info" → "Run anyway"
+- **macOS**: If you see "damaged and can't be opened" error, run `xattr -cr /Applications/AudioPie.app` in Terminal, or allow the app in **System Settings → Privacy & Security → "Open Anyway"**
+- **Windows**: If Windows SmartScreen blocks the app, click **"More info"** → **"Run anyway"**
+
+:::info Code Signing Status
+Code signing for macOS and Windows is currently in progress. Once complete, these security warnings will no longer appear.
+:::
 
 ### FFmpeg Errors
 

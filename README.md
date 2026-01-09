@@ -75,6 +75,27 @@ The built application will be in the `release/{version}` directory.
 - Node.js >= 18.0.0
 - npm or yarn
 
+## Security Warnings
+
+> ⚠️ **Note**: Code signing is currently in progress. Until it's complete, you may see security warnings when launching the app.
+
+### macOS
+
+If macOS shows "AudioPie is damaged and can't be opened", run in Terminal:
+
+```bash
+xattr -cr /Applications/AudioPie.app
+```
+
+Or go to **System Settings → Privacy & Security** and click **"Open Anyway"**.
+
+### Windows
+
+If Windows SmartScreen shows "Windows protected your PC":
+
+1. Click **"More info"**
+2. Click **"Run anyway"**
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) file for details
