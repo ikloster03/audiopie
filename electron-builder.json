@@ -3,7 +3,11 @@
   "productName": "AudioPie",
   "asar": true,
   "asarUnpack": ["node_modules/ffmpeg-static/**/*"],
-  "publish": null,
+  "publish": {
+    "provider": "github",
+    "owner": "ikloster03",
+    "repo": "audiopie"
+  },
   "directories": {
     "output": "release/${version}"
   },
