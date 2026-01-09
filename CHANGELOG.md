@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.6.10
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.9...v0.6.10)
+
+### 🚀 Enhancements
+
+- **electron:** Add support for DevTools in production mode and update build script ([6f4f9b2](https://github.com/ikloster03/audiopie/commit/6f4f9b2))
+- **electron-builder:** Configure GitHub as the publishing provider ([cecb40a](https://github.com/ikloster03/audiopie/commit/cecb40a))
+
+### 🩹 Fixes
+
+- **build:** Update build command to prevent automatic publishing ([c0281ad](https://github.com/ikloster03/audiopie/commit/c0281ad))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.9
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.8...v0.6.9)
