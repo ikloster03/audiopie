@@ -12,6 +12,55 @@ import {
 import { Button } from './ui/button';
 import { Download, X } from 'lucide-react';
 
+/**
+ * Преобразует HTML release notes в читаемый текст
+ */
+const parseReleaseNotes = (html: string): string => {
+  if (!html) return '';
+  
+  let text = html;
+  
+  // Заменяем заголовки на текст с новой строкой
+  text = text.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '\n$1\n');
+  
+  // Заменяем <li> на маркированные пункты
+  text = text.replace(/<li[^>]*>(.*?)<\/li>/gi, '• $1\n');
+  
+  // Заменяем <br> и <br/> на новые строки
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  
+  // Заменяем </p> на новую строку
+  text = text.replace(/<\/p>/gi, '\n');
+  
+  // Удаляем <strong>, <b>, <em>, <i> но оставляем содержимое
+  text = text.replace(/<\/?(strong|b|em|i)[^>]*>/gi, '');
+  
+  // Удаляем ссылки, оставляем текст
+  text = text.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1');
+  
+  // Удаляем все оставшиеся HTML теги
+  text = text.replace(/<[^>]+>/g, '');
+  
+  // Декодируем HTML entities
+  text = text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  
+  // Убираем лишние пустые строки и пробелы
+  text = text
+    .split('\n')
+    .map(line => line.trim())
+    .filter((line, index, arr) => !(line === '' && arr[index - 1] === ''))
+    .join('\n')
+    .trim();
+  
+  return text;
+};
+
 export const UpdateNotificationDialog: React.FC = () => {
   const { t } = useTranslation();
   const { updateState, setUpdateState } = useAppContext();
@@ -20,10 +69,26 @@ export const UpdateNotificationDialog: React.FC = () => {
   const updateInfo = updateState?.info;
 
   const handleDownload = async () => {
+    // Сначала переключаем состояние на downloading с сохранением info
+    setUpdateState({
+      status: 'downloading',
+      info: updateInfo,
+      progress: {
+        bytesPerSecond: 0,
+        percent: 0,
+        transferred: 0,
+        total: 0,
+      },
+    });
+    
     try {
       await window.audioPie.update.download();
     } catch (error) {
       console.error('Failed to start download:', error);
+      setUpdateState({
+        status: 'error',
+        error: (error as Error).message,
+      });
     }
   };
 
@@ -67,7 +132,7 @@ export const UpdateNotificationDialog: React.FC = () => {
                 {t('update.available.releaseNotes')}:
               </p>
               <div className="update-notification__release-notes-content">
-                {updateInfo.releaseNotes}
+                {parseReleaseNotes(updateInfo.releaseNotes)}
               </div>
             </div>
           )}
