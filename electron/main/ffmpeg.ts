@@ -366,9 +366,8 @@ export const buildAudiobook = async (
 
   const useLibfdk = await detectLibfdk();
   
-  // Определяем количество параллельных процессов FFmpeg
-  // 0 = авто (используем все доступные ядра)
-  const concurrency = settings.ffmpegThreads || os.cpus().length;
+  // Определяем количество параллельных процессов FFmpeg (минимум 1)
+  const concurrency = Math.max(1, settings.ffmpegThreads ?? 1);
   
   // Распределяем потоки между параллельными процессами
   // Например: 8 ядер, 4 трека параллельно = 2 потока на процесс
