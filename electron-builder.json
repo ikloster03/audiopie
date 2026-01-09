@@ -22,7 +22,7 @@
   ],
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
-    "target": ["dmg"],
+    "target": ["dmg", "zip"],
     "category": "public.app-category.music",
     "icon": "assets/audiopie.png"
   },
