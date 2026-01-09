@@ -44,7 +44,7 @@ Chapters are automatically timed based on your audio tracks.
 
 ## Step 4: Fill Metadata
 
-Switch to the **Metadata** tab to add information about your audiobook:
+Switch to the **Basic** tab to add information about your audiobook:
 
 | Field | Description |
 |-------|-------------|

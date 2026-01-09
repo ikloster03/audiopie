@@ -30,7 +30,7 @@ Metadata makes your audiobook discoverable and well-organized. AudioPie supports
 
 ## Editing Metadata
 
-1. Switch to the **Metadata** tab in the right panel
+1. Switch to the **Basic** tab in the right panel
 2. Fill in the desired fields
 3. Metadata is auto-saved with the project
 
