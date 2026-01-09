@@ -83,7 +83,7 @@ jobs:
       - name: Upload Release Assets
         run: |
           # Find all artifact files
-          find release-artifacts -type f \( -name "AudioPie_*.exe" -o -name "*.nupkg" -o -name "*.blockmap" -o -name "*.dmg" -o -name "*.AppImage" -o -name "latest*.yml" \) | while read file; do
+          find release-artifacts -type f \( -name "AudioPie_*.exe" -o -name "*.nupkg" -o -name "*.blockmap" -o -name "*.dmg" -o -name "*.zip" -o -name "*.AppImage" -o -name "latest*.yml" \) | while read file; do
             echo "Uploading $file..."
             gh release upload ${{ github.ref_name }} "$file" --clobber
           done
