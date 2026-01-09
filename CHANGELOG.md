@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.9
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.8...v0.6.9)
+
+### 📖 Documentation
+
+- Add security warnings and installation notes for macOS and Windows ([1ac657e](https://github.com/ikloster03/audiopie/commit/1ac657e))
+- Update tab references from "Metadata" to "Basic" ([ba14747](https://github.com/ikloster03/audiopie/commit/ba14747))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.8
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.7...v0.6.8)
