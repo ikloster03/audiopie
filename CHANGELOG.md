@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.11
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.10...v0.6.11)
+
+### 🩹 Fixes
+
+- **ffmpeg:** Enforce minimum of 1 for FFmpeg threads and update related settings ([f3e173d](https://github.com/ikloster03/audiopie/commit/f3e173d))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.10
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.9...v0.6.10)
