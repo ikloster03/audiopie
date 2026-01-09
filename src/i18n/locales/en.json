@@ -151,5 +151,12 @@
     "version": "Version",
     "os": "OS",
     "copy": "Copy"
+  },
+  "menu": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "help": "Help",
+    "learnMore": "Learn More"
   }
 }
