@@ -71,13 +71,13 @@ export const rebuildMenu = () => {
       ],
     }] : []),
     {
-      label: 'File',
+      label: t('menu.file'),
       submenu: [
         { role: isMac ? 'close' as const : 'quit' as const },
       ],
     },
     {
-      label: 'Edit',
+      label: t('menu.edit'),
       submenu: [
         { role: 'undo' as const },
         { role: 'redo' as const },
@@ -97,7 +97,7 @@ export const rebuildMenu = () => {
       ],
     },
     {
-      label: 'View',
+      label: t('menu.view'),
       submenu: [
         { role: 'reload' },
         ...(isDev ? [{ role: 'toggleDevTools' as const }] : []),
@@ -109,10 +109,10 @@ export const rebuildMenu = () => {
       ],
     },
     {
-      role: 'help',
+      label: t('menu.help'),
       submenu: [
         {
-          label: 'Learn More',
+          label: t('menu.learnMore'),
           click: () => {
             mainWindowRef?.webContents.send('app/openHelp');
           },
