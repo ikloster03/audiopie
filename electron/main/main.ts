@@ -10,6 +10,9 @@ import { initMenu, rebuildMenu } from './menu';
 import { initializeUpdater, stopPeriodicUpdateChecks } from './updater';
 
 const isDev = !app.isPackaged;
+// Проверяем аргументы командной строки для включения DevTools в собранном приложении
+const hasDevToolsArg = process.argv.includes('--devtools') || process.argv.includes('-d');
+const enableDevTools = isDev || hasDevToolsArg;
 
 // Устанавливаем имя приложения (важно для macOS dock в dev режиме)
 app.setName('AudioPie');
@@ -71,8 +74,8 @@ const createWindow = async () => {
     await mainWindow.loadFile(htmlPath);
   }
 
-  if (isDev) {
-    console.log('Opening dev tools');
+  if (enableDevTools) {
+    console.log('Opening dev tools (isDev:', isDev, ', hasDevToolsArg:', hasDevToolsArg, ')');
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
