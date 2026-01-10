@@ -30,8 +30,12 @@ console.log('Is dev:', isDev);
 const createWindow = async () => {
   const preloadPath = path.join(__dirname, '../preload/preload.js');
   
-  // Проверяем наличие иконки (ICO для Windows, PNG для macOS/Linux)
-  const iconName = process.platform === 'win32' ? 'audiopie.ico' : 'audiopie.png';
+  // Проверяем наличие иконки (ICO для Windows, PNG с отступами для macOS, обычный PNG для Linux)
+  const iconName = process.platform === 'win32' 
+    ? 'audiopie.ico' 
+    : process.platform === 'darwin' 
+      ? 'audiopie-mac.png'  // macOS требует иконку с ~10% отступами
+      : 'audiopie.png';
   const iconPath = isDev 
     ? path.join(__dirname, '../../assets', iconName)  // В dev: dist-electron/main -> корень проекта
     : path.join(process.resourcesPath, iconName);
