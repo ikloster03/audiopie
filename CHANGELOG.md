@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.6.14
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.13...v0.6.14)
+
+### 🚀 Enhancements
+
+- **icon:** Update macOS icon handling and add icon generation script ([e9ab9ec](https://github.com/ikloster03/audiopie/commit/e9ab9ec))
+
+### 🩹 Fixes
+
+- **dependencies:** Update electron to v32.3.3 and cross-env to v10.1.0 ([b7bd149](https://github.com/ikloster03/audiopie/commit/b7bd149))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.13
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.12...v0.6.13)
