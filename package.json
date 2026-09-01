@@ -62,7 +62,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cross-env": "^10.1.0",
-    "electron": "^31.2.0",
+    "electron": "^32.3.3",
     "electron-builder": "^24.13.3",
     "husky": "^9.1.7",
     "png-to-ico": "^3.0.1",
