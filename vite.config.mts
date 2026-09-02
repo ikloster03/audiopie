@@ -16,13 +16,12 @@ export default defineConfig(({ command }) => {
   return {
     resolve: {
       alias: {
-        '@': path.join(__dirname, 'src')
+        '@': path.join(import.meta.dirname, 'src')
       },
     },
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler',
           silenceDeprecations: ['import', 'legacy-js-api'],
         },
       },
@@ -45,7 +44,7 @@ export default defineConfig(({ command }) => {
               sourcemap,
               minify: isBuild,
               outDir: 'dist-electron/main',
-              rollupOptions: {
+              rolldownOptions: {
                 external: ['electron'],
               },
             },
@@ -58,7 +57,7 @@ export default defineConfig(({ command }) => {
               sourcemap: sourcemap ? 'inline' : undefined,
               minify: isBuild,
               outDir: 'dist-electron/preload',
-              rollupOptions: {
+              rolldownOptions: {
                 external: ['electron'],
               },
             },

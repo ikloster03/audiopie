@@ -24,7 +24,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

@@ -17,23 +17,17 @@ const store = new Store<AppSettings>({
   },
 });
 
-const rawStore = store as unknown as {
-  get<K extends keyof AppSettings>(key: K): AppSettings[K];
-  set<K extends keyof AppSettings>(key: K, value: AppSettings[K]): void;
-  delete<K extends keyof AppSettings>(key: K): void;
-};
-
 export const getSettings = (): AppSettings => {
   return {
-    ffmpegPath: rawStore.get('ffmpegPath'),
-    ffprobePath: rawStore.get('ffprobePath'),
-    defaultBitrateKbps: rawStore.get('defaultBitrateKbps'),
-    defaultOutputDir: rawStore.get('defaultOutputDir'),
-    ffmpegThreads: rawStore.get('ffmpegThreads'),
-    theme: rawStore.get('theme'),
-    language: rawStore.get('language'),
-    autoCheckForUpdates: rawStore.get('autoCheckForUpdates'),
-    lastUpdateCheck: rawStore.get('lastUpdateCheck'),
+    ffmpegPath: store.get('ffmpegPath'),
+    ffprobePath: store.get('ffprobePath'),
+    defaultBitrateKbps: store.get('defaultBitrateKbps'),
+    defaultOutputDir: store.get('defaultOutputDir'),
+    ffmpegThreads: store.get('ffmpegThreads'),
+    theme: store.get('theme'),
+    language: store.get('language'),
+    autoCheckForUpdates: store.get('autoCheckForUpdates'),
+    lastUpdateCheck: store.get('lastUpdateCheck'),
   };
 };
 
@@ -41,9 +35,9 @@ export const setSettings = (partial: Partial<AppSettings>): void => {
   for (const [key, value] of Object.entries(partial)) {
     const typedKey = key as keyof AppSettings;
     if (value === undefined) {
-      rawStore.delete(typedKey);
+      store.delete(typedKey);
     } else {
-      rawStore.set(typedKey, value as AppSettings[typeof typedKey]);
+      store.set(typedKey, value as AppSettings[typeof typedKey]);
     }
   }
 };
