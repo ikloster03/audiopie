@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.15
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.14...v0.6.15)
+
+### 🏡 Chore
+
+- **dependencies:** Update package versions and improve configuration files ([6c9d744](https://github.com/ikloster03/audiopie/commit/6c9d744))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.14
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.13...v0.6.14)
