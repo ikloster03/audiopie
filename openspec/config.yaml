@@ -1,0 +1,36 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+context: |
+  Project: AudioPie — Electron + React (TypeScript) desktop app that builds M4B
+  audiobooks from MP3 tracks (chapter editing, metadata, FFmpeg encoding).
+  Tech stack: Electron, React 18, TypeScript (strict), Vite, Tailwind + SCSS/BEM,
+  i18next (en/ru), Vitest. See CLAUDE.md for full architecture/conventions.
+
+  Team writes in Russian; the codebase, UI copy, and app itself are bilingual
+  (English + Russian via i18next locales in src/i18n/locales/en.json and ru.json).
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+rules:
+  specs:
+    - "Bilingual specs: every Requirement description and every Scenario MUST be
+      written in English first, immediately followed by a Russian translation.
+      For a requirement, add a paragraph starting with '**RU:**' right after the
+      English description (before the first '#### Scenario:'). For a scenario,
+      keep the '- **WHEN**' / '- **THEN**' (and optional '- **AND**') bullets in
+      English exactly as required by the parser, then add one extra bullet
+      '- **RU:**' containing a single-paragraph Russian translation of that
+      WHEN/THEN/AND scenario. Do NOT translate the literal keywords WHEN/THEN/AND
+      or the '### Requirement:' / '#### Scenario:' headers themselves — only the
+      prose. Keep requirement/scenario names (the text after ':') in English so
+      names stay stable across future MODIFIED/RENAMED deltas."
+    - "This bilingual convention applies whenever a human will read the spec
+      directly (default: yes). It's fine to skip the RU translation only for
+      very small, purely mechanical deltas where the reviewer explicitly opts out."
+  proposal:
+    - "Keep 'Why' and 'What Changes' in English; a short Russian summary
+      paragraph may be appended at the end of 'Why' if helpful, but it is not
+      required for every proposal (proposals are shorter-lived than specs)."
