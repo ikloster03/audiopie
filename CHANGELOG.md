@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.7.0
+
+[compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.15...v0.7.0)
+
+### 🚀 Enhancements
+
+- **opsx:** Add new experimental commands for workflow management including apply, archive, bulk archive, continue, explore, fast forward, new, and onboarding ([75a0c9c](https://github.com/ikloster03/audiopie/commit/75a0c9c))
+- **openspec:** Initialize OpenSpec configuration and document existing capabilities for AudioPie project ([a0c0e17](https://github.com/ikloster03/audiopie/commit/a0c0e17))
+- **redesign-project-workspace:** Add discord-like sidebar + tg-like float button ([ea42e6c](https://github.com/ikloster03/audiopie/commit/ea42e6c))
+
+### 📖 Documentation
+
+- Add new changes ([3e934da](https://github.com/ikloster03/audiopie/commit/3e934da))
+
+### ❤️ Contributors
+
+- Ivan Monastyrev <ikloster@yandex.ru>
+
 ## v0.6.15
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.14...v0.6.15)
