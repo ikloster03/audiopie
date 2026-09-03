@@ -60,5 +60,13 @@
     &--icon-lg {
         @apply size-10;
     }
+
+    &--icon-md {
+        @apply size-12 rounded-full shadow-md;
+    }
+
+    &--icon-xl {
+        @apply size-16 rounded-full shadow-lg;
+    }
 }
 

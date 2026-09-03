@@ -1,77 +1,137 @@
 /* ChapterList Component BEM Styles */
 
 .chapter-list {
-  @apply flex-1 flex flex-col;
+  @apply flex-1 flex flex-col min-h-0;
 
   &__container {
-    @apply flex-1 flex flex-col overflow-hidden;
+    @apply flex-1 flex flex-col overflow-hidden min-h-0;
   }
 
-  /* Empty State */
   &__empty {
-    @apply flex-1 flex flex-col;
+    @apply flex-1 flex flex-col min-h-0;
+  }
 
-    &-actions {
-      @apply flex justify-end mb-4;
-    }
+  &__empty-content {
+    @apply flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8;
+  }
 
-    &-content {
-      @apply flex-1 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8;
-    }
+  &__empty-inner {
+    @apply text-center;
+  }
 
-    &-inner {
-      @apply text-center;
-    }
+  &__empty-icon {
+    @apply h-12 w-12 mx-auto text-muted-foreground/50 mb-3;
+  }
+
+  &__empty-text {
+    @apply text-sm text-muted-foreground font-medium mb-1;
+  }
+
+  &__empty-hint {
+    @apply text-xs text-muted-foreground;
+  }
+
+  &__header {
+    @apply flex justify-between items-center mb-4 gap-3 flex-wrap;
+  }
+
+  &__identity {
+    @apply flex items-center gap-3 min-w-0 flex-1;
+  }
+
+  &__cover {
+    @apply h-14 w-14 shrink-0 overflow-hidden rounded-md border bg-muted;
+  }
+
+  &__cover-image {
+    @apply h-full w-full object-cover;
+  }
+
+  &__cover-placeholder {
+    @apply flex h-full w-full items-center justify-center;
 
     &-icon {
-      @apply h-12 w-12 mx-auto text-muted-foreground/50 mb-3;
-    }
-
-    &-text {
-      @apply text-sm text-muted-foreground font-medium mb-1;
-    }
-
-    &-hint {
-      @apply text-xs text-muted-foreground;
+      @apply h-6 w-6 text-muted-foreground/50;
     }
   }
 
-  /* Chapter List Header */
-  &__header {
-    @apply flex justify-between items-center mb-4;
+  &__identity-text {
+    @apply flex min-w-0 flex-col gap-0.5;
+  }
+
+  &__book-title {
+    @apply truncate text-base font-semibold leading-tight text-foreground;
+
+    &--placeholder {
+      @apply font-medium text-muted-foreground;
+    }
   }
 
   &__count {
     @apply text-sm text-muted-foreground;
   }
 
+  &__meta {
+    @apply flex items-baseline gap-3 min-w-0;
+  }
+
+  &__total-duration {
+    @apply text-sm font-medium text-foreground tabular-nums;
+  }
+
+  &__actions {
+    @apply flex items-center gap-2 flex-wrap;
+  }
+
   &__list {
-    @apply flex-1;
+    @apply flex-1 min-h-0;
   }
 
   &__items {
     @apply space-y-2;
   }
+
+  &__rename-field {
+    @apply space-y-2;
+  }
 }
 
-/* Chapter Row */
 .chapter-row {
   @apply flex items-center gap-3 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all;
 
+  &:hover .chapter-row__remove-button {
+    opacity: 1;
+  }
+
+  &__drag-handle {
+    @apply h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing hover:text-primary transition-colors shrink-0;
+  }
+
   &__number {
-    @apply flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium;
+    @apply flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium shrink-0;
   }
 
   &__input {
-    @apply flex-1 h-9 text-sm;
+    @apply flex-1 h-9 text-sm min-w-0;
   }
 
   &__duration {
-    @apply flex items-center gap-1 whitespace-nowrap;
+    @apply flex items-center gap-1 shrink-0;
 
     &-icon {
       @apply h-3 w-3;
     }
   }
-}
 
+  &__range {
+    @apply text-xs text-muted-foreground whitespace-nowrap shrink-0;
+  }
+
+  &__remove-button {
+    @apply h-8 w-8 opacity-0 transition-opacity text-destructive hover:text-destructive shrink-0;
+  }
+
+  &__remove-icon {
+    @apply h-4 w-4;
+  }
+}

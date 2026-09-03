@@ -1,0 +1,94 @@
+/* WorkspaceSidebar Component BEM Styles */
+
+.workspace-sidebar {
+  @apply flex flex-col w-56 shrink-0 border-r bg-card py-4;
+
+  &__brand {
+    @apply flex items-center gap-3 px-4 mb-6;
+  }
+
+  &__logo {
+    @apply h-9 w-9 shrink-0;
+    object-fit: contain;
+  }
+
+  &__title {
+    @apply text-xl font-bold text-primary;
+  }
+
+  &__list {
+    @apply flex flex-col gap-1 px-2 list-none m-0 flex-1;
+  }
+
+  &__footer {
+    @apply mt-auto px-2 pt-3 border-t;
+  }
+
+  &__item {
+    @apply relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors;
+    @apply hover:bg-muted hover:text-foreground;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+
+    &--active {
+      @apply bg-primary/10 text-primary font-medium;
+
+      &::before {
+        content: '';
+        @apply absolute left-0 top-1/2 h-5 w-1 -translate-x-2 -translate-y-1/2 rounded-full bg-primary;
+      }
+    }
+  }
+
+  &__icon {
+    @apply h-4 w-4 shrink-0;
+  }
+
+  &__label {
+    @apply truncate;
+  }
+
+  &--minimal {
+    @apply w-[4.5rem] items-center;
+
+    .workspace-sidebar__brand {
+      @apply justify-center px-0 mb-5;
+    }
+
+    .workspace-sidebar__list,
+    .workspace-sidebar__footer {
+      @apply items-center px-0 gap-2;
+    }
+
+    .workspace-sidebar__footer {
+      @apply w-full flex justify-center;
+    }
+
+    .workspace-sidebar__item {
+      @apply size-11 justify-center px-0 gap-0 rounded-full;
+      @apply bg-muted/70 text-muted-foreground;
+      @apply transition-[border-radius,background-color,color,transform] duration-200 ease-out;
+      @apply hover:rounded-2xl hover:bg-muted hover:text-foreground;
+      @apply focus-visible:rounded-2xl;
+
+      &--active {
+        @apply rounded-2xl bg-primary text-primary-foreground;
+        @apply hover:rounded-2xl hover:bg-primary hover:text-primary-foreground;
+
+        &::before {
+          content: none;
+          display: none;
+        }
+      }
+    }
+
+    .workspace-sidebar__icon {
+      @apply h-5 w-5;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-sidebar--minimal .workspace-sidebar__item {
+    transition: none;
+  }
+}

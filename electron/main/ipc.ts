@@ -5,8 +5,9 @@ import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialo
 import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile, createNewProject } from './project';
 import { probeDuration, buildAudiobook, cancelBuild, isBusy, type BuildResult } from './ffmpeg';
 import { getSettings, setSettings, getMaxCpuCores } from './settings';
-import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo } from './types';
+import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, ChapterReorderResult, TrackInfo } from './types';
 import { changeLanguage, t } from './i18n';
+import { renameChaptersByTemplate, reorderChaptersAndTracks } from '../../src/lib/chapters';
 import { rebuildMenu } from './menu';
 import { checkForUpdatesNow, downloadUpdate, installUpdateAndRestart, setAutoUpdateEnabled } from './updater';
 
@@ -173,6 +174,20 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   ipcMain.handle('chapters/update', (_event: IpcMainInvokeEvent, chapters: Chapter[]) => {
     updateChapters(chapters);
     return undefined;
+  });
+
+  ipcMain.handle('chapters/reorder', (_event: IpcMainInvokeEvent, newOrder: number[]): ChapterReorderResult => {
+    const project = getProjectData();
+    const result = reorderChaptersAndTracks(project.tracks, project.chapters, newOrder);
+    setProjectData({ ...project, tracks: result.tracks, chapters: result.chapters });
+    return result;
+  });
+
+  ipcMain.handle('chapters/renameByTemplate', (_event: IpcMainInvokeEvent, template: string): Chapter[] => {
+    const project = getProjectData();
+    const chapters = renameChaptersByTemplate(project.chapters, template ?? '');
+    updateChapters(chapters);
+    return chapters;
   });
 
   ipcMain.handle('build/start', async (_event: IpcMainInvokeEvent, options: BuildOptions) => {

@@ -12,6 +12,7 @@ const store = new Store<AppSettings>({
     ffmpegThreads: 1,
     theme: 'light',
     language: 'en',
+    sidebarMode: 'expanded',
     autoCheckForUpdates: true,
     lastUpdateCheck: 0,
   },
@@ -26,6 +27,7 @@ export const getSettings = (): AppSettings => {
     ffmpegThreads: store.get('ffmpegThreads'),
     theme: store.get('theme'),
     language: store.get('language'),
+    sidebarMode: store.get('sidebarMode') || 'expanded',
     autoCheckForUpdates: store.get('autoCheckForUpdates'),
     lastUpdateCheck: store.get('lastUpdateCheck'),
   };

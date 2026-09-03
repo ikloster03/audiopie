@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { TrackInfo, Chapter, BookMetadata, AppSettings, BuildProgress, UpdateState } from '../types';
 import { useTranslation } from 'react-i18next';
+import { appendChaptersForTracks, applyTimeRangesFromTracks } from '../lib/chapters';
 
 interface AppState {
   tracks: TrackInfo[];
@@ -26,6 +27,8 @@ interface AppContextType extends AppState {
   openProject: () => void;
   newProject: () => void;
   closeProject: () => void;
+  addTracksFromPaths: (paths: string[]) => Promise<void>;
+  removeTrackAt: (index: number) => Promise<void>;
   toggleTheme: () => void;
   changeLanguage: (lang: 'en' | 'ru') => void;
 }
@@ -111,6 +114,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setIsProjectOpen(false);
   };
 
+  const addTracksFromPaths = async (paths: string[]) => {
+    if (paths.length === 0) {
+      return;
+    }
+    const added = await window.audioPie.tracks.addFromPaths(paths);
+    if (!added.length) {
+      return;
+    }
+    const nextTracks = [...tracks, ...added];
+    const nextChapters = appendChaptersForTracks(chapters, added);
+    setTracks(nextTracks);
+    setChapters(nextChapters);
+    await window.audioPie.chapters.update(nextChapters);
+  };
+
+  const removeTrackAt = async (index: number) => {
+    await window.audioPie.tracks.remove([index]);
+    const nextTracks = tracks.filter((_, i) => i !== index);
+    const remainingChapters = chapters.filter((_, i) => i !== index);
+    const nextChapters = applyTimeRangesFromTracks(remainingChapters, nextTracks);
+    setTracks(nextTracks);
+    setChapters(nextChapters);
+    await window.audioPie.chapters.update(nextChapters);
+  };
+
   // Theme management
   const toggleTheme = async () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -193,6 +221,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     openProject,
     newProject,
     closeProject,
+    addTracksFromPaths,
+    removeTrackAt,
     toggleTheme,
     changeLanguage
   };

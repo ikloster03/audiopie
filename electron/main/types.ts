@@ -10,6 +10,11 @@ export type Chapter = {
   endMs: number;
 };
 
+export type ChapterReorderResult = {
+  tracks: TrackInfo[];
+  chapters: Chapter[];
+};
+
 export type BookMetadata = {
   title: string;
   author?: string;
@@ -38,6 +43,7 @@ export type AppSettings = {
   ffmpegThreads?: number;
   theme?: 'light' | 'dark';
   language?: 'en' | 'ru';
+  sidebarMode?: 'minimal' | 'expanded';
   autoCheckForUpdates?: boolean;
   lastUpdateCheck?: number;
 };

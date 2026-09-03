@@ -18,15 +18,11 @@
     "createNew": "Создать новый",
     "createNewDesc": "Начать новый проект аудиокниги с нуля"
   },
-  "tracks": {
-    "title": "Треки",
-    "count_one": "{{count}} трек",
-    "count_few": "{{count}} трека",
-    "count_many": "{{count}} треков",
-    "count_other": "{{count}} треков",
-    "noTracks": "Пока нет треков",
-    "dragDrop": "Перетащите MP3 файлы или нажмите \"Добавить треки\"",
-    "removeTrack": "Удалить трек"
+  "sidebar": {
+    "ariaLabel": "Разделы рабочего пространства",
+    "chapters": "Главы",
+    "metadata": "Метаданные",
+    "settings": "Настройки"
   },
   "chapters": {
     "title": "Главы",
@@ -34,11 +30,27 @@
     "count_few": "{{count}} главы",
     "count_many": "{{count}} глав",
     "count_other": "{{count}} глав",
+    "totalDuration": "{{hours}}ч {{minutes}}м",
     "noChapters": "Пока нет глав",
+    "noTracks": "Пока нет исходных файлов",
+    "dragDrop": "Перетащите MP3 файлы или нажмите «Добавить треки»",
     "generateFromTracks": "Сгенерировать из треков",
     "generate": "Сгенерировать из треков",
     "regenerate": "Пересоздать",
-    "generateDesc": "Сгенерировать главы из ваших треков"
+    "generateDesc": "Сгенерировать главы из исходных файлов",
+    "addTracks": "Добавить треки",
+    "removeSource": "Удалить исходный файл",
+    "duration": "Длительность",
+    "startTime": "Время начала",
+    "endTime": "Время конца",
+    "renameByTemplate": "Переименовать по шаблону",
+    "renameByTemplateTitle": "Переименовать главы по шаблону",
+    "renameByTemplateDesc": "Используйте {n} для номера главы. Например: Глава {n}",
+    "renameByTemplatePlaceholder": "Шаблон",
+    "renameByTemplateApply": "Переименовать все",
+    "renameTemplateDefault": "Глава {n}",
+    "coverAlt": "Обложка аудиокниги",
+    "coverPlaceholder": "Нет обложки"
   },
   "metadata": {
     "tab": "📝 Основное",
@@ -55,9 +67,6 @@
     "loadingCover": "Загрузка обложки...",
     "enterPlaceholder": "Введите {{field}}...",
     "dropImageHere": "Отпустите изображение здесь"
-  },
-  "chaptersTab": {
-    "tab": "📖 Главы"
   },
   "settings": {
     "title": "Настройки",
@@ -79,6 +88,10 @@
     "themeDesc": "Выберите предпочитаемую цветовую тему",
     "light": "Светлая",
     "dark": "Темная",
+    "sidebarMode": "Боковая панель",
+    "sidebarModeDesc": "Выберите компактную панель только с иконками или полную панель с подписями",
+    "sidebarExpanded": "Расширенная",
+    "sidebarMinimal": "Минимальная",
     "language": "Язык",
     "languageDesc": "Выберите предпочитаемый язык",
     "autoCheckForUpdates": "Автоматические обновления",
@@ -101,7 +114,8 @@
     "cannotBuildDesc": "Проект должен содержать хотя бы один трек и иметь название, отличное от \"Без названия\"."
   },
   "common": {
-    "untitledAudiobook": "Без названия"
+    "untitledAudiobook": "Без названия",
+    "cancel": "Отмена"
   },
   "ffmpeg": {
     "parallelEncoding": "Параллельное кодирование треков ({{concurrency}} одновременно)",

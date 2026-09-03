@@ -1,47 +1,44 @@
-/* SettingsDialog Component BEM Styles */
+/* Settings page BEM Styles */
 
-.settings-dialog {
-  &__content {
-    @apply sm:max-w-[600px] max-h-[80vh];
+.settings-page {
+  @apply flex-1 flex flex-col min-h-0;
+
+  &__header {
+    @apply mb-6 shrink-0;
   }
 
-  &__header-title {
-    @apply flex items-center gap-2;
+  &__title {
+    @apply flex items-center gap-2 text-lg font-semibold;
   }
 
-  &__header-icon {
+  &__title-icon {
     @apply h-5 w-5 text-primary;
   }
 
-  &__scroll-area {
-    @apply max-h-[50vh];
+  &__description {
+    @apply text-sm text-muted-foreground mt-1;
+  }
+
+  &__scroll {
+    @apply flex-1 min-h-0;
   }
 
   &__form {
-    @apply space-y-6;
+    @apply space-y-6 pb-4;
   }
 
   &__fields {
-    @apply space-y-4;
+    @apply space-y-4 max-w-2xl;
   }
 
   &__field {
     @apply space-y-2;
-
-    &-label {
-      /* Label styles are inherited from ui/label */
-    }
-
-    &-input {
-      /* Input styles are inherited from ui/input */
-    }
 
     &-description {
       @apply text-xs text-muted-foreground;
     }
   }
 
-  /* Theme Toggle */
   &__theme-buttons {
     @apply flex gap-2;
   }
@@ -54,7 +51,6 @@
     @apply h-4 w-4 mr-2;
   }
 
-  /* Language Toggle */
   &__language-buttons {
     @apply flex gap-2;
   }
@@ -67,7 +63,6 @@
     @apply h-4 w-4 mr-2;
   }
 
-  /* Update Settings */
   &__update-check {
     @apply flex flex-col gap-3;
   }
@@ -93,9 +88,7 @@
     }
   }
 
-  /* Footer */
   &__footer {
-    @apply gap-2;
+    @apply flex justify-end gap-2 pt-2;
   }
 }
-

@@ -1,40 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TrackList } from './components/TrackList';
 import { ChapterList } from './components/ChapterList';
 import { MetadataForm } from './components/MetadataForm';
 import { ProgressModal } from './components/ProgressModal';
-import { SettingsDialog } from './components/SettingsDialog';
+import { SettingsPage } from './components/SettingsPage';
 import { ProjectManager } from './components/ProjectManager';
 import { UpdateNotificationDialog } from './components/UpdateNotificationDialog';
 import { UpdateProgressModal } from './components/UpdateProgressModal';
+import { WorkspaceSidebar, type WorkspaceSection } from './components/WorkspaceSidebar';
 import { useAppContext } from './context/AppContext';
 import type { BuildOptions } from './types';
 import { Button } from './components/ui/button';
+import { Tooltip } from './components/ui/tooltip';
 import { Card, CardContent } from './components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Music, Plus, Save, Hammer, Settings, X, Moon, Sun, Languages } from 'lucide-react';
+import { Save, Hammer } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
-import audioPieLogo from '../assets/audiopie.svg';
 
 export const App: React.FC = () => {
   const { t } = useTranslation();
-  const { tracks, setTracks, setChapters, metadata, settings, isProjectOpen, closeProject, theme, toggleTheme, language, changeLanguage } = useAppContext();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const {
+    tracks,
+    metadata,
+    settings,
+    isProjectOpen,
+    closeProject,
+    addTracksFromPaths,
+  } = useAppContext();
   const [emptyProjectAlertType, setEmptyProjectAlertType] = useState<'save' | 'build' | null>(null);
+  const [activeSection, setActiveSection] = useState<WorkspaceSection>('chapters');
+  const [fabsHidden, setFabsHidden] = useState(false);
+  const lastScrollTop = useRef(0);
 
-  const handleAddTracks = async () => {
-    const files = await window.audioPie.tracks.selectFiles();
-    if (files.length) {
-      await addTracks(files);
+  useEffect(() => {
+    if (isProjectOpen) {
+      setActiveSection('chapters');
     }
-  };
+  }, [isProjectOpen]);
+
+  const isEditorSection = activeSection === 'chapters' || activeSection === 'metadata';
+
+  useEffect(() => {
+    setFabsHidden(false);
+    lastScrollTop.current = 0;
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (!isEditorSection) {
+      return;
+    }
+
+    const onScroll = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+      if (!target.closest('.app__main')) {
+        return;
+      }
+
+      const current = target.scrollTop;
+      const delta = current - lastScrollTop.current;
+      if (Math.abs(delta) < 6) {
+        return;
+      }
+
+      lastScrollTop.current = current;
+      if (current <= 8 || delta < 0) {
+        setFabsHidden(false);
+      } else {
+        setFabsHidden(true);
+      }
+    };
+
+    document.addEventListener('scroll', onScroll, true);
+    return () => document.removeEventListener('scroll', onScroll, true);
+  }, [isEditorSection]);
 
   const handleSaveProject = async () => {
     const untitledCheck = t('common.untitledAudiobook');
     if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
       setEmptyProjectAlertType('save');
-      setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
+      setTimeout(() => setEmptyProjectAlertType(null), 5000);
       return;
     }
 
@@ -45,7 +91,7 @@ export const App: React.FC = () => {
     const untitledCheck = t('common.untitledAudiobook');
     if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
       setEmptyProjectAlertType('build');
-      setTimeout(() => setEmptyProjectAlertType(null), 5000); // Hide after 5 seconds
+      setTimeout(() => setEmptyProjectAlertType(null), 5000);
       return;
     }
 
@@ -69,27 +115,14 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleOpenSettings = async () => {
-    setIsSettingsOpen(true);
-  };
-
   const handleTrackDrop = async (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files).filter((file) => file.name.endsWith('.mp3'));
     const paths = files
-      .map((file) => (file as any).path)
+      .map((file) => (file as File & { path?: string }).path)
       .filter((p): p is string => typeof p === 'string' && p.length > 0);
     if (paths.length) {
-      await addTracks(paths);
-    }
-  };
-
-  const addTracks = async (paths: string[]) => {
-    const added = await window.audioPie.tracks.addFromPaths(paths);
-    if (added.length) {
-      setTracks([...tracks, ...added]);
-      const chapters = await window.audioPie.chapters.autoFromTracks();
-      setChapters(chapters);
+      await addTracksFromPaths(paths);
     }
   };
 
@@ -97,56 +130,12 @@ export const App: React.FC = () => {
     return value.replace(/[^a-zA-Z0-9-_]+/g, '_');
   };
 
-  // If no project is open, show the project manager
   if (!isProjectOpen) {
     return <ProjectManager />;
   }
 
   return (
     <div className="app">
-      {/* Header */}
-      <header className="app__header">
-        <div className="app__header-container">
-          <div className="app__header-content">
-            <div className="app__logo">
-              <img src={audioPieLogo} alt="AudioPie Logo" className="app__logo-icon" />
-              <h1 className="app__logo-title">
-                {t('app.title')}
-              </h1>
-            </div>
-            <div className="app__actions">
-              <Button onClick={handleAddTracks} variant="outline" size="sm">
-                <Plus className="h-4 w-4" />
-                {t('header.addTracks')}
-              </Button>
-              <Button onClick={handleSaveProject} variant="outline" size="sm">
-                <Save className="h-4 w-4" />
-                {t('header.save')}
-              </Button>
-              <Button onClick={handleBuild} variant="outline" size="sm">
-                <Hammer className="h-4 w-4" />
-                {t('header.build')}
-              </Button>
-              <Button onClick={closeProject} variant="outline" size="sm">
-                <X className="h-4 w-4" />
-                {t('header.close')}
-              </Button>
-              <Button onClick={toggleTheme} variant="ghost" size="sm" title={theme === 'light' ? t('header.switchToDarkMode') : t('header.switchToLightMode')}>
-                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-              </Button>
-              <Button onClick={() => changeLanguage(language === 'en' ? 'ru' : 'en')} variant="ghost" size="sm" title={language === 'en' ? 'Переключить на русский' : 'Switch to English'}>
-                <Languages className="h-4 w-4" />
-                <span className="ml-1 text-xs font-medium">{language.toUpperCase()}</span>
-              </Button>
-              <Button onClick={handleOpenSettings} variant="ghost" size="sm">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Empty Project Alert - Toast Notification */}
       {emptyProjectAlertType === 'save' && (
         <div className="app__alert">
           <Alert variant="destructive" className="app__alert--destructive">
@@ -157,7 +146,7 @@ export const App: React.FC = () => {
           </Alert>
         </div>
       )}
-      
+
       {emptyProjectAlertType === 'build' && (
         <div className="app__alert">
           <Alert variant="destructive" className="app__alert--destructive">
@@ -169,67 +158,54 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
-      <main className="app__main">
-        <div className="app__content">
-          {/* Tracks Panel */}
-          <Card
-            className="app__tracks-panel"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleTrackDrop}
-          >
-            <CardContent className="app__tracks-content">
-              <div className="app__tracks-header">
-                <Music className="app__tracks-icon" />
-                <h2 className="app__tracks-title">{t('tracks.title')}</h2>
-                <span className="app__tracks-count">
-                  {t('tracks.count', { count: tracks.length })}
-                </span>
-              </div>
-              {tracks.length === 0 ? (
-                <div className="app__tracks-empty">
-                  <div className="app__tracks-empty-content">
-                    <Music className="app__tracks-empty-icon" />
-                    <p className="app__tracks-empty-text">
-                      {t('tracks.noTracks')}
-                    </p>
-                    <p className="app__tracks-empty-hint">
-                      {t('tracks.dragDrop')}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="app__tracks-list">
-                  <TrackList />
-                </div>
-              )}
+      <div className="app__workspace">
+        <WorkspaceSidebar
+          activeSection={activeSection}
+          onSelect={setActiveSection}
+          onCloseProject={closeProject}
+          mode={settings?.sidebarMode || 'expanded'}
+        />
+        <main
+          className="app__main"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleTrackDrop}
+        >
+          <Card className="app__section-panel">
+            <CardContent className="app__section-content">
+              {activeSection === 'chapters' && <ChapterList />}
+              {activeSection === 'metadata' && <MetadataForm />}
+              {activeSection === 'settings' && <SettingsPage />}
             </CardContent>
           </Card>
-
-          {/* Details Panel */}
-          <Card className="app__details-panel">
-            <CardContent className="app__details-content">
-              <Tabs defaultValue="metadata" className="app__tabs">
-                <TabsList className="app__tabs-list">
-                  <TabsTrigger value="metadata">{t('metadata.tab')}</TabsTrigger>
-                  <TabsTrigger value="chapters">{t('chaptersTab.tab')}</TabsTrigger>
-                </TabsList>
-                <TabsContent value="metadata" className="app__tabs-content">
-                  <MetadataForm />
-                </TabsContent>
-                <TabsContent value="chapters" className="app__tabs-content--chapters">
-                  <ChapterList />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+          {isEditorSection && (
+            <div className={`app__fab-stack${fabsHidden ? ' app__fab-stack--hidden' : ''}`}>
+              <Tooltip label={t('header.save')} side="left">
+                <Button
+                  onClick={handleSaveProject}
+                  variant="outline"
+                  size="icon-md"
+                  aria-label={t('header.save')}
+                >
+                  <Save className="size-5" />
+                </Button>
+              </Tooltip>
+              <Tooltip label={t('header.build')} side="left">
+                <Button
+                  onClick={handleBuild}
+                  size="icon-xl"
+                  aria-label={t('header.build')}
+                >
+                  <Hammer className="size-8" />
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </main>
+      </div>
 
       <ProgressModal />
       <UpdateNotificationDialog />
       <UpdateProgressModal />
-      <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

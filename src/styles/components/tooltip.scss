@@ -1,0 +1,39 @@
+/* Tooltip Component BEM Styles */
+
+.tooltip {
+  @apply relative inline-flex;
+
+  &__label {
+    @apply pointer-events-none absolute z-50 whitespace-nowrap rounded-md px-2 py-1;
+    @apply bg-foreground text-background text-xs font-medium shadow-md;
+    @apply opacity-0 invisible;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+
+  &:hover &__label,
+  &:focus-within &__label {
+    @apply opacity-100 visible;
+  }
+
+  &--bottom &__label {
+    @apply top-full left-1/2 mt-2 -translate-x-1/2;
+  }
+
+  &--top &__label {
+    @apply bottom-full left-1/2 mb-2 -translate-x-1/2;
+  }
+
+  &--left &__label {
+    @apply right-full top-1/2 mr-2 -translate-y-1/2;
+  }
+
+  &--right &__label {
+    @apply left-full top-1/2 ml-2 -translate-y-1/2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip__label {
+    transition: none;
+  }
+}

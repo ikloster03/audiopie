@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
 type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
-type ButtonSize = "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg"
+type ButtonSize = "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-md" | "icon-lg" | "icon-xl"
 
 interface ButtonProps extends React.ComponentProps<"button"> {
   variant?: ButtonVariant

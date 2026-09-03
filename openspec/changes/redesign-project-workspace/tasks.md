@@ -1,36 +1,52 @@
 ## 1. IPC & backend
 
-- [ ] 1.1 Add `chapters/reorder` IPC handler in `electron/main/ipc.ts` that accepts a new chapter order, reorders the underlying `tracks` array to match, and persists both to the in-memory project (RU: добавить обработчик IPC `chapters/reorder` в `electron/main/ipc.ts`, который принимает новый порядок глав, переупорядочивает соответствующий массив `tracks` и сохраняет оба списка в проекте в памяти)
-- [ ] 1.2 Add `chapters/renameByTemplate` IPC handler that accepts a template string, substitutes `{n}` with each chapter's 1-based index, and persists the updated chapter list (RU: добавить обработчик IPC `chapters/renameByTemplate`, принимающий строку-шаблон, подставляющий `{n}` порядковым номером каждой главы (с 1) и сохраняющий обновлённый список глав)
-- [ ] 1.3 Expose both new handlers via `electron/preload/preload.ts` (`window.audioPie.chapters.reorder`, `window.audioPie.chapters.renameByTemplate`) (RU: пробросить оба новых обработчика через `electron/preload/preload.ts`)
-- [ ] 1.4 Update `electron/main/types.ts` and preload types with the new API shapes (RU: обновить `electron/main/types.ts` и типы preload новыми формами API)
+- [x] 1.1 Add `chapters/reorder` IPC handler in `electron/main/ipc.ts` that accepts a new chapter order, reorders the underlying `tracks` array to match, and persists both to the in-memory project (RU: добавить обработчик IPC `chapters/reorder`)
+- [x] 1.2 Add `chapters/renameByTemplate` IPC handler that accepts a template string, substitutes `{n}` with each chapter's 1-based index, and persists the updated chapter list (RU: добавить обработчик IPC `chapters/renameByTemplate`)
+- [x] 1.3 Expose both new handlers via `electron/preload/preload.ts` (`window.audioPie.chapters.reorder`, `window.audioPie.chapters.renameByTemplate`) (RU: пробросить оба обработчика через preload)
+- [x] 1.4 Update `electron/main/types.ts` and preload types with the new API shapes (RU: обновить типы API)
 
 ## 2. Chapters view enhancements
 
-- [ ] 2.1 Add `sortablejs`-based drag-and-drop to `src/components/ChapterList.tsx`, mirroring the pattern used in `src/components/TrackList.tsx` (RU: добавить drag-and-drop на основе `sortablejs` в `src/components/ChapterList.tsx`, повторяя паттерн из `src/components/TrackList.tsx`)
-- [ ] 2.2 On drag end, call `chapters/reorder`, update local chapter and track state in `AppContext` (RU: по завершении перетаскивания вызывать `chapters/reorder`, обновлять локальное состояние глав и треков в `AppContext`)
-- [ ] 2.3 Add editable start/end time inputs per chapter row, with `start < end` validation before persisting via `chapters/update` (RU: добавить редактируемые поля времени начала/конца для каждой строки главы с проверкой `start < end` перед сохранением через `chapters/update`)
-- [ ] 2.4 Add a "Rename by template" toolbar action + small dialog/input for the template string, wired to `chapters/renameByTemplate` (RU: добавить действие тулбара «Переименовать по шаблону» и небольшой диалог/поле ввода шаблона, подключённые к `chapters/renameByTemplate`)
-- [ ] 2.5 Add an "Add/remove tracks" affordance reachable from the Chapters view (per design.md open question resolution) so users can still fix source files without a dedicated tab (RU: добавить элемент управления «Добавить/удалить треки», доступный из панели глав (по итогам решения открытого вопроса в design.md), чтобы пользователи могли исправлять исходные файлы без отдельной вкладки)
+- [x] 2.1 Add `sortablejs`-based drag-and-drop to `src/components/ChapterList.tsx` (RU: drag-and-drop глав)
+- [x] 2.2 On drag end, call `chapters/reorder`, update local chapter and track state in `AppContext` (RU: по окончании DnD вызывать `chapters/reorder`)
+- [x] 2.3 Display start/end and track duration per chapter row as read-only; only the title is editable (RU: таймкоды и длительность трека только для чтения; редактируется название)
+- [x] 2.4 Add a "Rename by template" toolbar action + dialog, wired to `chapters/renameByTemplate` (RU: переименование по шаблону)
+- [x] 2.5 Add add/remove source-file controls in the Chapters view (toolbar icon + per-row remove; drop MP3 on workspace) (RU: добавление/удаление исходников из панели глав)
+- [x] 2.6 Show chapter count and total audiobook duration (hours + minutes) in the top-left of the Chapters view (RU: счётчик глав и суммарная длительность слева вверху)
 
 ## 3. Sidebar navigation
 
-- [ ] 3.1 Create `src/components/WorkspaceSidebar.tsx` with a Discord-style vertical list of sections (Chapters, Metadata) (RU: создать `src/components/WorkspaceSidebar.tsx` с вертикальным списком разделов в стиле Discord (Главы, Метаданные))
-- [ ] 3.2 Add `activeSection` state (in `AppContext` or local to `App.tsx`) and wire sidebar item clicks to switch it (RU: добавить состояние `activeSection` (в `AppContext` или локально в `App.tsx`) и подключить клики по пунктам боковой панели к его переключению)
-- [ ] 3.3 Update `src/App.tsx` to remove the horizontal tab bar and render the sidebar + active section's content instead (RU: обновить `src/App.tsx`, убрав горизонтальную панель вкладок и отрисовав вместо неё боковую панель + содержимое активного раздела)
-- [ ] 3.4 Create `src/styles/components/workspace-sidebar.scss` following BEM conventions and import it in `globals.scss` (RU: создать `src/styles/components/workspace-sidebar.scss` по методологии BEM и подключить его в `globals.scss`)
+- [x] 3.1 Create `src/components/WorkspaceSidebar.tsx` with sections Chapters, Metadata, Settings and brand at the top (RU: сайдбар с разделами и брендом)
+- [x] 3.2 Add `activeSection` state local to `App.tsx`; default to Chapters on project open (RU: `activeSection` в `App.tsx`)
+- [x] 3.3 Remove the horizontal tab bar and top header; render sidebar + active section (RU: убрать вкладки и шапку)
+- [x] 3.4 Create `src/styles/components/workspace-sidebar.scss` (BEM) and import it in `globals.scss` (RU: стили сайдбара)
+- [x] 3.5 Support expanded vs minimal sidebar modes (Discord-like icons + tooltips in minimal); persist as `sidebarMode` (RU: два режима сайдбара)
+- [x] 3.6 Render Settings as a workspace page (`SettingsPage`) instead of a modal (RU: настройки страницей)
 
 ## 4. Cleanup
 
-- [ ] 4.1 Remove or repurpose `src/components/TrackList.tsx` and its dedicated tab wiring from `src/App.tsx` (RU: удалить или переиспользовать `src/components/TrackList.tsx` и его отдельную привязку к вкладке в `src/App.tsx`)
-- [ ] 4.2 Remove now-unused track-list-only styles/translations, or repurpose them for the new "manage source files" affordance (RU: удалить ставшие ненужными стили/переводы, относящиеся только к списку треков, либо переиспользовать их для нового элемента «управление исходными файлами»)
+- [x] 4.1 Remove `src/components/TrackList.tsx` and its tab wiring (RU: удалить TrackList)
+- [x] 4.2 Remove unused track-list-only styles/translations (RU: убрать неиспользуемые стили/переводы списка треков)
 
 ## 5. Localization
 
-- [ ] 5.1 Add new i18n keys (sidebar labels, rename-by-template dialog, time-range inputs, add/remove-tracks affordance) to `src/i18n/locales/en.json` (RU: добавить новые ключи i18n (подписи боковой панели, диалог переименования по шаблону, поля временного диапазона, элемент добавления/удаления треков) в `src/i18n/locales/en.json`)
-- [ ] 5.2 Add matching Russian translations to `src/i18n/locales/ru.json` (RU: добавить соответствующие переводы на русский в `src/i18n/locales/ru.json`)
+- [x] 5.1 Add i18n keys (sidebar, FABs, rename-by-template, duration summary, sidebar modes) to `src/i18n/locales/en.json` (RU: ключи en)
+- [x] 5.2 Add matching Russian translations to `src/i18n/locales/ru.json` (RU: ключи ru)
 
 ## 6. Tests
 
-- [ ] 6.1 Add/update unit tests for chapter reordering, time-range validation, and rename-by-template logic (RU: добавить/обновить юнит-тесты для переупорядочивания глав, валидации временного диапазона и логики переименования по шаблону)
-- [ ] 6.2 Manually verify build pipeline still produces correct chapter markers after reordering via the new UI (RU: вручную проверить, что конвейер сборки по-прежнему создаёт корректные метки глав после переупорядочивания через новый UI)
+- [x] 6.1 Unit tests for chapter reordering, time-range helpers, rename-by-template, and hours/minutes duration formatting (RU: юнит-тесты)
+- [x] 6.2 Verify reorder keeps chapter markers aligned with concatenated track durations (data-contract tests; FFmpeg pipeline unchanged) (RU: проверка меток глав после reorder)
+
+## 7. Workspace chrome (post-apply UX)
+
+- [x] 7.1 Icon-only Save/Build/Add-tracks buttons with hover tooltips (RU: кнопки-иконки с тултипами)
+- [x] 7.2 Medium Save FAB stacked above large Build FAB on Chapters and Metadata (RU: float Сохранить над Собрать)
+- [x] 7.3 Hide FABs on scroll down and show on scroll up with animation (RU: скрытие float-кнопок при скролле)
+
+## 8. Chapters identity header (post-apply UX)
+
+- [x] 8.1 Render cover thumbnail + metadata title above chapter count and total duration in `ChapterList` (including empty states) (RU: миниатюра обложки и название над сводкой глав)
+- [x] 8.2 Load cover via `metadata.getCoverDataUrl`; cover placeholder when missing/failed; muted untitled placeholder when title is empty or default untitled (RU: загрузка обложки и заглушки)
+- [x] 8.3 BEM styles for the identity header in `chapter-list.scss` (~56×56 thumbnail, reserved slot while loading) (RU: стили шапки идентичности)
+- [x] 8.4 i18n for cover alt / identity header as needed; reuse `common.untitledAudiobook` for the title placeholder (RU: i18n, заглушка названия из `common.untitledAudiobook`)

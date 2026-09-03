@@ -1,56 +1,72 @@
 ## Context
 
-Today `src/App.tsx` renders a horizontal tab bar with two peer tabs: `TrackList` and `ChapterList` (see `src/App.tsx:203,221`). `ChapterList` currently has no drag-and-drop (chapter order and time range are pure derivations from `TrackList`'s track order via "auto-generate"), while `TrackList` owns reordering (via `sortablejs`, already a project dependency) and renaming. `chapters/update` (IPC) already exists and persists the full chapter array; `tracks/reorder` already exists for tracks. There is no `chapters/reorder` or `chapters/renameByTemplate` IPC handler yet.
+The workspace originally rendered a horizontal tab bar with `TrackList` and `ChapterList`, plus a top header (add tracks, save, build, close, theme, language, settings). Implementation of this change removed that chrome. Chapters are 1:1 with tracks; `chapters/reorder` and `chapters/renameByTemplate` IPC handlers exist. After the first apply pass, UX iteration dropped inline time-range editing (titles only), moved settings to a sidebar page, and replaced header actions with icon FABs and a compact/expanded sidebar.
 
-**RU:** Сейчас `src/App.tsx` рендерит горизontальную панель вкладок с двумя равноправными вкладками: `TrackList` и `ChapterList` (см. `src/App.tsx:203,221`). У `ChapterList` пока нет drag-and-drop (порядок и временной диапазон глав — чистая производная от порядка треков в `TrackList` через «автогенерацию»), тогда как `TrackList` владеет переупорядочиванием (через `sortablejs`, уже имеющаяся зависимость проекта) и переименованием. IPC `chapters/update` уже существует и сохраняет весь массив глав; `tracks/reorder` уже существует для треков. Обработчиков `chapters/reorder` или `chapters/renameByTemplate` пока нет.
+**RU:** Изначально рабочее пространство было с вкладками `TrackList`/`ChapterList` и верхней шапкой. Реализация убрала этот chrome. Главы 1:1 с треками; IPC `chapters/reorder` и `chapters/renameByTemplate` есть. После первой реализации UX-итерация убрала редактирование таймкодов (только название), перенесла настройки на страницу сайдбара и заменила шапку на float-кнопки и два режима сайдбара.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Make the Chapters view the single primary editing surface for audiobook structure (order, titles, time ranges).
-- Keep the underlying track/chapter data model consistent (chapter start/end are still ultimately expressed against concatenated track duration) while allowing direct editing.
-- Introduce a scalable sidebar navigation pattern for future sections (player, statistics) without another rewrite.
-- Add a low-effort, high-value bulk rename action (template-based).
+- Make the Chapters view the single primary editing surface for audiobook structure (order and titles), with the book identity (cover + title) visible at the top.
+- Keep the track/chapter parallel-array model; start/end remain derived from concatenated track duration and are shown, not edited, in the list.
+- Sidebar navigation that can grow (player, statistics later) without another rewrite; Settings is a first-class section.
+- Bulk rename-by-template.
 
-**RU (цели):** Сделать панель глав единственной основной поверхностью редактирования структуры аудиокниги (порядок, названия, временные диапазоны). Сохранить согласованность базовой модели данных треков/глав (время начала/конца главы по-прежнему в итоге выражается относительно объединённой длительности треков), допустив при этом прямое редактирование. Ввести масштабируемый паттерн sidebar-навигации для будущих разделов (плеер, статистика) без очередного переписывания. Добавить недорогое, но ценное массовое действие переименования (по шаблону).
+**RU (цели):** Панель глав — основная поверхность (порядок и названия) с идентичностью книги (обложка + название) сверху. Модель параллельных массивов трек/глава сохраняется; start/end показываются, не редактируются. Сайдбар масштабируется; Настройки — полноценный раздел. Массовое переименование по шаблону.
 
 **Non-Goals:**
-- Fully decoupling chapter time ranges from track boundaries (e.g. splitting one track into multiple chapters, or merging tracks into one chapter) is out of scope for this change — chapters still map 1:1 to tracks; only their order and displayed time range become editable.
-- Redesigning the Metadata section's internal layout (only navigation wrapping changes).
-- Building out placeholder sections like Player/Statistics content (only the sidebar shell needs to be ready for them — see the `add-media-player` and `build-time-statistics` changes).
+- Splitting/merging chapters vs tracks (still 1:1).
+- Independently editable chapter time ranges (reverted after UX review; helpers/tests may remain for a later change).
+- Redesigning Metadata form internals.
+- Player/Statistics section content (sidebar is ready for them later).
 
-**RU (не цели):** Полное отделение временных диапазонов глав от границ треков (например, разбиение одного трека на несколько глав или объединение треков в одну главу) вне рамок этого изменения — главы по-прежнему соответствуют трекам 1:1; редактируемыми становятся только их порядок и отображаемый временной диапазон. Редизайн внутренней раскладки раздела Метаданных (меняется только обёртка навигации). Наполнение контентом разделов-заглушек вроде Плеера/Статистики (нужно лишь подготовить оболочку sidebar под них — см. изменения `add-media-player` и `build-time-statistics`).
+**RU (не цели):** Разбиение/объединение глав и треков. Отдельное редактирование таймкодов глав (откатили после UX). Редизайн формы метаданных. Контент Плеера/Статистики.
 
 ## Decisions
 
-- **Chapters remain 1:1 with tracks.** Rather than decoupling chapters from tracks (a much larger data-model change), reordering a chapter reorders its paired track under the hood. This keeps the existing `TrackInfo[]` + `Chapter[]` parallel-array model in `AppContext` intact and avoids touching the FFmpeg build pipeline (`electron/main/ffmpeg.ts`), which still concatenates tracks in track order.
-  - *Alternative considered*: introduce a chapter-to-track mapping (many-to-one/one-to-many). Rejected for this change due to scope; flagged as a possible future change if issue requests splitting/merging emerge.
-  - **RU:** Главы остаются в соответствии 1:1 с треками. Вместо отделения глав от треков (гораздо более крупное изменение модели данных) переупорядочивание главы «под капотом» переупорядочивает соответствующий трек. Это сохраняет существующую модель параллельных массивов `TrackInfo[]` + `Chapter[]` в `AppContext` и не затрагивает конвейер сборки FFmpeg (`electron/main/ffmpeg.ts`), который по-прежнему объединяет треки в их порядке. *Рассмотренная альтернатива*: ввести отображение глава-трек (многие-к-одному/один-ко-многим). Отклонено для этого изменения из-за объёма; отмечено как возможное будущее изменение, если появятся запросы на разбиение/объединение.
-- **Editable time range is stored as an override, but validated against contiguity loosely.** Editing a chapter's start/end no longer forces strict wall-to-wall contiguity with neighboring chapters (previously guaranteed by auto-generation). We only validate `start < end` per chapter; we do not (in this change) re-validate that chapters don't overlap each other, since that would require broader UX for resolving overlaps.
-  - *Alternative considered*: full contiguous-range re-validation/re-flow (adjusting neighbors when one chapter's end changes). Rejected as significantly more complex UX; can be revisited if user feedback shows overlapping ranges are a real problem.
-  - **RU:** Редактируемый временной диапазон хранится как переопределение, но проверяется на смежность нестрого. Редактирование начала/конца главы больше не требует строгой сквозной смежности с соседними главами (раньше это гарантировалось автогенерацией). Проверяется только `start < end` для каждой главы; в этом изменении не проверяется отсутствие пересечений между главами, поскольку это потребовало бы более широкого UX для разрешения пересечений. *Рассмотренная альтернатива*: полная повторная проверка/перестроение смежных диапазонов (корректировка соседей при изменении конца одной главы). Отклонено как значительно более сложный UX; можно пересмотреть, если пользователи сообщат, что пересекающиеся диапазоны — реальная проблема.
-- **Reuse `sortablejs`** (already a dependency, used by `TrackList`) for the new chapter drag-and-drop, moving the pattern rather than introducing a new DnD library.
-  - **RU:** Переиспользовать `sortablejs` (уже зависимость проекта, используется в `TrackList`) для нового drag-and-drop глав, перенося существующий паттерн, а не вводя новую библиотеку DnD.
-- **Sidebar is a new component**, not a generalized routing library. Given the small, fixed number of sections, plain React state (`activeSection`) in `AppContext` or local `App.tsx` state is sufficient — no need for `react-router` at this scale.
-  - **RU:** Боковая панель — новый компонент, а не полноценная библиотека маршрутизации. Учитывая небольшое фиксированное число разделов, обычного React-состояния (`activeSection`) в `AppContext` или локальном состоянии `App.tsx` достаточно — `react-router` в таком масштабе не нужен.
-- **Track add/remove/rename actions**: exact placement (e.g. a compact "manage source files" affordance within the Chapters view vs. removed entirely) is left to implementation/UX iteration; the backend IPC contract for tracks is unchanged.
-  - **RU:** Действия добавления/удаления/переименования треков: точное размещение (например, компактный элемент управления «управление исходными файлами» внутри панели глав вместо полного удаления) оставлено на усмотрение реализации/UX-итерации; бэкенд-контракт IPC для треков не меняется.
+- **Chapters remain 1:1 with tracks.** Reordering a chapter reorders its paired track. FFmpeg still concatenates tracks in track order. `chapters/reorder` returns both arrays and recomputes contiguous start/end from track durations while keeping titles.
+  - **RU:** Главы 1:1 с треками. Перестановка главы переставляет парный трек. Таймкоды пересчитываются по длительностям треков, названия сохраняются.
+- **Only chapter titles are user-editable.** Each row shows track duration (`MM:SS` / `HH:MM:SS`) and a read-only start–end range. Time-range override UX was prototyped then removed; `start < end` validation remains in `src/lib/chapters.ts` for a possible follow-up.
+  - **RU:** Редактируется только название. Длительность трека и диапазон — только чтение.
+- **Add/remove source files from Chapters.** Toolbar icon adds tracks; per-row remove deletes the paired track and chapter, preserving remaining titles and recomputing times. Drop `.mp3` onto the workspace main area. Header "Add tracks" was removed as duplicate.
+  - **RU:** Добавление/удаление исходников из панели глав. DnD MP3 на основную область.
+- **Sidebar, not tabs or a top header.** Brand (logo; plus "AudioPie" in expanded mode) is the sidebar header. Sections: Chapters, Metadata, Settings. Close project is in the sidebar footer. `activeSection` is local React state and resets to Chapters when a project is opened — not persisted.
+  - **RU:** Сайдбар вместо вкладок и шапки. `activeSection` не персистится, при открытии проекта сбрасывается на Главы.
+- **Two sidebar modes**, persisted as `AppSettings.sidebarMode`: `expanded` (default, labels) and `minimal` (logo only, Discord-like round→squircle icon buttons, tooltips, no left active stripe). Switching in Settings applies immediately.
+  - **RU:** `sidebarMode`: `expanded` (по умолчанию) и `minimal` (иконки Discord-like). Переключение в настройках сразу.
+- **Settings is a page** (`SettingsPage`), not `SettingsDialog`. Theme/language remain on that page (removed from the old header).
+  - **RU:** Настройки — страница, не модалка.
+- **Save and Build are icon FABs** on Chapters and Metadata only (not Settings). Save is medium, stacked above the large Build button. Both have hover tooltips. The stack hides (slides down + fade) on scroll down and shows on scroll up; always shown near the top of the list.
+  - **RU:** Float-кнопки Сохранить (средняя) над Собрать (большая). Скрытие при скролле вниз, показ при скролле вверх.
+- **List identity + summary:** top of Chapters is a compact identity block, then the existing count/duration row. Cover thumbnail sits left of the title; both sit **above** chapter count and total duration. Toolbar actions stay on the right of that header (same row as count/duration, or aligned to the identity block — implementation may group them visually as one header).
+  ```
+  ┌────────┐  Title (or untitled placeholder)
+  │ cover  │  12 chapters    15h 54m          [+] [Rename] [Regen]
+  └────────┘
+  ```
+  Cover comes from `metadata.coverPath` via existing `metadata.getCoverDataUrl` (same IPC as Metadata). Missing/failed cover → muted rounded square with a book icon (not a drop target). Empty, whitespace, or default untitled title (`Untitled Audiobook` / localized `common.untitledAudiobook`) → muted placeholder using that untitled string. Real title is prominent, not muted. Header is display-only (no jump to Metadata, no cover picker). Shown in empty states too — placeholders matter most when the book is not filled in yet. Thumbnail ~56×56, `object-cover`, rounded; reserve the box while loading so the header does not jump.
+  - **RU:** Сверху панели глав — миниатюра обложки и название из метаданных **над** числом глав и суммарной длительностью. Нет обложки/названия — заглушки. Только отображение, без перехода в Метаданные.
+- **Reuse `sortablejs`** for chapter drag-and-drop.
+- **No `react-router`:** `activeSection` in `App.tsx`.
 
 ## Risks / Trade-offs
 
-- [Risk] Removing the dedicated Tracks tab could strand users who relied on it to fix a bad track import (wrong file, wrong duration) → Mitigation: keep an "Add/remove tracks" affordance reachable from the Chapters view (e.g. a toolbar action), even though there's no dedicated tab.
-  - **RU:** [Риск] Удаление отдельной вкладки Треков может создать проблему для пользователей, полагавшихся на неё для исправления неудачного импорта трека (не тот файл, неверная длительность) → Смягчение: сохранить элемент управления «Добавить/удалить треки», доступный из панели глав (например, действие в тулбаре), даже без отдельной вкладки.
-- [Risk] Allowing free-form time-range edits can produce chapters with gaps or overlaps, which could look wrong or break assumptions in the build pipeline (chapters are used for FFMETADATA chapter markers, not for cutting audio) → Mitigation: since chapter markers are informational metadata over the concatenated stream, overlaps/gaps don't break the build technically, but the UI should visually flag overlapping/gapped chapters as a soft warning in a follow-up iteration.
-  - **RU:** [Риск] Свободное редактирование временных диапазонов может привести к главам с пробелами или пересечениями, что может выглядеть неправильно или нарушить допущения конвейера сборки (главы используются для меток FFMETADATA, а не для нарезки аудио) → Смягчение: поскольку метки глав — информационные метаданные поверх объединённого потока, пересечения/пробелы технически не ломают сборку, но UI должен визуально помечать такие главы мягким предупреждением в одной из следующих итераций.
-- [Risk] Reordering chapters reorders tracks, which also affects auto-generated title fallback and any place that assumes track order == chapter order == import order → Mitigation: confirm `chapters/reorder` (new) reorders tracks server-side atomically so both stay in sync in one IPC round-trip; add tests per `add-tests` initiative.
-  - **RU:** [Риск] Переупорядочивание глав меняет порядок треков, что также влияет на резервное автогенерируемое название и на любые места, предполагающие, что порядок треков == порядок глав == порядок импорта → Смягчение: убедиться, что новый `chapters/reorder` атомарно переупорядочивает треки на стороне сервера, чтобы оба списка оставались синхронными за один IPC-вызов; добавить тесты в рамках инициативы `testing-and-ci-hardening`.
-- [Trade-off] Bulk rename-by-template overwrites all chapter titles unconditionally; there's no per-chapter opt-out or preview before applying → acceptable for v1 given `chapters/update` already supports full-list replace and users can undo by re-editing manually (no undo/redo system exists yet in the app).
-  - **RU:** [Компромисс] Массовое переименование по шаблону безусловно перезаписывает все названия глав; нет отказа по отдельным главам или предпросмотра перед применением → приемлемо для v1, так как `chapters/update` уже поддерживает замену всего списка, а пользователь может отменить вручную повторным редактированием (системы undo/redo в приложении пока нет).
+- [Risk] No Tracks tab → Mitigation: add/remove from Chapters toolbar and row actions; drop MP3 on the workspace.
+- [Risk] Read-only time ranges cannot fix a wrong marker without regenerate → accepted; regenerate still exists; independent edits deferred.
+- [Risk] Chapter reorder also reorders tracks → Mitigation: atomic `chapters/reorder` + unit tests in `tests/chapters.test.ts`.
+- [Trade-off] Rename-by-template overwrites all titles; no preview/undo.
+
+**RU:** Риски те же, что в английской секции.
 
 ## Open Questions
 
-- Should "Add tracks" / "Remove chapter's source track" remain accessible from the Chapters view, and if so, what does the interaction look like (inline vs. a secondary modal)?
-- Should the sidebar's `activeSection` state persist across app restarts (e.g. via `electron-store` settings) or always reset to "Chapters"?
-- Should chapter time-range edits warn on overlaps/gaps in this change, or is that deferred to a follow-up?
+Resolved in implementation:
+- Add/remove tracks: yes — icon in Chapters toolbar, remove on each row, drag-and-drop on main.
+- `activeSection` persistence: no — always reset to Chapters on project open. `sidebarMode` is persisted instead.
+- Time-range overlap warnings: N/A while ranges are not user-editable.
 
-**RU (открытые вопросы):** Должны ли «Добавить треки» / «Удалить исходный трек главы» оставаться доступными из панели глав, и если да, как выглядит взаимодействие (встроенно или через отдельное модальное окно)? Должно ли состояние `activeSection` боковой панели сохраняться между перезапусками приложения (например, через настройки `electron-store`) или всегда сбрасываться на «Главы»? Должны ли редактирования временного диапазона глав предупреждать о пересечениях/пробелах уже в этом изменении, или это откладывается на следующую итерацию?
+Identity header (section 8):
+- Click-through from cover/title to Metadata: no — display-only.
+- Author line under the title: no — title only unless we reopen this.
+
+**RU:** Открытые вопросы закрыты реализацией (см. английский список). Шапка идентичности: только отображение, без перехода в Метаданные и без автора.

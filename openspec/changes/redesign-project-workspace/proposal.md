@@ -6,36 +6,42 @@ The current editing workspace exposes raw MP3 "tracks" as a first-class, user-fa
 
 ## What Changes
 
-- Remove the standalone "Tracks" tab from the primary workspace UI; MP3 tracks become an internal/technical concept, no longer directly editable by the user in the main workflow. **BREAKING** (removes the `TrackList` tab and any direct track-rename/track-reorder UI entry points).
-  - **RU:** Убрать отдельную вкладку «Треки» из основного UI рабочего пространства; MP3-треки становятся внутренней/технической сущностью, больше не редактируемой пользователем напрямую в основном сценарии. **ЛОМАЮЩЕЕ ИЗМЕНЕНИЕ** (удаляет вкладку `TrackList` и любые точки входа для прямого переименования/переупорядочивания треков).
-- Promote the chapters view to the primary editing surface for the audiobook structure: users can reorder chapters via drag-and-drop, rename chapter titles inline, and edit each chapter's start/end time range directly (previously time range was derived only from tracks and not independently editable).
-  - **RU:** Сделать панель глав основной поверхностью редактирования структуры аудиокниги: пользователь может изменять порядок глав перетаскиванием, редактировать названия глав прямо в списке и напрямую редактировать время начала/конца каждой главы (раньше временной диапазон вычислялся только из треков и не редактировался отдельно).
+- Remove the standalone "Tracks" tab and the workspace top header from the primary UI; MP3 tracks become an internal/technical concept. Source files are added/removed from the Chapters view. **BREAKING** (removes the `TrackList` tab, the header bar, and any direct track-rename/track-reorder UI entry points).
+  - **RU:** Убрать отдельную вкладку «Треки» и верхнюю шапку рабочего пространства из основного UI; MP3-треки становятся внутренней/технической сущностью. Исходные файлы добавляются/удаляются из панели глав. **ЛОМАЮЩЕЕ ИЗМЕНЕНИЕ**.
+- Promote the chapters view to the primary editing surface: users can reorder chapters via drag-and-drop and rename titles inline. Each row shows the paired track duration and a read-only start–end range; only the title is editable. The list header shows the audiobook cover thumbnail and title from metadata (with placeholders when missing), then chapter count and total audiobook duration (e.g. `15ч 54м`).
+  - **RU:** Сделать панель глав основной поверхностью редактирования: пользователь меняет порядок глав перетаскиванием и редактирует названия. В строке показываются длительность исходного трека и диапазон начала/конца только для чтения; редактируется только название. В шапке списка — миниатюра обложки и название из метаданных (с заглушками, если их нет), затем число глав и суммарная длительность книги (например, `15ч 54м`).
 - Add "rename chapters by template" bulk action: user supplies a template with a numeric placeholder (e.g. `Chapter {n}`) and the system renames all chapters sequentially in one operation.
-  - **RU:** Добавить массовое действие «переименовать главы по шаблону»: пользователь задаёт шаблон с числовым плейсхолдером (например, `Chapter {n}`), и система переименовывает все главы последовательно за одну операцию.
-- Replace the top-level tab navigation with a persistent sidebar (Discord-style) that lists the primary workspace sections (Chapters, Metadata, and future sections such as Player/Statistics), improving navigation scalability and affordance for active/selected state.
-  - **RU:** Заменить верхнеуровневую навигацию по вкладкам постоянной боковой панелью (в стиле Discord) со списком основных разделов рабочего пространства (Главы, Метаданные и будущие разделы вроде Плеера/Статистики), что улучшает масштабируемость навигации и индикацию активного/выбранного раздела.
-- Reordering chapters directly SHALL also reorder the underlying tracks, since chapter order still ultimately drives build order (chapters no longer strictly mirror 1:1 auto-generated tracks order without the ability to adjust it from the chapters UI).
-  - **RU:** Изменение порядка глав напрямую ДОЛЖНО также менять порядок соответствующих треков, поскольку порядок глав в итоге определяет порядок при сборке (главы больше не строго зеркалят автоматически сгенерированный порядок треков без возможности его скорректировать из UI глав).
+  - **RU:** Добавить массовое действие «переименовать главы по шаблону».
+- Replace the top-level tab bar (and header) with a persistent sidebar. Sections: Chapters, Metadata, Settings. Brand (logo ± title) sits at the top of the sidebar. Two persisted modes: expanded (labels) and minimal (Discord-like icon buttons with tooltips).
+  - **RU:** Заменить вкладки и шапку постоянной боковой панелью. Разделы: Главы, Метаданные, Настройки. Бренд вверху сайдбара. Два сохраняемых режима: расширенный (с подписями) и минимальный (иконки в стиле Discord с тултипами).
+- Settings open as a workspace page (not a modal). Save and Build are icon-only floating buttons on Chapters/Metadata (Save medium, Build large); they hide on scroll down and reappear on scroll up.
+  - **RU:** Настройки — страница рабочего пространства, не модалка. «Сохранить» и «Собрать» — float-кнопки-иконки на страницах глав и метаданных; скрываются при скролле вниз и появляются при скролле вверх.
+- Reordering chapters SHALL also reorder the underlying tracks, since chapter order drives build order.
+  - **RU:** Изменение порядка глав ДОЛЖНО также менять порядок соответствующих треков.
 
 ## Capabilities
 
 ### New Capabilities
-- `workspace-navigation`: Sidebar-based primary navigation between workspace sections (Chapters, Metadata, and future sections), replacing top tab bar.
-  - **RU:** Основная навигация между разделами рабочего пространства (Главы, Метаданные и будущие разделы) на основе боковой панели, заменяющая верхнюю панель вкладок.
+- `workspace-navigation`: Sidebar-based primary navigation between workspace sections (Chapters, Metadata, Settings), replacing the top tab bar and header; includes expanded/minimal sidebar modes and scroll-aware floating Save/Build actions.
+  - **RU:** Основная навигация по разделам (Главы, Метаданные, Настройки) на основе боковой панели; режимы сайдбара и float-кнопки Сохранить/Собрать.
 
 ### Modified Capabilities
-- `chapter-management`: Chapters become independently reorderable (drag-and-drop) and their start/end time range becomes directly editable; adds bulk rename-by-template action.
-  - **RU:** Главы становятся независимо переупорядочиваемыми (drag-and-drop), их временной диапазон начала/конца становится напрямую редактируемым; добавляется массовое действие переименования по шаблону.
-- `track-management`: Track list is no longer directly exposed/editable in the primary UI; track order is now driven by chapter reordering rather than a separate track drag-and-drop UI.
-  - **RU:** Список треков больше не отображается/не редактируется напрямую в основном UI; порядок треков теперь определяется переупорядочиванием глав, а не отдельным UI drag-and-drop для треков.
+- `chapter-management`: Chapters are independently reorderable (drag-and-drop); titles are inline-editable; start/end and track duration are displayed read-only; bulk rename-by-template; identity header (cover + title from metadata, with placeholders) above count + total duration.
+  - **RU:** Главы переупорядочиваются drag-and-drop; названия редактируются в списке; время и длительность трека только отображаются; массовое переименование по шаблону; шапка идентичности (обложка + название из метаданных, с заглушками) над сводкой «число глав + длительность».
+- `track-management`: Track list is no longer a dedicated tab; add/remove happens from the Chapters view; track order follows chapter reorder.
+  - **RU:** Отдельной вкладки треков нет; добавление/удаление из панели глав; порядок треков следует за порядком глав.
+- `app-settings`: Settings are a sidebar page; persisted `sidebarMode` (`expanded` | `minimal`).
+  - **RU:** Настройки — страница сайдбара; сохраняемый `sidebarMode` (`expanded` | `minimal`).
 
 ## Impact
 
-- `src/App.tsx`: remove tab bar, wire up sidebar layout and routing between Chapters/Metadata sections.
-- `src/components/TrackList.tsx`: removed from primary UI (component may be deleted or repurposed as an internal/debug view).
-- `src/components/ChapterList.tsx`: extended with drag-and-drop (likely via existing `sortablejs` dependency), editable time-range inputs, and a "rename by template" action/dialog.
-- New sidebar component (e.g. `src/components/WorkspaceSidebar.tsx`) + BEM styles.
-- `electron/main/ipc.ts` / `electron/preload/preload.ts`: likely need a `chapters/reorder` IPC handler (analogous to existing `tracks/reorder`) and a `chapters/renameByTemplate` handler, since chapter reordering must persist to the underlying track order.
-- `src/i18n/locales/en.json` and `ru.json`: new strings for sidebar navigation and rename-by-template UI.
+- `src/App.tsx`: sidebar layout, no header/tab bar, FAB stack, scroll-hide.
+- `src/components/TrackList.tsx`: deleted.
+- `src/components/ChapterList.tsx`: drag-and-drop, title-only editing, duration/range display, rename-by-template, add/remove source files, identity header (cover + title) above count + total duration.
+- `src/components/WorkspaceSidebar.tsx` + BEM styles; expanded/minimal modes.
+- `src/components/SettingsPage.tsx` replaces `SettingsDialog`.
+- `electron/main/ipc.ts` / `electron/preload/preload.ts`: `chapters/reorder`, `chapters/renameByTemplate`.
+- `electron/main/settings.ts` / `AppSettings`: `sidebarMode`.
+- `src/i18n/locales/en.json` and `ru.json`: sidebar, FABs, settings, duration strings.
 
-**RU:** `src/App.tsx` — убрать панель вкладок, подключить sidebar-layout и переключение между разделами Главы/Метаданные. `src/components/TrackList.tsx` — убрать из основного UI (компонент можно удалить или превратить во внутренний/отладочный вид). `src/components/ChapterList.tsx` — добавить drag-and-drop (вероятно через уже имеющуюся зависимость `sortablejs`), редактируемые поля временного диапазона и действие/диалог «переименовать по шаблону». Новый компонент боковой панели (например, `src/components/WorkspaceSidebar.tsx`) + стили по BEM. `electron/main/ipc.ts` / `electron/preload/preload.ts` — вероятно потребуются обработчики `chapters/reorder` (по аналогии с существующим `tracks/reorder`) и `chapters/renameByTemplate`, так как переупорядочивание глав должно сохраняться и в порядке треков. `src/i18n/locales/en.json` и `ru.json` — новые строки для навигации по боковой панели и UI переименования по шаблону.
+**RU:** См. английский список Impact — те же файлы и контракты.

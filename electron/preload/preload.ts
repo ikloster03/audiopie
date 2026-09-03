@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, TrackInfo, UpdateState } from '../main/types';
+import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, ChapterReorderResult, TrackInfo, UpdateState } from '../main/types';
 
 type ProgressListener = (progress: BuildProgress) => void;
 type UpdateListener = (state: UpdateState) => void;
@@ -40,6 +40,8 @@ const audioPieAPI = {
   chapters: {
     autoFromTracks: (): Promise<Chapter[]> => ipcRenderer.invoke('chapters/autoFromTracks'),
     update: (chapters: Chapter[]): Promise<void> => ipcRenderer.invoke('chapters/update', chapters),
+    reorder: (newOrder: number[]): Promise<ChapterReorderResult> => ipcRenderer.invoke('chapters/reorder', newOrder),
+    renameByTemplate: (template: string): Promise<Chapter[]> => ipcRenderer.invoke('chapters/renameByTemplate', template),
   },
   build: {
     start: (options: BuildOptions): Promise<void> => ipcRenderer.invoke('build/start', options),

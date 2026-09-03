@@ -18,23 +18,37 @@
     "createNew": "Create New",
     "createNewDesc": "Start a new audiobook project from scratch"
   },
-  "tracks": {
-    "title": "Tracks",
-    "count": "{{count}} track",
-    "count_plural": "{{count}} tracks",
-    "noTracks": "No tracks yet",
-    "dragDrop": "Drag & drop MP3 files or click \"Add Tracks\"",
-    "removeTrack": "Remove track"
+  "sidebar": {
+    "ariaLabel": "Workspace sections",
+    "chapters": "Chapters",
+    "metadata": "Metadata",
+    "settings": "Settings"
   },
   "chapters": {
     "title": "Chapters",
     "count": "{{count}} chapter",
     "count_plural": "{{count}} chapters",
+    "totalDuration": "{{hours}}h {{minutes}}m",
     "noChapters": "No chapters yet",
+    "noTracks": "No source files yet",
+    "dragDrop": "Drag & drop MP3 files or click \"Add tracks\"",
     "generateFromTracks": "Generate from tracks",
     "generate": "Generate from tracks",
     "regenerate": "Regenerate",
-    "generateDesc": "Generate chapters from your tracks"
+    "generateDesc": "Generate chapters from your source files",
+    "addTracks": "Add tracks",
+    "removeSource": "Remove source file",
+    "duration": "Duration",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "renameByTemplate": "Rename by template",
+    "renameByTemplateTitle": "Rename chapters by template",
+    "renameByTemplateDesc": "Use {n} for the chapter number. Example: Chapter {n}",
+    "renameByTemplatePlaceholder": "Template",
+    "renameByTemplateApply": "Rename all",
+    "renameTemplateDefault": "Chapter {n}",
+    "coverAlt": "Audiobook cover",
+    "coverPlaceholder": "No cover"
   },
   "metadata": {
     "tab": "📝 Basic",
@@ -51,9 +65,6 @@
     "loadingCover": "Loading cover...",
     "enterPlaceholder": "Enter {{field}}...",
     "dropImageHere": "Drop image here"
-  },
-  "chaptersTab": {
-    "tab": "📖 Chapters"
   },
   "settings": {
     "title": "Settings",
@@ -75,6 +86,10 @@
     "themeDesc": "Choose your preferred color theme",
     "light": "Light",
     "dark": "Dark",
+    "sidebarMode": "Sidebar",
+    "sidebarModeDesc": "Choose a compact icon-only sidebar or the full sidebar with labels",
+    "sidebarExpanded": "Expanded",
+    "sidebarMinimal": "Minimal",
     "language": "Language",
     "languageDesc": "Choose your preferred language",
     "autoCheckForUpdates": "Automatic Updates",
@@ -97,7 +112,8 @@
     "cannotBuildDesc": "The project must contain at least one track and have a title other than \"Untitled Audiobook\"."
   },
   "common": {
-    "untitledAudiobook": "Untitled Audiobook"
+    "untitledAudiobook": "Untitled Audiobook",
+    "cancel": "Cancel"
   },
   "ffmpeg": {
     "parallelEncoding": "Parallel track encoding ({{concurrency}} at once)",

@@ -188,8 +188,8 @@
 /* Import BEM Component Styles */
 @import "./components/app.scss";
 @import "./components/project-manager.scss";
-@import "./components/track-list.scss";
 @import "./components/chapter-list.scss";
+@import "./components/workspace-sidebar.scss";
 @import "./components/metadata-form.scss";
 @import "./components/progress-modal.scss";
 @import "./components/settings-dialog.scss";
@@ -204,5 +204,6 @@
 @import "./components/scroll-area.scss";
 @import "./components/tabs.scss";
 @import "./components/textarea.scss";
+@import "./components/tooltip.scss";
 @import "./components/update-notification.scss";
 @import "./components/update-progress.scss";
