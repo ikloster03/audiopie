@@ -1,5 +1,27 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, ChapterReorderResult, TrackInfo, UpdateState } from '../main/types';
+import {
+  AppSettings,
+  BookMetadata,
+  BuildOptions,
+  BuildProgress,
+  Chapter,
+  ChapterReorderResult,
+  ProjectType,
+  SeriesMetadata,
+  TrackInfo,
+  UpdateState,
+} from '../main/types';
+
+export type ProjectSnapshot = {
+  type: ProjectType;
+  series: SeriesMetadata | null;
+  bookOrder: string[];
+  activeBookId: string | undefined;
+  books: Array<{ id: string; metadata: BookMetadata }>;
+  tracks: TrackInfo[];
+  chapters: Chapter[];
+  metadata: BookMetadata;
+};
 
 type ProgressListener = (progress: BuildProgress) => void;
 type UpdateListener = (state: UpdateState) => void;
@@ -36,6 +58,7 @@ const audioPieAPI = {
     selectCover: (): Promise<string | undefined> => ipcRenderer.invoke('metadata/selectCover'),
     getCoverDataUrl: (coverPath: string): Promise<string | null> => ipcRenderer.invoke('metadata/getCoverDataUrl', coverPath),
     setCoverFromPath: (filePath: string): Promise<string | undefined> => ipcRenderer.invoke('metadata/setCoverFromPath', filePath),
+    clearCover: (): Promise<void> => ipcRenderer.invoke('metadata/clearCover'),
   },
   chapters: {
     autoFromTracks: (): Promise<Chapter[]> => ipcRenderer.invoke('chapters/autoFromTracks'),
@@ -46,8 +69,8 @@ const audioPieAPI = {
   build: {
     start: (options: BuildOptions): Promise<void> => ipcRenderer.invoke('build/start', options),
     cancel: (): Promise<void> => ipcRenderer.invoke('build/cancel'),
-    selectOutput: (directory?: string, fileName?: string): Promise<string | undefined> =>
-      ipcRenderer.invoke('build/selectOutput', { directory, fileName }),
+    selectOutput: (fileName?: string): Promise<string | undefined> =>
+      ipcRenderer.invoke('build/selectOutput', { fileName }),
     onProgress: (listener: ProgressListener) => {
       progressListeners.add(listener);
       return () => {
@@ -57,8 +80,22 @@ const audioPieAPI = {
   },
   project: {
     save: (path?: string): Promise<void> => ipcRenderer.invoke('project/save', path),
-    open: (): Promise<{ tracks: TrackInfo[]; chapters: Chapter[]; metadata: BookMetadata }> => ipcRenderer.invoke('project/open'),
-    new: (): Promise<{ tracks: TrackInfo[]; chapters: Chapter[]; metadata: BookMetadata }> => ipcRenderer.invoke('project/new'),
+    open: (): Promise<ProjectSnapshot | undefined> => ipcRenderer.invoke('project/open'),
+    new: (type: ProjectType): Promise<ProjectSnapshot | undefined> => ipcRenderer.invoke('project/new', type),
+    newFromTemplate: (): Promise<BookMetadata | undefined> => ipcRenderer.invoke('project/newFromTemplate'),
+    close: (): Promise<void> => ipcRenderer.invoke('project/close'),
+    setActiveBook: (bookId: string): Promise<ProjectSnapshot> => ipcRenderer.invoke('project/setActiveBook', bookId),
+    addBookToSeries: (): Promise<ProjectSnapshot> => ipcRenderer.invoke('project/addBookToSeries'),
+    removeBookFromSeries: (bookId: string): Promise<ProjectSnapshot> => ipcRenderer.invoke('project/removeBookFromSeries', bookId),
+    reorderBooks: (order: string[]): Promise<ProjectSnapshot> => ipcRenderer.invoke('project/reorderBooks', order),
+    updateBookSeriesIndex: (bookId: string, seriesIndex: number | undefined): Promise<ProjectSnapshot> =>
+      ipcRenderer.invoke('project/updateBookSeriesIndex', bookId, seriesIndex),
+    updateSeriesMetadata: (partial: Partial<SeriesMetadata>): Promise<ProjectSnapshot> =>
+      ipcRenderer.invoke('project/updateSeriesMetadata', partial),
+    importBookFromFile: (): Promise<ProjectSnapshot | undefined> => ipcRenderer.invoke('project/importBookFromFile'),
+    extractBook: (bookId: string): Promise<boolean> => ipcRenderer.invoke('project/extractBook', bookId),
+    setType: (newType: ProjectType): Promise<ProjectSnapshot> => ipcRenderer.invoke('project/setType', newType),
+    getBookCount: (): Promise<number> => ipcRenderer.invoke('project/getBookCount'),
   },
   settings: {
     get: (): Promise<AppSettings> => ipcRenderer.invoke('settings/get'),

@@ -25,7 +25,28 @@ export type BookMetadata = {
   genre?: string;
   publisher?: string;
   description?: string;
+  /** Absolute path (within the project's working directory) to this book's cover image, if any. */
   coverPath?: string;
+  /** File name of the cover image inside `books/<bookId>/`, as persisted in that book's own index.json. */
+  coverFile?: string;
+};
+
+// --- Container format (v2) ---
+
+export type ProjectType = 'audiobook' | 'series';
+
+export type SeriesMetadata = {
+  title: string;
+  author?: string;
+  narrator?: string;
+  description?: string;
+};
+
+/** A book as held in-memory while a project is open. */
+export type Book = {
+  id: string;
+  metadata: BookMetadata;
+  tracks: TrackInfo[];
 };
 
 export type BuildOptions = {
@@ -39,7 +60,6 @@ export type AppSettings = {
   ffmpegPath?: string;
   ffprobePath?: string;
   defaultBitrateKbps: number;
-  defaultOutputDir?: string;
   ffmpegThreads?: number;
   theme?: 'light' | 'dark';
   language?: 'en' | 'ru';

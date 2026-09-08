@@ -8,6 +8,8 @@ import { initializeFFmpeg } from './ffmpeg';
 import { initializeI18n } from './i18n';
 import { initMenu, rebuildMenu } from './menu';
 import { initializeUpdater, stopPeriodicUpdateChecks } from './updater';
+import { cleanupOnQuit } from './project';
+import { sweepOrphanedWorkingDirs } from './projectFile';
 
 const isDev = !app.isPackaged;
 // Проверяем аргументы командной строки для включения DevTools в собранном приложении
@@ -111,6 +113,9 @@ app.whenReady().then(async () => {
   // Инициализируем i18n для main process
   initializeI18n();
   
+  // Подчищаем осиротевшие рабочие директории проектов от предыдущих сбоев
+  await sweepOrphanedWorkingDirs();
+  
   // Автоматически инициализируем пути к FFmpeg и FFprobe (сохраняем в настройки)
   initializeBinaries();
   
@@ -134,4 +139,5 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   stopPeriodicUpdateChecks();
+  void cleanupOnQuit();
 });

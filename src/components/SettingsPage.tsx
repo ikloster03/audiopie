@@ -6,13 +6,20 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
-import { Settings2, Moon, Sun, Languages, RefreshCw, PanelLeft, PanelLeftClose } from 'lucide-react';
+import { Settings2, Moon, Sun, Languages, RefreshCw, PanelLeft, PanelLeftClose, BookOpen, Library, AlertTriangle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
 
 const defaultFormData = (settings: AppSettings | null, theme: 'light' | 'dark', language: 'en' | 'ru'): AppSettings => ({
   ffmpegPath: settings?.ffmpegPath || '',
   ffprobePath: settings?.ffprobePath || '',
   defaultBitrateKbps: settings?.defaultBitrateKbps || 128,
-  defaultOutputDir: settings?.defaultOutputDir || '',
   ffmpegThreads: settings?.ffmpegThreads ?? 1,
   theme: settings?.theme || theme || 'light',
   language: settings?.language || language || 'en',
@@ -20,12 +27,18 @@ const defaultFormData = (settings: AppSettings | null, theme: 'light' | 'dark', 
   autoCheckForUpdates: settings?.autoCheckForUpdates ?? true,
 });
 
-export const SettingsPage: React.FC = () => {
+interface SettingsPageProps {
+  onNavigateToSeries?: () => void;
+  onNavigateToBookEditor?: () => void;
+}
+
+export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigateToSeries, onNavigateToBookEditor }) => {
   const { t } = useTranslation();
-  const { settings, setSettings, theme, changeLanguage, language, updateState } = useAppContext();
+  const { settings, setSettings, theme, changeLanguage, language, updateState, projectType, bookOrder, setProjectType } = useAppContext();
   const [maxCpuCores, setMaxCpuCores] = useState<number>(0);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
   const [formData, setFormData] = useState<AppSettings>(() => defaultFormData(settings, theme, language));
+  const [isConfirmTypeSwitchOpen, setIsConfirmTypeSwitchOpen] = useState(false);
 
   useEffect(() => {
     setFormData(defaultFormData(settings, theme, language));
@@ -59,7 +72,6 @@ export const SettingsPage: React.FC = () => {
       ffmpegPath: formData.ffmpegPath || undefined,
       ffprobePath: formData.ffprobePath || undefined,
       defaultBitrateKbps: formData.defaultBitrateKbps,
-      defaultOutputDir: formData.defaultOutputDir || undefined,
       ffmpegThreads: formData.ffmpegThreads,
       theme: formData.theme,
       language: formData.language,
@@ -93,6 +105,26 @@ export const SettingsPage: React.FC = () => {
     handleChange('sidebarMode', mode);
     const updated = await window.audioPie.settings.set({ sidebarMode: mode });
     setSettings(updated);
+  };
+
+  const handleSwitchToSeries = async () => {
+    await setProjectType('series');
+    onNavigateToSeries?.();
+  };
+
+  const handleSwitchToAudiobook = async () => {
+    if (bookOrder.length > 1) {
+      setIsConfirmTypeSwitchOpen(true);
+      return;
+    }
+    await setProjectType('audiobook');
+    onNavigateToBookEditor?.();
+  };
+
+  const handleConfirmSwitchToAudiobook = async () => {
+    setIsConfirmTypeSwitchOpen(false);
+    await setProjectType('audiobook');
+    onNavigateToBookEditor?.();
   };
 
   return (
@@ -143,18 +175,6 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => handleChange('defaultBitrateKbps', Number(e.target.value))}
               />
               <p className="settings-page__field-description">{t('settings.defaultBitrateDesc')}</p>
-            </div>
-
-            <div className="settings-page__field">
-              <Label htmlFor="defaultOutputDir">{t('settings.defaultOutputDir')}</Label>
-              <Input
-                id="defaultOutputDir"
-                type="text"
-                value={formData.defaultOutputDir}
-                onChange={(e) => handleChange('defaultOutputDir', e.target.value)}
-                placeholder={t('settings.defaultOutputDirPlaceholder')}
-              />
-              <p className="settings-page__field-description">{t('settings.defaultOutputDirDesc')}</p>
             </div>
 
             <div className="settings-page__field">
@@ -281,8 +301,57 @@ export const SettingsPage: React.FC = () => {
             </Button>
             <Button type="submit">{t('settings.saveChanges')}</Button>
           </div>
+
+          <div className="settings-page__danger-zone">
+            <h3 className="settings-page__danger-zone-title">
+              <AlertTriangle className="settings-page__danger-zone-icon" />
+              {t('settings.dangerZone')}
+            </h3>
+            <p className="settings-page__field-description">{t('settings.dangerZoneDesc')}</p>
+            <div className="settings-page__theme-buttons">
+              <Button
+                type="button"
+                variant={projectType === 'audiobook' ? 'default' : 'outline'}
+                className="settings-page__theme-button"
+                onClick={handleSwitchToAudiobook}
+                disabled={projectType === 'audiobook'}
+              >
+                <BookOpen className="settings-page__theme-icon" />
+                {t('settings.typeAudiobook')}
+              </Button>
+              <Button
+                type="button"
+                variant={projectType === 'series' ? 'default' : 'outline'}
+                className="settings-page__theme-button"
+                onClick={handleSwitchToSeries}
+                disabled={projectType === 'series'}
+              >
+                <Library className="settings-page__theme-icon" />
+                {t('settings.typeSeries')}
+              </Button>
+            </div>
+          </div>
         </form>
       </ScrollArea>
+
+      <Dialog open={isConfirmTypeSwitchOpen} onOpenChange={setIsConfirmTypeSwitchOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('settings.confirmSwitchTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('settings.confirmSwitchDesc', { count: bookOrder.length - 1 })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmTypeSwitchOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmSwitchToAudiobook}>
+              {t('settings.confirmSwitchAction')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

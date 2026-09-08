@@ -33,7 +33,7 @@
 - Chapter editing with auto-generation from tracks
 - Complete metadata editing (title, author, narrator, cover art, etc.)
 - FFmpeg integration for audio processing
-- Project save/load functionality (.audiopie files)
+- Project save/load functionality (`.audiopie` ZIP container files, supporting both single audiobooks and multi-book series)
 - Multilingual support (English & Russian)
 - Cross-platform (macOS, Windows, Linux)
 - Light/dark theme support
@@ -60,7 +60,8 @@ audiopie/
 │   │   ├── main.ts              # Entry point, window creation
 │   │   ├── ipc.ts               # IPC handler registration (25+ handlers)
 │   │   ├── ffmpeg.ts            # FFmpeg/FFprobe integration
-│   │   ├── project.ts           # Project file I/O (.audiopie format)
+│   │   ├── project.ts           # Project in-memory state, open/save lifecycle
+│   │   ├── projectFile.ts       # .audiopie ZIP container pack/unpack, format detection
 │   │   ├── settings.ts          # Settings persistence (electron-store)
 │   │   ├── fileDialog.ts        # File selection dialogs
 │   │   ├── menu.ts              # Application menu
@@ -194,32 +195,52 @@ window.audioPie = {
 **Location:** `src/types.ts` and `electron/main/types.ts`
 
 ```typescript
-// Track information
+// Track information (in-memory; `path` is absolute, inside the working directory)
 type TrackInfo = {
   path: string;           // Absolute file path
-  displayTitle: string;   // User-editable title
+  displayTitle: string;   // User-editable title; chapter titles are derived from this
   durationMs: number;     // Track duration in milliseconds
 }
 
-// Chapter definition
+// Chapter definition — NOT persisted; always derived from a book's TrackInfo[]
+// (one chapter per track, contiguous, using displayTitle as the chapter title)
 type Chapter = {
   title: string;          // Chapter title
   startMs: number;        // Start time in milliseconds
   endMs: number;          // End time in milliseconds
 }
 
-// Book metadata
+// Per-book metadata (one per book, stored in that book's own index.json)
 type BookMetadata = {
   title: string;
   author?: string;
   narrator?: string;
   series?: string;
-  seriesIndex?: number;
-  year?: string;
+  seriesIndex?: number;   // Book's position within its series (does not affect bookOrder)
+  year?: number;
   genre?: string;
   publisher?: string;
   description?: string;
-  coverPath?: string;     // Path to cover image
+  coverPath?: string;     // Absolute path to cover image (in-memory; within the working directory)
+  coverFile?: string;     // File name of the cover as persisted inside books/<bookId>/
+}
+
+// Container project type — an 'audiobook' has exactly one book; a 'series' has 0+ books
+type ProjectType = 'audiobook' | 'series';
+
+// Series-level metadata (no cover; only present when type === 'series')
+type SeriesMetadata = {
+  title: string;
+  author?: string;
+  narrator?: string;
+  description?: string;
+}
+
+// A book as held in-memory while a project is open
+type Book = {
+  id: string;             // Stable, opaque folder id — independent of display order
+  metadata: BookMetadata;
+  tracks: TrackInfo[];
 }
 
 // Build configuration
@@ -235,7 +256,6 @@ type AppSettings = {
   ffmpegPath?: string;    // Custom FFmpeg binary path
   ffprobePath?: string;   // Custom FFprobe binary path
   defaultBitrateKbps: number;
-  defaultOutputDir?: string;
   ffmpegThreads?: number;
   theme: 'light' | 'dark';
   language: 'en' | 'ru';
@@ -250,6 +270,37 @@ type BuildProgress = {
   totalSteps?: number;
 }
 ```
+
+### Project File Format (`.audiopie`)
+
+**Location:** `electron/main/projectFile.ts` (ZIP pack/unpack, format detection), `electron/main/project.ts` (in-memory state, open/save lifecycle)
+
+Since the container-format change, a `.audiopie` file is a **ZIP archive** (packed with the `STORE`/uncompressed method, via `yazl`/`yauzl` for streaming, memory-bounded pack/unpack — audio doesn't compress well anyway) rather than a single plain-JSON file. This lets one file hold either a single audiobook or a multi-book series.
+
+**On-disk layout inside the ZIP:**
+
+```
+index.json              # Root manifest (see RootManifest below)
+books/
+  <bookId>/
+    index.json           # This book's metadata + track list (see BookIndexFile below)
+    cover.<ext>           # Optional cover image
+    01 - Chapter One.mp3  # Audio track files, copied in as added
+    02 - Chapter Two.mp3
+  <bookId>/
+    ...
+```
+
+- **`bookId` is a stable, opaque folder name** — it never changes when books are reordered or when `seriesIndex` is edited.
+- **`index.json` (root manifest)** carries only container-level facts: `{ version: 2, type: 'audiobook' | 'series', series: SeriesMetadata | null, bookOrder: string[] }`. `bookOrder` is the authoritative display order (a list of `bookId`s); it is intentionally decoupled from each book's `metadata.seriesIndex`.
+- **`books/<bookId>/index.json`** carries that book's own `{ metadata, tracks }`. Track paths are stored as bare file names (relative to that book's folder), not absolute paths.
+- **Chapters are never persisted.** They're always derived on the fly from a book's `tracks` (one chapter per track).
+- **There is no series-level cover** — only individual books have covers.
+- **`audiobook` vs `series`** is just the `type` field on the root manifest; a `series` project may have any number of books (including zero), and `type` can be changed after creation (audiobook→series is non-destructive; series→audiobook with 2+ books is destructive — see Settings' danger zone).
+
+**Working-directory lifecycle:** opening a project extracts the ZIP into a temporary working directory (cleaned up on close/quit, swept for orphans on startup); all edits (adding tracks, editing metadata, etc.) happen directly on files in that directory; saving re-zips the working directory back to the `.audiopie` path.
+
+**Legacy format:** old plain-JSON `.audiopie` files (`{ version: 1, tracks, chapters, metadata }`, no ZIP wrapper) are still openable. `detectFormat()` sniffs file bytes (not the extension) to tell the two formats apart. A legacy file is transparently upgraded to the container format the first time it's saved; this upgrade is **one-directional** — files saved in the new format are not openable by older AudioPie versions.
 
 ### FFmpeg Integration
 

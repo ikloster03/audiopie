@@ -1,34 +1,42 @@
 import { app, BrowserWindow, ipcMain, Notification, type IpcMainInvokeEvent } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import { selectTrackFiles, selectCoverFile, chooseOutputFile } from './fileDialog';
-import { getProjectData, setProjectData, saveProjectToFile, openProjectFromFile, createNewProject } from './project';
-import { probeDuration, buildAudiobook, cancelBuild, isBusy, type BuildResult } from './ffmpeg';
+import { selectTrackFiles, selectCoverFile, chooseOutputFile, selectProjectFile } from './fileDialog';
+import {
+  addBookToSeries,
+  addTracksToActiveBook,
+  applyTemplateToActiveBook,
+  clearActiveBookCover,
+  closeProject,
+  createNewProjectAtPath,
+  extractBook,
+  getBookCount,
+  getProjectPath,
+  getSnapshot,
+  importBookFromFile,
+  openProjectFromFile,
+  removeBookFromSeries,
+  removeTracksFromActiveBook,
+  reorderBooks,
+  saveProjectToFile,
+  setActiveBookCoverFromPath,
+  setActiveBookId,
+  setActiveBookMetadata,
+  setActiveBookTracks,
+  setActiveTrackTitle,
+  setProjectType,
+  showNewProjectSaveDialog,
+  updateBookSeriesIndex,
+  updateSeriesMetadata,
+  type ProjectSnapshot,
+} from './project';
+import { buildAudiobook, cancelBuild, isBusy, type BuildResult } from './ffmpeg';
 import { getSettings, setSettings, getMaxCpuCores } from './settings';
-import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, ChapterReorderResult, TrackInfo } from './types';
+import { AppSettings, BookMetadata, BuildOptions, BuildProgress, Chapter, ChapterReorderResult, ProjectType, SeriesMetadata, TrackInfo } from './types';
 import { changeLanguage, t } from './i18n';
 import { renameChaptersByTemplate, reorderChaptersAndTracks } from '../../src/lib/chapters';
 import { rebuildMenu } from './menu';
 import { checkForUpdatesNow, downloadUpdate, installUpdateAndRestart, setAutoUpdateEnabled } from './updater';
-
-const sanitizeTitle = (filePath: string): string => {
-  return path.basename(filePath).replace(/\.[^/.]+$/, '');
-};
-
-const updateTracks = (tracks: TrackInfo[]) => {
-  const project = getProjectData();
-  setProjectData({ ...project, tracks });
-};
-
-const updateMetadata = (metadata: BookMetadata) => {
-  const project = getProjectData();
-  setProjectData({ ...project, metadata });
-};
-
-const updateChapters = (chapters: Chapter[]) => {
-  const project = getProjectData();
-  setProjectData({ ...project, chapters });
-};
 
 const computeChaptersFromTracks = (tracks: TrackInfo[]): Chapter[] => {
   let cursor = 0;
@@ -50,78 +58,50 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   });
 
   ipcMain.handle('tracks/addFromPaths', async (_event: IpcMainInvokeEvent, paths: string[]): Promise<TrackInfo[]> => {
-    const added: TrackInfo[] = [];
-    const errors: string[] = [];
-    
-    for (const filePath of paths) {
-      try {
-        const durationMs = await probeDuration(filePath);
-        added.push({
-          path: filePath,
-          displayTitle: sanitizeTitle(filePath),
-          durationMs,
-        });
-      } catch (error) {
-        errors.push(`${path.basename(filePath)}: ${(error as Error).message}`);
-      }
-    }
-    
-    // Report errors if any
+    const { added, errors } = await addTracksToActiveBook(paths);
+
     if (errors.length > 0) {
       win.webContents.send('build/onProgress', {
         phase: 'probe',
         message: `Failed to analyze some files:\n${errors.join('\n')}`,
       } satisfies BuildProgress);
     }
-    
-    if (added.length > 0) {
-      const project = getProjectData();
-      updateTracks([...project.tracks, ...added]);
-    }
+
     return added;
   });
 
   ipcMain.handle('tracks/reorder', (_event: IpcMainInvokeEvent, newOrder: number[]) => {
-    const project = getProjectData();
-    const reordered = newOrder.map((index) => project.tracks[index]).filter(Boolean);
-    updateTracks(reordered);
+    const { tracks } = getSnapshot();
+    const reordered = newOrder.map((index) => tracks[index]).filter(Boolean);
+    setActiveBookTracks(reordered);
     return undefined;
   });
 
-  ipcMain.handle('tracks/remove', (_event: IpcMainInvokeEvent, indexes: number[]) => {
-    const project = getProjectData();
-    const remaining = project.tracks.filter((_, index) => !indexes.includes(index));
-    updateTracks(remaining);
+  ipcMain.handle('tracks/remove', async (_event: IpcMainInvokeEvent, indexes: number[]) => {
+    await removeTracksFromActiveBook(indexes);
     return undefined;
   });
 
   ipcMain.handle('tracks/updateTitle', (_event: IpcMainInvokeEvent, index: number, title: string) => {
-    const project = getProjectData();
-    if (!project.tracks[index]) {
-      return undefined;
-    }
-    const updated = project.tracks.map((track, idx) => (idx === index ? { ...track, displayTitle: title } : track));
-    updateTracks(updated);
-    return updated[index];
+    return setActiveTrackTitle(index, title);
   });
 
   ipcMain.handle('metadata/get', () => {
-    return getProjectData().metadata;
+    return getSnapshot().metadata;
   });
 
   ipcMain.handle('metadata/set', (_event: IpcMainInvokeEvent, partial: Partial<BookMetadata>) => {
-    const project = getProjectData();
-    updateMetadata({ ...project.metadata, ...partial });
+    const { metadata } = getSnapshot();
+    setActiveBookMetadata({ ...metadata, ...partial });
     return undefined;
   });
 
   ipcMain.handle('metadata/selectCover', async () => {
-    const coverPath = await selectCoverFile(win);
-    if (coverPath) {
-      const project = getProjectData();
-      updateMetadata({ ...project.metadata, coverPath });
+    const coverSourcePath = await selectCoverFile(win);
+    if (!coverSourcePath) {
+      return undefined;
     }
-    return coverPath;
+    return setActiveBookCoverFromPath(coverSourcePath);
   });
 
   ipcMain.handle('metadata/getCoverDataUrl', async (_event: IpcMainInvokeEvent, coverPath: string): Promise<string | null> => {
@@ -149,15 +129,11 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
       if (!filePath || !fs.existsSync(filePath)) {
         return undefined;
       }
-      // Проверяем, что это изображение
       const ext = path.extname(filePath).toLowerCase();
       if (!['.jpg', '.jpeg', '.png'].includes(ext)) {
         return undefined;
       }
-      // Используем путь напрямую (файл уже на диске)
-      const project = getProjectData();
-      updateMetadata({ ...project.metadata, coverPath: filePath });
-      return filePath;
+      return setActiveBookCoverFromPath(filePath);
     } catch (error) {
       console.error('Failed to set cover from path:', error);
       return undefined;
@@ -165,47 +141,55 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
   });
 
   ipcMain.handle('chapters/autoFromTracks', () => {
-    const project = getProjectData();
-    const chapters = computeChaptersFromTracks(project.tracks);
-    updateChapters(chapters);
-    return chapters;
+    const { tracks } = getSnapshot();
+    return computeChaptersFromTracks(tracks);
   });
 
   ipcMain.handle('chapters/update', (_event: IpcMainInvokeEvent, chapters: Chapter[]) => {
-    updateChapters(chapters);
+    // Chapters are derived from track order/displayTitle and are never
+    // persisted separately — sync any edited chapter titles back onto the
+    // corresponding tracks so the derivation stays consistent.
+    const { tracks } = getSnapshot();
+    const updatedTracks = tracks.map((track, index) =>
+      chapters[index] ? { ...track, displayTitle: chapters[index].title } : track,
+    );
+    setActiveBookTracks(updatedTracks);
     return undefined;
   });
 
   ipcMain.handle('chapters/reorder', (_event: IpcMainInvokeEvent, newOrder: number[]): ChapterReorderResult => {
-    const project = getProjectData();
-    const result = reorderChaptersAndTracks(project.tracks, project.chapters, newOrder);
-    setProjectData({ ...project, tracks: result.tracks, chapters: result.chapters });
+    const { tracks } = getSnapshot();
+    const chapters = computeChaptersFromTracks(tracks);
+    const result = reorderChaptersAndTracks(tracks, chapters, newOrder);
+    setActiveBookTracks(result.tracks);
     return result;
   });
 
   ipcMain.handle('chapters/renameByTemplate', (_event: IpcMainInvokeEvent, template: string): Chapter[] => {
-    const project = getProjectData();
-    const chapters = renameChaptersByTemplate(project.chapters, template ?? '');
-    updateChapters(chapters);
-    return chapters;
+    const { tracks } = getSnapshot();
+    const chapters = computeChaptersFromTracks(tracks);
+    const renamed = renameChaptersByTemplate(chapters, template ?? '');
+    const updatedTracks = tracks.map((track, index) => ({ ...track, displayTitle: renamed[index]?.title ?? track.displayTitle }));
+    setActiveBookTracks(updatedTracks);
+    return renamed;
   });
 
   ipcMain.handle('build/start', async (_event: IpcMainInvokeEvent, options: BuildOptions) => {
     if (isBusy()) {
       throw new Error('Another build is already running.');
     }
-    const project = getProjectData();
-    const { tracks, chapters, metadata } = project;
+    const { tracks, metadata } = getSnapshot();
     if (tracks.length === 0) {
       throw new Error('No tracks available to build.');
     }
     if (!options.outputPath) {
       throw new Error('Output path is required.');
     }
-    const result: BuildResult = await buildAudiobook(tracks, chapters.length > 0 ? chapters : computeChaptersFromTracks(tracks), metadata, options, (progress) => {
+    const chapters = computeChaptersFromTracks(tracks);
+    const result: BuildResult = await buildAudiobook(tracks, chapters, metadata, options, (progress) => {
       win.webContents.send('build/onProgress', progress satisfies BuildProgress);
     });
-    
+
     // Показываем системное уведомление о завершении сборки
     const formatDuration = (ms: number): string => {
       const totalSec = Math.round(ms / 1000);
@@ -213,11 +197,11 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
       const seconds = totalSec % 60;
       return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
     };
-    
+
     const formatSize = (bytes: number): string => {
       return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
     };
-    
+
     if (Notification.isSupported()) {
       const notification = new Notification({
         title: t('notification.buildComplete'),
@@ -230,7 +214,7 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
       });
       notification.show();
     }
-    
+
     return undefined;
   });
 
@@ -239,28 +223,103 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
     return undefined;
   });
 
-  ipcMain.handle('build/selectOutput', async (_event: IpcMainInvokeEvent, suggestion?: { directory?: string; fileName?: string }) => {
-    const defaultPath = suggestion?.directory && suggestion?.fileName
-      ? path.join(suggestion.directory, suggestion.fileName)
-      : suggestion?.fileName
-        ? path.join(app.getPath('documents'), suggestion.fileName)
-        : undefined;
+  ipcMain.handle('build/selectOutput', async (_event: IpcMainInvokeEvent, suggestion?: { fileName?: string }) => {
+    // Default to the currently open project's own directory (every project has
+    // a known path from creation onward), falling back to Documents only in
+    // the unlikely case no project path is available yet.
+    const projectPath = getProjectPath();
+    const directory = projectPath ? path.dirname(projectPath) : app.getPath('documents');
+    const defaultPath = suggestion?.fileName ? path.join(directory, suggestion.fileName) : undefined;
     const selected = await chooseOutputFile(win, defaultPath);
     return selected;
   });
+
+  // --- Project lifecycle -----------------------------------------------------------
 
   ipcMain.handle('project/save', async (_event: IpcMainInvokeEvent, targetPath?: string) => {
     await saveProjectToFile(win, targetPath);
     return undefined;
   });
 
-  ipcMain.handle('project/open', async () => {
-    await openProjectFromFile(win);
-    return getProjectData();
+  ipcMain.handle('project/open', async (): Promise<ProjectSnapshot | undefined> => {
+    return openProjectFromFile(win);
   });
 
-  ipcMain.handle('project/new', () => {
-    return createNewProject();
+  ipcMain.handle('project/new', async (_event: IpcMainInvokeEvent, type: ProjectType): Promise<ProjectSnapshot | undefined> => {
+    const savePath = await showNewProjectSaveDialog(win, type);
+    if (!savePath) {
+      return undefined;
+    }
+    return createNewProjectAtPath(type, savePath);
+  });
+
+  ipcMain.handle('project/newFromTemplate', async (): Promise<BookMetadata | undefined> => {
+    const result = await selectProjectFile(win, 'Select Template Project');
+    if (!result) {
+      return undefined;
+    }
+    return applyTemplateToActiveBook(result);
+  });
+
+  ipcMain.handle('project/close', async () => {
+    await closeProject();
+    return undefined;
+  });
+
+  // --- Series & book management -----------------------------------------------------
+
+  ipcMain.handle('project/setActiveBook', (_event: IpcMainInvokeEvent, bookId: string): ProjectSnapshot => {
+    return setActiveBookId(bookId);
+  });
+
+  ipcMain.handle('project/addBookToSeries', (): ProjectSnapshot => {
+    return addBookToSeries();
+  });
+
+  ipcMain.handle('project/removeBookFromSeries', (_event: IpcMainInvokeEvent, bookId: string): ProjectSnapshot => {
+    return removeBookFromSeries(bookId);
+  });
+
+  ipcMain.handle('project/reorderBooks', (_event: IpcMainInvokeEvent, order: string[]): ProjectSnapshot => {
+    return reorderBooks(order);
+  });
+
+  ipcMain.handle('project/updateBookSeriesIndex', (_event: IpcMainInvokeEvent, bookId: string, seriesIndex: number | undefined): ProjectSnapshot => {
+    return updateBookSeriesIndex(bookId, seriesIndex);
+  });
+
+  ipcMain.handle('project/updateSeriesMetadata', (_event: IpcMainInvokeEvent, partial: Partial<SeriesMetadata>): ProjectSnapshot => {
+    return updateSeriesMetadata(partial);
+  });
+
+  ipcMain.handle('project/importBookFromFile', async (): Promise<ProjectSnapshot | undefined> => {
+    const result = await selectProjectFile(win, 'Import Audiobook Into Series');
+    if (!result) {
+      return undefined;
+    }
+    return importBookFromFile(result);
+  });
+
+  ipcMain.handle('project/extractBook', async (_event: IpcMainInvokeEvent, bookId: string): Promise<boolean> => {
+    const savePath = await showNewProjectSaveDialog(win, 'audiobook');
+    if (!savePath) {
+      return false;
+    }
+    await extractBook(bookId, savePath);
+    return true;
+  });
+
+  ipcMain.handle('project/setType', async (_event: IpcMainInvokeEvent, newType: ProjectType): Promise<ProjectSnapshot> => {
+    return setProjectType(newType);
+  });
+
+  ipcMain.handle('project/getBookCount', (): number => {
+    return getBookCount();
+  });
+
+  ipcMain.handle('metadata/clearCover', () => {
+    clearActiveBookCover();
+    return undefined;
   });
 
   ipcMain.handle('settings/get', (): AppSettings => {
@@ -269,13 +328,13 @@ export const registerIpcHandlers = (win: BrowserWindow) => {
 
   ipcMain.handle('settings/set', async (_event: IpcMainInvokeEvent, partial: Partial<AppSettings>) => {
     setSettings(partial);
-    
+
     // Если изменился язык, обновляем его в main process и пересоздаём меню
     if (partial.language) {
       changeLanguage(partial.language);
       rebuildMenu();
     }
-    
+
     return getSettings();
   });
 

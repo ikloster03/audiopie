@@ -83,5 +83,14 @@
   &__footer {
     @apply text-center text-sm text-muted-foreground mt-8;
   }
+
+  /* Secondary links (type-picker screen) */
+  &__template-link {
+    @apply mt-6 mx-auto flex text-muted-foreground;
+  }
+
+  &__back-link {
+    @apply mt-2 mx-auto flex text-muted-foreground;
+  }
 }
 

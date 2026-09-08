@@ -16,12 +16,20 @@
     "openProject": "Открыть проект",
     "openProjectDesc": "Продолжить работу над существующим проектом аудиокниги",
     "createNew": "Создать новый",
-    "createNewDesc": "Начать новый проект аудиокниги с нуля"
+    "createNewDesc": "Начать новый проект аудиокниги с нуля",
+    "chooseTypeTitle": "Что вы создаёте?",
+    "typeAudiobook": "Аудиокнига",
+    "typeAudiobookDesc": "Одна аудиокнига с главами и метаданными",
+    "typeSeries": "Серия",
+    "typeSeriesDesc": "Коллекция нескольких аудиокниг с общими метаданными серии",
+    "startFromExisting": "Начать на основе существующего проекта…"
   },
   "sidebar": {
     "ariaLabel": "Разделы рабочего пространства",
     "chapters": "Главы",
     "metadata": "Метаданные",
+    "series": "Серия",
+    "backToSeries": "К серии",
     "settings": "Настройки"
   },
   "chapters": {
@@ -66,7 +74,28 @@
     "clear": "Очистить",
     "loadingCover": "Загрузка обложки...",
     "enterPlaceholder": "Введите {{field}}...",
-    "dropImageHere": "Отпустите изображение здесь"
+    "dropImageHere": "Отпустите изображение здесь",
+    "partOfSeries": "Входит в серию: {{title}}",
+    "backToSeries": "К серии"
+  },
+  "series": {
+    "numberShort": "№",
+    "removeFromSeries": "Удалить из серии",
+    "metadataTitle": "Серия",
+    "title": "Название",
+    "titlePlaceholder": "Серия без названия",
+    "author": "Автор",
+    "narrator": "Чтец",
+    "description": "Описание",
+    "booksTitle": "Книги ({{count}})",
+    "noBooks": "В этой серии пока нет книг",
+    "addBook": "Добавить книгу",
+    "createNewBook": "Создать новую книгу",
+    "importBook": "Импортировать из существующего файла проекта",
+    "removeConfirmTitle": "Удалить книгу из серии",
+    "removeConfirmDesc": "Это безвозвратно удалит книгу из серии после сохранения. Вы можете сначала извлечь её как отдельный файл аудиокниги, чтобы сохранить копию.",
+    "extractAndRemove": "Извлечь как отдельный файл",
+    "removeOnly": "Удалить"
   },
   "settings": {
     "title": "Настройки",
@@ -79,9 +108,6 @@
     "ffprobePathPlaceholder": "Оставьте пустым для системного по умолчанию",
     "defaultBitrate": "Битрейт по умолчанию (kbps)",
     "defaultBitrateDesc": "Аудио битрейт для закодированного вывода (32-512 kbps)",
-    "defaultOutputDir": "Папка вывода по умолчанию",
-    "defaultOutputDirDesc": "Папка по умолчанию для сохранения собранных аудиокниг",
-    "defaultOutputDirPlaceholder": "Оставьте пустым для последней использованной папки",
     "ffmpegThreads": "Параллельные процессы FFmpeg",
     "ffmpegThreadsDesc": "Количество треков для одновременного кодирования (1-{{cores}})",
     "theme": "Тема",
@@ -99,7 +125,14 @@
     "autoCheckForUpdatesDesc": "AudioPie будет проверять обновления при запуске (раз в день) и каждые 6 часов во время работы",
     "checkForUpdates": "Проверить обновления",
     "cancel": "Отмена",
-    "saveChanges": "Сохранить изменения"
+    "saveChanges": "Сохранить изменения",
+    "dangerZone": "Опасная зона",
+    "dangerZoneDesc": "Измените тип этого проекта. Переключение на «Аудиокнига» безвозвратно удалит все книги кроме первой, если их больше одной.",
+    "typeAudiobook": "Аудиокнига",
+    "typeSeries": "Серия",
+    "confirmSwitchTitle": "Переключить на «Аудиокнига»?",
+    "confirmSwitchDesc": "Это безвозвратно удалит {{count}} других книг(и) в этой серии, оставив только первую. Действие не может быть отменено.",
+    "confirmSwitchAction": "Удалить и переключить"
   },
   "build": {
     "title": "Сборка аудиокниги",
@@ -115,7 +148,8 @@
   },
   "common": {
     "untitledAudiobook": "Без названия",
-    "cancel": "Отмена"
+    "cancel": "Отмена",
+    "back": "Назад"
   },
   "ffmpeg": {
     "parallelEncoding": "Параллельное кодирование треков ({{concurrency}} одновременно)",

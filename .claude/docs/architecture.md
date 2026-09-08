@@ -153,6 +153,6 @@ TrackInfo: { path, displayTitle, durationMs }
 Chapter: { title, startMs, endMs }
 BookMetadata: { title, author, narrator, series, seriesIndex, year, genre, publisher, description, coverPath }
 BuildOptions: { bitrateKbps, outputPath, tempDir?, reencode? }
-AppSettings: { ffmpegPath?, ffprobePath?, defaultBitrateKbps, defaultOutputDir?, ffmpegThreads?, theme, language }
+AppSettings: { ffmpegPath?, ffprobePath?, defaultBitrateKbps, ffmpegThreads?, theme, language }
 BuildProgress: { phase, percent?, message?, currentStep?, totalSteps? }
 ```

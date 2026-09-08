@@ -8,11 +8,16 @@ import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
-import { ImagePlus, X, Loader2 } from 'lucide-react';
+import { ImagePlus, X, Loader2, ArrowLeft, Library } from 'lucide-react';
 
-export const MetadataForm: React.FC = () => {
+interface MetadataFormProps {
+  onBackToSeries?: () => void;
+}
+
+export const MetadataForm: React.FC<MetadataFormProps> = ({ onBackToSeries }) => {
   const { t } = useTranslation();
-  const { metadata, setMetadata } = useAppContext();
+  const { metadata, setMetadata, projectType, seriesMetadata } = useAppContext();
+  const isSeriesMember = projectType === 'series' && Boolean(seriesMetadata);
   const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
   const [isLoadingCover, setIsLoadingCover] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -56,7 +61,7 @@ export const MetadataForm: React.FC = () => {
   };
 
   const handleCoverClear = async () => {
-    await window.audioPie.metadata.set({ coverPath: undefined });
+    await window.audioPie.metadata.clearCover();
     setMetadata({ ...metadata, coverPath: undefined });
     setCoverDataUrl(null);
   };
@@ -163,6 +168,21 @@ export const MetadataForm: React.FC = () => {
   return (
     <ScrollArea className="metadata-form">
       <div className="metadata-form__container">
+        {isSeriesMember && (
+          <div className="metadata-form__series-callout">
+            <Library className="metadata-form__series-callout-icon" />
+            <span className="metadata-form__series-callout-text">
+              {t('metadata.partOfSeries', { title: seriesMetadata?.title })}
+            </span>
+            {onBackToSeries && (
+              <Button variant="outline" size="sm" onClick={onBackToSeries}>
+                <ArrowLeft className="h-4 w-4" />
+                {t('metadata.backToSeries')}
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Cover Section */}
         <Card className="metadata-form__cover-card">
           <div 

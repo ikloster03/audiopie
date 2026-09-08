@@ -23,7 +23,6 @@ export const getSettings = (): AppSettings => {
     ffmpegPath: store.get('ffmpegPath'),
     ffprobePath: store.get('ffprobePath'),
     defaultBitrateKbps: store.get('defaultBitrateKbps'),
-    defaultOutputDir: store.get('defaultOutputDir'),
     ffmpegThreads: store.get('ffmpegThreads'),
     theme: store.get('theme'),
     language: store.get('language'),

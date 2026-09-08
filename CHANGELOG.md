@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### ⚠️ Breaking Changes
+
+- **project:** `.audiopie` files are now ZIP containers instead of plain JSON, supporting both single audiobooks and multi-book series in one file. Opening old plain-JSON `.audiopie` files still works and they are transparently upgraded to the new container format the first time they're saved, but **this upgrade is one-directional** — once saved in the new format, a file can no longer be opened by older versions of AudioPie.
+
+### 🚀 Enhancements
+
+- **project:** Add series support — a single `.audiopie` file can now contain multiple books, with a dedicated Series page for managing series metadata, member book order, and adding/removing/extracting books.
+- **settings:** Add a "danger zone" to switch a project's type between Audiobook and Series after creation.
+
 ## v0.7.0
 
 [compare changes](https://github.com/ikloster03/audiopie/compare/v0.6.15...v0.7.0)

@@ -5,6 +5,7 @@ import { MetadataForm } from './components/MetadataForm';
 import { ProgressModal } from './components/ProgressModal';
 import { SettingsPage } from './components/SettingsPage';
 import { ProjectManager } from './components/ProjectManager';
+import { SeriesPage } from './components/SeriesPage';
 import { UpdateNotificationDialog } from './components/UpdateNotificationDialog';
 import { UpdateProgressModal } from './components/UpdateProgressModal';
 import { WorkspaceSidebar, type WorkspaceSection } from './components/WorkspaceSidebar';
@@ -22,22 +23,24 @@ export const App: React.FC = () => {
     tracks,
     metadata,
     settings,
+    projectType,
     isProjectOpen,
     closeProject,
     addTracksFromPaths,
   } = useAppContext();
-  const [emptyProjectAlertType, setEmptyProjectAlertType] = useState<'save' | 'build' | null>(null);
+  const [cannotBuildAlertVisible, setCannotBuildAlertVisible] = useState(false);
   const [activeSection, setActiveSection] = useState<WorkspaceSection>('chapters');
   const [fabsHidden, setFabsHidden] = useState(false);
   const lastScrollTop = useRef(0);
 
   useEffect(() => {
     if (isProjectOpen) {
-      setActiveSection('chapters');
+      setActiveSection(projectType === 'series' ? 'series' : 'chapters');
     }
-  }, [isProjectOpen]);
+  }, [isProjectOpen, projectType]);
 
   const isEditorSection = activeSection === 'chapters' || activeSection === 'metadata';
+  const isBuildableSection = isEditorSection || activeSection === 'series';
 
   useEffect(() => {
     setFabsHidden(false);
@@ -77,30 +80,24 @@ export const App: React.FC = () => {
   }, [isEditorSection]);
 
   const handleSaveProject = async () => {
-    const untitledCheck = t('common.untitledAudiobook');
-    if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
-      setEmptyProjectAlertType('save');
-      setTimeout(() => setEmptyProjectAlertType(null), 5000);
-      return;
-    }
-
+    // Every project already has a save path assigned at creation time, so
+    // Save always writes to that known path without any guard/dialog.
     await window.audioPie.project.save();
   };
 
   const handleBuild = async () => {
     const untitledCheck = t('common.untitledAudiobook');
     if (tracks.length === 0 || metadata.title === 'Untitled Audiobook' || metadata.title === untitledCheck) {
-      setEmptyProjectAlertType('build');
-      setTimeout(() => setEmptyProjectAlertType(null), 5000);
+      setCannotBuildAlertVisible(true);
+      setTimeout(() => setCannotBuildAlertVisible(false), 5000);
       return;
     }
 
     try {
       const currentSettings = settings || (await window.audioPie.settings.get());
       const defaultBitrate = currentSettings.defaultBitrateKbps || 128;
-      const defaultDir = currentSettings.defaultOutputDir || undefined;
       const fileName = `${sanitizeFileName(metadata.title || 'audiobook')}.m4b`;
-      const outputPath = await window.audioPie.build.selectOutput(defaultDir, fileName);
+      const outputPath = await window.audioPie.build.selectOutput(fileName);
       if (!outputPath) {
         return;
       }
@@ -136,18 +133,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="app">
-      {emptyProjectAlertType === 'save' && (
-        <div className="app__alert">
-          <Alert variant="destructive" className="app__alert--destructive">
-            <AlertTitle className="app__alert-title">{t('alerts.cannotSaveTitle')}</AlertTitle>
-            <AlertDescription className="app__alert-description">
-              {t('alerts.cannotSaveDesc')}
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {emptyProjectAlertType === 'build' && (
+      {cannotBuildAlertVisible && (
         <div className="app__alert">
           <Alert variant="destructive" className="app__alert--destructive">
             <AlertTitle className="app__alert-title">{t('alerts.cannotBuildTitle')}</AlertTitle>
@@ -164,6 +150,7 @@ export const App: React.FC = () => {
           onSelect={setActiveSection}
           onCloseProject={closeProject}
           mode={settings?.sidebarMode || 'expanded'}
+          projectType={projectType}
         />
         <main
           className="app__main"
@@ -173,11 +160,17 @@ export const App: React.FC = () => {
           <Card className="app__section-panel">
             <CardContent className="app__section-content">
               {activeSection === 'chapters' && <ChapterList />}
-              {activeSection === 'metadata' && <MetadataForm />}
-              {activeSection === 'settings' && <SettingsPage />}
+              {activeSection === 'metadata' && <MetadataForm onBackToSeries={() => setActiveSection('series')} />}
+              {activeSection === 'series' && <SeriesPage onEditBook={() => setActiveSection('chapters')} />}
+              {activeSection === 'settings' && (
+                <SettingsPage
+                  onNavigateToSeries={() => setActiveSection('series')}
+                  onNavigateToBookEditor={() => setActiveSection('chapters')}
+                />
+              )}
             </CardContent>
           </Card>
-          {isEditorSection && (
+          {isBuildableSection && (
             <div className={`app__fab-stack${fabsHidden ? ' app__fab-stack--hidden' : ''}`}>
               <Tooltip label={t('header.save')} side="left">
                 <Button
@@ -189,15 +182,17 @@ export const App: React.FC = () => {
                   <Save className="size-5" />
                 </Button>
               </Tooltip>
-              <Tooltip label={t('header.build')} side="left">
-                <Button
-                  onClick={handleBuild}
-                  size="icon-xl"
-                  aria-label={t('header.build')}
-                >
-                  <Hammer className="size-8" />
-                </Button>
-              </Tooltip>
+              {isEditorSection && (
+                <Tooltip label={t('header.build')} side="left">
+                  <Button
+                    onClick={handleBuild}
+                    size="icon-xl"
+                    aria-label={t('header.build')}
+                  >
+                    <Hammer className="size-8" />
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           )}
         </main>

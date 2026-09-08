@@ -1,10 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, FileText, LogOut, Settings } from 'lucide-react';
+import { BookOpen, FileText, LogOut, Settings, Library, ArrowLeft } from 'lucide-react';
 import { Tooltip } from './ui/tooltip';
+import type { ProjectType } from '../types';
 import audioPieLogo from '../../assets/audiopie.svg';
 
-export type WorkspaceSection = 'chapters' | 'metadata' | 'settings';
+export type WorkspaceSection = 'chapters' | 'metadata' | 'series' | 'settings';
 export type SidebarMode = 'minimal' | 'expanded';
 
 interface WorkspaceSidebarProps {
@@ -12,6 +13,7 @@ interface WorkspaceSidebarProps {
   onSelect: (section: WorkspaceSection) => void;
   onCloseProject: () => void;
   mode?: SidebarMode;
+  projectType: ProjectType;
 }
 
 export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
@@ -19,27 +21,58 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   onSelect,
   onCloseProject,
   mode = 'expanded',
+  projectType,
 }) => {
   const { t } = useTranslation();
   const isMinimal = mode === 'minimal';
 
-  const items: Array<{ id: WorkspaceSection; label: string; icon: React.ReactNode }> = [
-    {
-      id: 'chapters',
-      label: t('sidebar.chapters'),
-      icon: <BookOpen className="workspace-sidebar__icon" />,
-    },
-    {
-      id: 'metadata',
-      label: t('sidebar.metadata'),
-      icon: <FileText className="workspace-sidebar__icon" />,
-    },
-    {
-      id: 'settings',
-      label: t('sidebar.settings'),
-      icon: <Settings className="workspace-sidebar__icon" />,
-    },
-  ];
+  const isEditingSeriesMember = projectType === 'series' && (activeSection === 'chapters' || activeSection === 'metadata');
+
+  const items: Array<{ id: WorkspaceSection; label: string; icon: React.ReactNode }> =
+    projectType === 'series'
+      ? isEditingSeriesMember
+        ? [
+            {
+              id: 'series',
+              label: t('sidebar.backToSeries'),
+              icon: <ArrowLeft className="workspace-sidebar__icon" />,
+            },
+            {
+              id: 'chapters',
+              label: t('sidebar.chapters'),
+              icon: <BookOpen className="workspace-sidebar__icon" />,
+            },
+            {
+              id: 'metadata',
+              label: t('sidebar.metadata'),
+              icon: <FileText className="workspace-sidebar__icon" />,
+            },
+          ]
+        : [
+            {
+              id: 'series',
+              label: t('sidebar.series'),
+              icon: <Library className="workspace-sidebar__icon" />,
+            },
+          ]
+      : [
+          {
+            id: 'chapters',
+            label: t('sidebar.chapters'),
+            icon: <BookOpen className="workspace-sidebar__icon" />,
+          },
+          {
+            id: 'metadata',
+            label: t('sidebar.metadata'),
+            icon: <FileText className="workspace-sidebar__icon" />,
+          },
+        ];
+
+  items.push({
+    id: 'settings',
+    label: t('sidebar.settings'),
+    icon: <Settings className="workspace-sidebar__icon" />,
+  });
 
   const renderItem = (
     label: string,

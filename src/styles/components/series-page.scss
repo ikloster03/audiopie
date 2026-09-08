@@ -1,0 +1,121 @@
+/* SeriesPage Component BEM Styles */
+
+.series-page {
+  @apply flex-1 flex gap-6 min-h-0 relative;
+
+  &__column {
+    @apply flex flex-col min-h-0;
+
+    &--metadata {
+      @apply w-full max-w-sm gap-4 shrink-0;
+    }
+
+    &--books {
+      @apply flex-1 min-w-0;
+    }
+  }
+
+  &__section-title {
+    @apply text-base font-semibold mb-3;
+  }
+
+  &__field {
+    @apply flex flex-col gap-1.5 mb-3;
+  }
+
+  &__books-scroll {
+    @apply flex-1 min-h-0;
+  }
+
+  &__books-list {
+    @apply space-y-2;
+  }
+
+  &__empty {
+    @apply flex flex-col items-center justify-center text-center border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/20 p-8 h-full;
+  }
+
+  &__empty-icon {
+    @apply h-12 w-12 text-muted-foreground/50 mb-3;
+  }
+
+  &__empty-text {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+
+  &__fab-stack {
+    @apply absolute bottom-4 right-4 flex flex-col items-end gap-2;
+  }
+
+  &__add-menu {
+    @apply flex flex-col gap-2 bg-card border rounded-lg p-2 shadow-lg;
+  }
+
+  &__add-menu-item {
+    @apply justify-start;
+  }
+}
+
+.series-book-row {
+  @apply flex items-center gap-3 p-3 bg-card border rounded-lg hover:border-primary/50 hover:shadow-md transition-all;
+
+  &:hover .series-book-row__remove-button {
+    opacity: 1;
+  }
+
+  &__drag-handle {
+    @apply h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing hover:text-primary transition-colors shrink-0;
+  }
+
+  &__order {
+    @apply flex items-center justify-center h-8 w-8 rounded-full bg-muted text-muted-foreground text-sm font-medium shrink-0;
+  }
+
+  &__cover {
+    @apply h-12 w-12 shrink-0 overflow-hidden rounded-md border bg-muted;
+  }
+
+  &__cover-image {
+    @apply h-full w-full object-cover;
+  }
+
+  &__cover-placeholder {
+    @apply flex h-full w-full items-center justify-center;
+
+    &-icon {
+      @apply h-5 w-5 text-muted-foreground/50;
+    }
+  }
+
+  &__body {
+    @apply flex flex-1 min-w-0 flex-col items-start gap-0.5 text-left;
+  }
+
+  &__title {
+    @apply truncate text-sm font-semibold text-foreground;
+  }
+
+  &__author {
+    @apply truncate text-xs text-muted-foreground;
+  }
+
+  &__series-index {
+    @apply flex items-center gap-2 shrink-0;
+  }
+
+  &__series-index-label {
+    @apply text-xs text-muted-foreground;
+  }
+
+  &__series-index-input {
+    @apply h-8 w-16 text-sm;
+  }
+
+  &__remove-button {
+    @apply h-8 w-8 opacity-0 transition-opacity text-destructive hover:text-destructive shrink-0;
+  }
+
+  &__remove-icon {
+    @apply h-4 w-4;
+  }
+}

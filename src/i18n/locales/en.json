@@ -16,12 +16,20 @@
     "openProject": "Open Project",
     "openProjectDesc": "Continue working on an existing audiobook project",
     "createNew": "Create New",
-    "createNewDesc": "Start a new audiobook project from scratch"
+    "createNewDesc": "Start a new audiobook project from scratch",
+    "chooseTypeTitle": "What are you creating?",
+    "typeAudiobook": "Audiobook",
+    "typeAudiobookDesc": "A single audiobook with chapters and metadata",
+    "typeSeries": "Series",
+    "typeSeriesDesc": "A collection of multiple audiobooks sharing series metadata",
+    "startFromExisting": "Start from existing project…"
   },
   "sidebar": {
     "ariaLabel": "Workspace sections",
     "chapters": "Chapters",
     "metadata": "Metadata",
+    "series": "Series",
+    "backToSeries": "Back to series",
     "settings": "Settings"
   },
   "chapters": {
@@ -64,7 +72,28 @@
     "clear": "Clear",
     "loadingCover": "Loading cover...",
     "enterPlaceholder": "Enter {{field}}...",
-    "dropImageHere": "Drop image here"
+    "dropImageHere": "Drop image here",
+    "partOfSeries": "Part of series: {{title}}",
+    "backToSeries": "Back to series"
+  },
+  "series": {
+    "numberShort": "#",
+    "removeFromSeries": "Remove from series",
+    "metadataTitle": "Series",
+    "title": "Title",
+    "titlePlaceholder": "Untitled Series",
+    "author": "Author",
+    "narrator": "Narrator",
+    "description": "Description",
+    "booksTitle": "Books ({{count}})",
+    "noBooks": "No books in this series yet",
+    "addBook": "Add book",
+    "createNewBook": "Create new book",
+    "importBook": "Import from existing project file",
+    "removeConfirmTitle": "Remove book from series",
+    "removeConfirmDesc": "This will permanently delete this book from the series once saved. You can extract it as a standalone audiobook file first to keep a copy.",
+    "extractAndRemove": "Extract as standalone file",
+    "removeOnly": "Remove"
   },
   "settings": {
     "title": "Settings",
@@ -77,9 +106,6 @@
     "ffprobePathPlaceholder": "Leave empty for system default",
     "defaultBitrate": "Default Bitrate (kbps)",
     "defaultBitrateDesc": "Audio bitrate for encoded output (32-512 kbps)",
-    "defaultOutputDir": "Default Output Directory",
-    "defaultOutputDirDesc": "Default directory for saving built audiobooks",
-    "defaultOutputDirPlaceholder": "Leave empty for last used directory",
     "ffmpegThreads": "Parallel FFmpeg Processes",
     "ffmpegThreadsDesc": "Number of tracks to encode simultaneously (1-{{cores}})",
     "theme": "Theme",
@@ -97,7 +123,14 @@
     "autoCheckForUpdatesDesc": "AudioPie will check for updates on startup (once per day) and every 6 hours while running",
     "checkForUpdates": "Check for Updates",
     "cancel": "Cancel",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "dangerZone": "Danger zone",
+    "dangerZoneDesc": "Change what kind of project this is. Switching to Audiobook permanently deletes every book except the first if there is more than one.",
+    "typeAudiobook": "Audiobook",
+    "typeSeries": "Series",
+    "confirmSwitchTitle": "Switch to Audiobook?",
+    "confirmSwitchDesc": "This will permanently delete {{count}} other book(s) in this series, keeping only the first. This cannot be undone.",
+    "confirmSwitchAction": "Delete and switch"
   },
   "build": {
     "title": "Building Audiobook",
@@ -113,7 +146,8 @@
   },
   "common": {
     "untitledAudiobook": "Untitled Audiobook",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "back": "Back"
   },
   "ffmpeg": {
     "parallelEncoding": "Parallel track encoding ({{concurrency}} at once)",

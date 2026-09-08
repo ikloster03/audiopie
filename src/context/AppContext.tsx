@@ -1,12 +1,37 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { TrackInfo, Chapter, BookMetadata, AppSettings, BuildProgress, UpdateState } from '../types';
+import type {
+  TrackInfo,
+  Chapter,
+  BookMetadata,
+  AppSettings,
+  BuildProgress,
+  UpdateState,
+  ProjectType,
+  SeriesMetadata,
+} from '../types';
 import { useTranslation } from 'react-i18next';
 import { appendChaptersForTracks, applyTimeRangesFromTracks } from '../lib/chapters';
+
+type ProjectSnapshot = {
+  type: ProjectType;
+  series: SeriesMetadata | null;
+  bookOrder: string[];
+  activeBookId: string | undefined;
+  books: Array<{ id: string; metadata: BookMetadata }>;
+  tracks: TrackInfo[];
+  chapters: Chapter[];
+  metadata: BookMetadata;
+};
 
 interface AppState {
   tracks: TrackInfo[];
   chapters: Chapter[];
   metadata: BookMetadata;
+  projectType: ProjectType;
+  seriesMetadata: SeriesMetadata | null;
+  bookOrder: string[];
+  books: Array<{ id: string; metadata: BookMetadata }>;
+  activeBookId: string | undefined;
   settings: AppSettings | null;
   buildProgress: BuildProgress | null;
   isBuildModalVisible: boolean;
@@ -24,11 +49,22 @@ interface AppContextType extends AppState {
   setBuildProgress: (progress: BuildProgress | null) => void;
   setIsBuildModalVisible: (visible: boolean) => void;
   setUpdateState: (state: UpdateState | null) => void;
-  openProject: () => void;
-  newProject: () => void;
-  closeProject: () => void;
+  applySnapshot: (snapshot: ProjectSnapshot) => void;
+  openProjectFromDialog: () => Promise<boolean>;
+  createNewProject: (type: ProjectType) => Promise<boolean>;
+  startFromTemplate: () => Promise<void>;
+  closeProject: () => Promise<void>;
   addTracksFromPaths: (paths: string[]) => Promise<void>;
   removeTrackAt: (index: number) => Promise<void>;
+  switchActiveBook: (bookId: string) => Promise<void>;
+  addBookToSeries: () => Promise<void>;
+  removeBookFromSeries: (bookId: string) => Promise<void>;
+  reorderBooks: (order: string[]) => Promise<void>;
+  updateBookSeriesIndex: (bookId: string, seriesIndex: number | undefined) => Promise<void>;
+  updateSeriesMetadata: (partial: Partial<SeriesMetadata>) => Promise<void>;
+  importBookFromFile: () => Promise<void>;
+  extractBook: (bookId: string) => Promise<boolean>;
+  setProjectType: (newType: ProjectType) => Promise<void>;
   toggleTheme: () => void;
   changeLanguage: (lang: 'en' | 'ru') => void;
 }
@@ -47,11 +83,27 @@ interface AppProviderProps {
   children: ReactNode;
 }
 
+const emptySnapshotState = (untitled: string) => ({
+  tracks: [] as TrackInfo[],
+  chapters: [] as Chapter[],
+  metadata: { title: untitled } as BookMetadata,
+  projectType: 'audiobook' as ProjectType,
+  seriesMetadata: null as SeriesMetadata | null,
+  bookOrder: [] as string[],
+  books: [] as Array<{ id: string; metadata: BookMetadata }>,
+  activeBookId: undefined as string | undefined,
+});
+
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const { i18n, t } = useTranslation();
   const [tracks, setTracks] = useState<TrackInfo[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [metadata, setMetadata] = useState<BookMetadata>({ title: 'Untitled Audiobook' });
+  const [projectType, setProjectTypeState] = useState<ProjectType>('audiobook');
+  const [seriesMetadata, setSeriesMetadata] = useState<SeriesMetadata | null>(null);
+  const [bookOrder, setBookOrder] = useState<string[]>([]);
+  const [books, setBooks] = useState<Array<{ id: string; metadata: BookMetadata }>>([]);
+  const [activeBookId, setActiveBookId] = useState<string | undefined>(undefined);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [buildProgress, setBuildProgress] = useState<BuildProgress | null>(null);
   const [isBuildModalVisible, setIsBuildModalVisible] = useState(false);
@@ -73,7 +125,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       } else {
         document.documentElement.classList.remove('dark');
       }
-      
+
       // Set initial language
       const initialLanguage = loadedSettings.language || (localStorage.getItem('audiopie-language') as 'en' | 'ru') || 'en';
       setLanguage(initialLanguage);
@@ -95,22 +147,67 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [settings, theme]);
 
-  // Project management functions
-  const openProject = () => {
-    setIsProjectOpen(true);
+  const applySnapshot = (snapshot: ProjectSnapshot) => {
+    setTracks(snapshot.tracks);
+    setChapters(snapshot.chapters);
+    setMetadata(snapshot.metadata);
+    setProjectTypeState(snapshot.type);
+    setSeriesMetadata(snapshot.series);
+    setBookOrder(snapshot.bookOrder);
+    setBooks(snapshot.books);
+    setActiveBookId(snapshot.activeBookId);
   };
 
-  const newProject = () => {
-    setTracks([]);
-    setChapters([]);
-    setMetadata({ title: t('common.untitledAudiobook') });
-    setIsProjectOpen(true);
+  const passesAudiobookCompletenessCheck = (snapshot: ProjectSnapshot): boolean => {
+    if (snapshot.type === 'series') {
+      // The audiobook-specific "zero tracks" completeness check does not apply to a series.
+      return true;
+    }
+    return (
+      snapshot.tracks.length > 0 &&
+      snapshot.chapters.length > 0 &&
+      snapshot.metadata.title !== 'Untitled Audiobook'
+    );
   };
 
-  const closeProject = () => {
-    setTracks([]);
-    setChapters([]);
-    setMetadata({ title: t('common.untitledAudiobook') });
+  const openProjectFromDialog = async (): Promise<boolean> => {
+    const snapshot = await window.audioPie.project.open();
+    if (!snapshot || !passesAudiobookCompletenessCheck(snapshot)) {
+      return false;
+    }
+    applySnapshot(snapshot);
+    setIsProjectOpen(true);
+    return true;
+  };
+
+  const createNewProject = async (type: ProjectType): Promise<boolean> => {
+    const snapshot = await window.audioPie.project.new(type);
+    if (!snapshot) {
+      return false;
+    }
+    applySnapshot(snapshot);
+    setIsProjectOpen(true);
+    return true;
+  };
+
+  const startFromTemplate = async (): Promise<void> => {
+    const updated = await window.audioPie.project.newFromTemplate();
+    if (updated) {
+      setMetadata(updated);
+    }
+  };
+
+  const closeProject = async (): Promise<void> => {
+    await window.audioPie.project.close();
+    const empty = emptySnapshotState(t('common.untitledAudiobook'));
+    setTracks(empty.tracks);
+    setChapters(empty.chapters);
+    setMetadata(empty.metadata);
+    setProjectTypeState(empty.projectType);
+    setSeriesMetadata(empty.seriesMetadata);
+    setBookOrder(empty.bookOrder);
+    setBooks(empty.books);
+    setActiveBookId(empty.activeBookId);
     setIsProjectOpen(false);
   };
 
@@ -139,18 +236,64 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     await window.audioPie.chapters.update(nextChapters);
   };
 
+  const switchActiveBook = async (bookId: string) => {
+    const snapshot = await window.audioPie.project.setActiveBook(bookId);
+    applySnapshot(snapshot);
+  };
+
+  const addBookToSeries = async () => {
+    const snapshot = await window.audioPie.project.addBookToSeries();
+    applySnapshot(snapshot);
+  };
+
+  const removeBookFromSeries = async (bookId: string) => {
+    const snapshot = await window.audioPie.project.removeBookFromSeries(bookId);
+    applySnapshot(snapshot);
+  };
+
+  const reorderBooks = async (order: string[]) => {
+    const snapshot = await window.audioPie.project.reorderBooks(order);
+    applySnapshot(snapshot);
+  };
+
+  const updateBookSeriesIndex = async (bookId: string, seriesIndex: number | undefined) => {
+    const snapshot = await window.audioPie.project.updateBookSeriesIndex(bookId, seriesIndex);
+    applySnapshot(snapshot);
+  };
+
+  const updateSeriesMetadata = async (partial: Partial<SeriesMetadata>) => {
+    const snapshot = await window.audioPie.project.updateSeriesMetadata(partial);
+    applySnapshot(snapshot);
+  };
+
+  const importBookFromFile = async () => {
+    const snapshot = await window.audioPie.project.importBookFromFile();
+    if (snapshot) {
+      applySnapshot(snapshot);
+    }
+  };
+
+  const extractBook = async (bookId: string): Promise<boolean> => {
+    return window.audioPie.project.extractBook(bookId);
+  };
+
+  const setProjectType = async (newType: ProjectType) => {
+    const snapshot = await window.audioPie.project.setType(newType);
+    applySnapshot(snapshot);
+  };
+
   // Theme management
   const toggleTheme = async () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    
+
     // Apply theme to document
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    
+
     // Save to settings
     const updatedSettings = await window.audioPie.settings.set({
       ...settings,
@@ -164,7 +307,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setLanguage(lang);
     i18n.changeLanguage(lang);
     localStorage.setItem('audiopie-language', lang);
-    
+
     // Save to settings
     const updatedSettings = await window.audioPie.settings.set({
       ...settings,
@@ -204,6 +347,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     tracks,
     chapters,
     metadata,
+    projectType,
+    seriesMetadata,
+    bookOrder,
+    books,
+    activeBookId,
     settings,
     buildProgress,
     isBuildModalVisible,
@@ -218,15 +366,25 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setBuildProgress,
     setIsBuildModalVisible,
     setUpdateState,
-    openProject,
-    newProject,
+    applySnapshot,
+    openProjectFromDialog,
+    createNewProject,
+    startFromTemplate,
     closeProject,
     addTracksFromPaths,
     removeTrackAt,
+    switchActiveBook,
+    addBookToSeries,
+    removeBookFromSeries,
+    reorderBooks,
+    updateBookSeriesIndex,
+    updateSeriesMetadata,
+    importBookFromFile,
+    extractBook,
+    setProjectType,
     toggleTheme,
-    changeLanguage
+    changeLanguage,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
-

@@ -24,6 +24,18 @@ export const selectCoverFile = async (win: BrowserWindow): Promise<string | unde
   return result.filePaths[0];
 };
 
+export const selectProjectFile = async (win: BrowserWindow, title = 'Select AudioPie Project'): Promise<string | undefined> => {
+  const result = await dialog.showOpenDialog(win, {
+    title,
+    filters: [{ name: 'AudioPie Project', extensions: ['audiopie'] }],
+    properties: ['openFile'],
+  });
+  if (result.canceled || !result.filePaths[0]) {
+    return undefined;
+  }
+  return result.filePaths[0];
+};
+
 export const chooseOutputFile = async (win: BrowserWindow, defaultPath?: string): Promise<string | undefined> => {
   const result = await dialog.showSaveDialog(win, {
     title: 'Save Audiobook As',
